@@ -12,9 +12,11 @@ from PySide6.QtWidgets import (QApplication, QLineEdit, QTabWidget,
 from PySide6.QtWidgets import (QFileDialog)
 
 import Downloader
+from modifications_on_screen import add_historic_item
 from modifications_on_screen import open_dialog_download, open_dialog_ops, add_download_history, \
-    load_download_history, add_download_notification, load_download_notificatios
-from register_recover import register_download_history
+    load_download_historic, add_download_notification, load_download_notificatios, load_historic, \
+    load_direction_specific_historic
+from register_recover import register_download_historic, register_historic
 # Important:
 # You need to run the following command to generate the ui_form.py file
 #     pyside6-uic form.ui -o ui_form.py, or
@@ -29,6 +31,7 @@ class Widget(QWidget):
         self.ui.setupUi(self)
         self.dialog_ops = None
         self.dialog_download = None
+        self.site_atual: dict = {}
         open_dialog_ops(main_window=self, view=False)
         open_dialog_download(main_window=self, view=False)
         self.ui.webEngineView.load(self.ui.url.text())
@@ -45,9 +48,19 @@ class Widget(QWidget):
                                                                               search_text=search.text()))
         self.ui.arrow_left_back.clicked.connect(lambda: self.ui.stacked_pages.setCurrentIndex(0))
         self.ui.arrow_left_back_historic.clicked.connect(lambda: self.ui.stacked_pages.setCurrentIndex(0))
+        self.ui.arrow_left_historic.clicked.connect(
+            lambda: load_direction_specific_historic(main_window=self, site=self.site_atual['name'],
+                                                     date_time=self.site_atual['date_time'], direc='ant'))
+        self.ui.arrow_right_historic.clicked.connect(
+            lambda: load_direction_specific_historic(main_window=self, site=self.site_atual['name'],
+                                                     date_time=self.site_atual['date_time'], direc='prox'))
         self.ui.webEngineView.page().profile().downloadRequested.connect(self.download_file)
 
     def update_url(self, url_input: QLineEdit, url: QUrl) -> None:
+        data = datetime.datetime.now()
+        self.site_atual = {"name": url.toString(), "cookies": [], "date_time": f"{data}"}
+        add_historic_item(self, {"name": url.toString(), "cookies": [], "date_time": f"{data}"})
+        register_historic(url.toString(), [], data)
         url_input.setText(url.toString())
         url_input.setCursorPosition(0)
 
@@ -114,7 +127,7 @@ class Widget(QWidget):
         downloader.progress_update.connect(lambda percent: self.handle_progress(percent, progress_bar),
                                            Qt.ConnectionType.QueuedConnection)
 
-        threading.Thread(target=register_download_history,
+        threading.Thread(target=register_download_historic,
                          args=(suggested_file_name, folder_path, 'Baixando',
                                f'{datetime.datetime.now()}', 'download_notifications.json')).start()
         downloader.download_file(download_item.url().toString(), folder_path, suggested_file_name, progress_bar)
@@ -123,7 +136,7 @@ class Widget(QWidget):
         progress_bar.setValue(percent)
 
     def handle_download_finished(self, suggested_file_name, folder_path):
-        threading.Thread(target=register_download_history,
+        threading.Thread(target=register_download_historic,
                          args=(suggested_file_name, folder_path, 'Concluido',
                                f'{datetime.datetime.now()}')).start()
         add_download_history(self, download_data={'name': suggested_file_name, 'path': folder_path,
@@ -131,7 +144,7 @@ class Widget(QWidget):
                                                   'download_time': f'{datetime.datetime.now()}'})
 
     def handle_download_failed(self, suggested_file_name, folder_path):
-        threading.Thread(target=register_download_history,
+        threading.Thread(target=register_download_historic,
                          args=(suggested_file_name, folder_path, 'Erro', f'{datetime.datetime.now()}')).start()
         add_download_history(self,
                              download_data={'name': suggested_file_name, 'path': folder_path, 'status': 'Erro',
@@ -142,6 +155,7 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     widget = Widget()
     widget.show()
-    load_download_history(widget)
+    load_download_historic(widget)
     load_download_notificatios(widget.dialog_download)
+    load_historic(widget)
     sys.exit(app.exec())

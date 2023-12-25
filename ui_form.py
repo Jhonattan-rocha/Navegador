@@ -51,9 +51,9 @@ class Ui_Widget(object):
         self.tabs.setTabsClosable(False)
         self.page = QWidget()
         self.page.setObjectName(u"page")
-        self.verticalLayout_3 = QVBoxLayout(self.page)
-        self.verticalLayout_3.setObjectName(u"verticalLayout_3")
-        self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
+        self.container_tab = QVBoxLayout(self.page)
+        self.container_tab.setObjectName(u"container_tab")
+        self.container_tab.setContentsMargins(0, 0, 0, 0)
         self.hot_bar = QGroupBox(self.page)
         self.hot_bar.setObjectName(u"hot_bar")
         self.hot_bar.setMinimumSize(QSize(0, 40))
@@ -67,15 +67,15 @@ class Ui_Widget(object):
         self.horizontalLayout.setSpacing(0)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.horizontalLayout.setContentsMargins(0, 5, 0, 0)
-        self.arrow_left_history = QPushButton(self.hot_bar)
-        self.arrow_left_history.setObjectName(u"arrow_left_history")
+        self.arrow_left_historic = QPushButton(self.hot_bar)
+        self.arrow_left_historic.setObjectName(u"arrow_left_historic")
         sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.arrow_left_history.sizePolicy().hasHeightForWidth())
-        self.arrow_left_history.setSizePolicy(sizePolicy)
-        self.arrow_left_history.setMaximumSize(QSize(30, 30))
-        self.arrow_left_history.setStyleSheet(u"QPushButton {\n"
+        sizePolicy.setHeightForWidth(self.arrow_left_historic.sizePolicy().hasHeightForWidth())
+        self.arrow_left_historic.setSizePolicy(sizePolicy)
+        self.arrow_left_historic.setMaximumSize(QSize(30, 30))
+        self.arrow_left_historic.setStyleSheet(u"QPushButton {\n"
 "    border: none;\n"
 "	border-radius: 15px;\n"
 "	background-color: none;\n"
@@ -90,16 +90,16 @@ class Ui_Widget(object):
 "}")
         icon1 = QIcon()
         icon1.addFile(u"figs/109618.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.arrow_left_history.setIcon(icon1)
+        self.arrow_left_historic.setIcon(icon1)
 
-        self.horizontalLayout.addWidget(self.arrow_left_history)
+        self.horizontalLayout.addWidget(self.arrow_left_historic)
 
-        self.arrow_right_history = QPushButton(self.hot_bar)
-        self.arrow_right_history.setObjectName(u"arrow_right_history")
-        sizePolicy.setHeightForWidth(self.arrow_right_history.sizePolicy().hasHeightForWidth())
-        self.arrow_right_history.setSizePolicy(sizePolicy)
-        self.arrow_right_history.setMaximumSize(QSize(30, 30))
-        self.arrow_right_history.setStyleSheet(u"QPushButton {\n"
+        self.arrow_right_historic = QPushButton(self.hot_bar)
+        self.arrow_right_historic.setObjectName(u"arrow_right_historic")
+        sizePolicy.setHeightForWidth(self.arrow_right_historic.sizePolicy().hasHeightForWidth())
+        self.arrow_right_historic.setSizePolicy(sizePolicy)
+        self.arrow_right_historic.setMaximumSize(QSize(30, 30))
+        self.arrow_right_historic.setStyleSheet(u"QPushButton {\n"
 "    border: none;\n"
 "	border-radius: 15px;\n"
 "	background-color: none;\n"
@@ -114,9 +114,9 @@ class Ui_Widget(object):
 "}")
         icon2 = QIcon()
         icon2.addFile(u"figs/r-arrow.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.arrow_right_history.setIcon(icon2)
+        self.arrow_right_historic.setIcon(icon2)
 
-        self.horizontalLayout.addWidget(self.arrow_right_history)
+        self.horizontalLayout.addWidget(self.arrow_right_historic)
 
         self.url = QLineEdit(self.hot_bar)
         self.url.setObjectName(u"url")
@@ -182,7 +182,7 @@ class Ui_Widget(object):
         self.horizontalLayout.addWidget(self.options)
 
 
-        self.verticalLayout_3.addWidget(self.hot_bar)
+        self.container_tab.addWidget(self.hot_bar)
 
         self.webEngineView = QWebEngineView(self.page)
         self.webEngineView.setObjectName(u"webEngineView")
@@ -190,7 +190,7 @@ class Ui_Widget(object):
         self.webEngineView.setSizePolicy(sizePolicy)
         self.webEngineView.setUrl(QUrl(u"about:blank"))
 
-        self.verticalLayout_3.addWidget(self.webEngineView)
+        self.container_tab.addWidget(self.webEngineView)
 
         self.tabs.addTab(self.page, "")
 
@@ -384,7 +384,7 @@ class Ui_Widget(object):
         self.open_file_path.setSizePolicy(sizePolicy)
         self.open_file_path.setMaximumSize(QSize(16777215, 16777215))
         font = QFont()
-        font.setFamilies([u"Arial"])
+        font.setFamilies([u"Segoe UI"])
         font.setBold(True)
         font.setUnderline(True)
         self.open_file_path.setFont(font)
@@ -533,10 +533,10 @@ class Ui_Widget(object):
         sizePolicy.setHeightForWidth(self.scrollAreaHistoricContents.sizePolicy().hasHeightForWidth())
         self.scrollAreaHistoricContents.setSizePolicy(sizePolicy)
         self.scrollAreaHistoricContents.setStyleSheet(u"")
-        self.container_downloads_itens_page_2 = QVBoxLayout(self.scrollAreaHistoricContents)
-        self.container_downloads_itens_page_2.setObjectName(u"container_downloads_itens_page_2")
-        self.container_downloads_itens_page_2.setSizeConstraint(QLayout.SetMinAndMaxSize)
-        self.container_downloads_itens_page_2.setContentsMargins(-1, 20, -1, -1)
+        self.container_historic_page = QVBoxLayout(self.scrollAreaHistoricContents)
+        self.container_historic_page.setObjectName(u"container_historic_page")
+        self.container_historic_page.setSizeConstraint(QLayout.SetMinAndMaxSize)
+        self.container_historic_page.setContentsMargins(-1, 20, -1, -1)
         self.historic_item = QGroupBox(self.scrollAreaHistoricContents)
         self.historic_item.setObjectName(u"historic_item")
         sizePolicy.setHeightForWidth(self.historic_item.sizePolicy().hasHeightForWidth())
@@ -576,11 +576,7 @@ class Ui_Widget(object):
         sizePolicy.setHeightForWidth(self.open_site.sizePolicy().hasHeightForWidth())
         self.open_site.setSizePolicy(sizePolicy)
         self.open_site.setMaximumSize(QSize(16777215, 16777215))
-        font1 = QFont()
-        font1.setFamilies([u"Segoe UI"])
-        font1.setBold(True)
-        font1.setUnderline(True)
-        self.open_site.setFont(font1)
+        self.open_site.setFont(font)
         self.open_site.setIcon(icon5)
 
         self.verticalLayout_13.addWidget(self.open_site)
@@ -614,7 +610,7 @@ class Ui_Widget(object):
         self.horizontalLayout_7.addWidget(self.del_item_historic)
 
 
-        self.container_downloads_itens_page_2.addWidget(self.historic_item)
+        self.container_historic_page.addWidget(self.historic_item)
 
         self.scrollAreaHistoric.setWidget(self.scrollAreaHistoricContents)
 
@@ -642,8 +638,8 @@ class Ui_Widget(object):
 
     def retranslateUi(self, Widget):
         Widget.setWindowTitle(QCoreApplication.translate("Widget", u"SurfEase", None))
-        self.arrow_left_history.setText("")
-        self.arrow_right_history.setText("")
+        self.arrow_left_historic.setText("")
+        self.arrow_right_historic.setText("")
         self.url.setText(QCoreApplication.translate("Widget", u"https://google.com", None))
         self.download_buttton.setText("")
         self.options.setText("")

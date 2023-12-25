@@ -69,7 +69,7 @@
             <attribute name="title">
              <string>Tab 1</string>
             </attribute>
-            <layout class="QVBoxLayout" name="verticalLayout_3">
+            <layout class="QVBoxLayout" name="container_tab">
              <property name="leftMargin">
               <number>0</number>
              </property>
@@ -120,7 +120,7 @@
                  <number>0</number>
                 </property>
                 <item>
-                 <widget class="QPushButton" name="arrow_left_history">
+                 <widget class="QPushButton" name="arrow_left_historic">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                     <horstretch>0</horstretch>
@@ -158,7 +158,7 @@ QPushButton:hover {
                  </widget>
                 </item>
                 <item>
-                 <widget class="QPushButton" name="arrow_right_history">
+                 <widget class="QPushButton" name="arrow_right_historic">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                     <horstretch>0</horstretch>
@@ -712,7 +712,7 @@ QPushButton:hover {
                           </property>
                           <property name="font">
                            <font>
-                            <family>Arial</family>
+                            <family>Segoe UI</family>
                             <bold>true</bold>
                             <underline>true</underline>
                            </font>
@@ -963,7 +963,7 @@ QPushButton:hover {
               <property name="styleSheet">
                <string notr="true"/>
               </property>
-              <layout class="QVBoxLayout" name="container_downloads_itens_page_2">
+              <layout class="QVBoxLayout" name="container_historic_page">
                <property name="sizeConstraint">
                 <enum>QLayout::SetMinAndMaxSize</enum>
                </property>
@@ -1114,6 +1114,12 @@ QPushButton:hover {
                       <horstretch>0</horstretch>
                       <verstretch>0</verstretch>
                      </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>40</width>
+                      <height>40</height>
+                     </size>
                     </property>
                     <property name="maximumSize">
                      <size>

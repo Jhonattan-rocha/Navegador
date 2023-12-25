@@ -12,7 +12,8 @@ from PySide6.QtWidgets import (QGroupBox, QHBoxLayout, QCommandLinkButton,
 from PySide6.QtWidgets import (QPushButton,
                                QVBoxLayout)
 
-from register_recover import recover_download_history, remove_download_history_item
+from register_recover import recover_download_historic, remove_download_historic_item, recover_historic, \
+    remove_historic_item, recover_adjacent_historic
 
 
 def open_dialog_ops(main_window, view=True):
@@ -74,9 +75,9 @@ def add_new_page(main_window):
     main_window.ui.tabs.setTabsClosable(True)
     page = QWidget()
     page.setObjectName(u"page")
-    verticalLayout_3 = QVBoxLayout(page)
-    verticalLayout_3.setObjectName(u"verticalLayout_3")
-    verticalLayout_3.setContentsMargins(0, 0, 0, 0)
+    container_tab = QVBoxLayout(page)
+    container_tab.setObjectName(u"container_tab")
+    container_tab.setContentsMargins(0, 0, 0, 0)
     hot_bar = QGroupBox(page)
     hot_bar.setObjectName(u"hot_bar")
     hot_bar.setMaximumSize(QSize(16777215, 40))
@@ -89,56 +90,63 @@ def add_new_page(main_window):
     horizontalLayout.setSpacing(0)
     horizontalLayout.setObjectName(u"horizontalLayout")
     horizontalLayout.setContentsMargins(0, 5, 0, 0)
-    arrow_left = QPushButton(hot_bar)
-    arrow_left.setObjectName(u"arrow_left")
+    arrow_left_historic = QPushButton(hot_bar)
+    arrow_left_historic.setObjectName(u"arrow_left_historic")
     sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
     sizePolicy.setHorizontalStretch(0)
     sizePolicy.setVerticalStretch(0)
-    sizePolicy.setHeightForWidth(arrow_left.sizePolicy().hasHeightForWidth())
-    arrow_left.setSizePolicy(sizePolicy)
-    arrow_left.setMaximumSize(QSize(30, 30))
-    arrow_left.setStyleSheet(u"QPushButton {\n"
-                             "    border: none;\n"
-                             "	border-radius: 15px;\n"
-                             "	background-color: none;\n"
-                             "	text-align: center;\n"
-                             "	color: white;\n"
-                             "}\n"
-                             "\n"
-                             "QPushButton:hover {\n"
-                             "	transition: 1s;\n"
-                             "	transition-delay: 1s;\n"
-                             "	background-color: lightgray;\n"
-                             "}")
+    sizePolicy.setHeightForWidth(arrow_left_historic.sizePolicy().hasHeightForWidth())
+    arrow_left_historic.setSizePolicy(sizePolicy)
+    arrow_left_historic.setMaximumSize(QSize(30, 30))
+    arrow_left_historic.setStyleSheet(u"QPushButton {\n"
+                                      "    border: none;\n"
+                                      "	border-radius: 15px;\n"
+                                      "	background-color: none;\n"
+                                      "	text-align: center;\n"
+                                      "	color: white;\n"
+                                      "}\n"
+                                      "\n"
+                                      "QPushButton:hover {\n"
+                                      "	transition: 1s;\n"
+                                      "	transition-delay: 1s;\n"
+                                      "	background-color: lightgray;\n"
+                                      "}")
     icon1 = QIcon()
     icon1.addFile(u"figs/109618.png", QSize(), QIcon.Normal, QIcon.Off)
-    arrow_left.setIcon(icon1)
+    arrow_left_historic.setIcon(icon1)
 
-    horizontalLayout.addWidget(arrow_left)
+    horizontalLayout.addWidget(arrow_left_historic)
 
-    arrow_right = QPushButton(hot_bar)
-    arrow_right.setObjectName(u"arrow_right")
-    sizePolicy.setHeightForWidth(arrow_right.sizePolicy().hasHeightForWidth())
-    arrow_right.setSizePolicy(sizePolicy)
-    arrow_right.setMaximumSize(QSize(30, 30))
-    arrow_right.setStyleSheet(u"QPushButton {\n"
-                              "    border: none;\n"
-                              "	border-radius: 15px;\n"
-                              "	background-color: none;\n"
-                              "	text-align: center;\n"
-                              "	color: white;\n"
-                              "}\n"
-                              "\n"
-                              "QPushButton:hover {\n"
-                              "	transition: 1s;\n"
-                              "	transition-delay: 1s;\n"
-                              "	background-color: lightgray;\n"
-                              "}")
+    arrow_right_historic = QPushButton(hot_bar)
+    arrow_right_historic.setObjectName(u"arrow_right_historic")
+    sizePolicy.setHeightForWidth(arrow_right_historic.sizePolicy().hasHeightForWidth())
+    arrow_right_historic.setSizePolicy(sizePolicy)
+    arrow_right_historic.setMaximumSize(QSize(30, 30))
+    arrow_right_historic.setStyleSheet(u"QPushButton {\n"
+                                       "    border: none;\n"
+                                       "	border-radius: 15px;\n"
+                                       "	background-color: none;\n"
+                                       "	text-align: center;\n"
+                                       "	color: white;\n"
+                                       "}\n"
+                                       "\n"
+                                       "QPushButton:hover {\n"
+                                       "	transition: 1s;\n"
+                                       "	transition-delay: 1s;\n"
+                                       "	background-color: lightgray;\n"
+                                       "}")
     icon2 = QIcon()
     icon2.addFile(u"figs/r-arrow.png", QSize(), QIcon.Normal, QIcon.Off)
-    arrow_right.setIcon(icon2)
+    arrow_right_historic.setIcon(icon2)
 
-    horizontalLayout.addWidget(arrow_right)
+    horizontalLayout.addWidget(arrow_right_historic)
+
+    main_window.arrow_left_historic.clicked.connect(
+        lambda: load_direction_specific_historic(main_window, main_window.site_atual['name'], main_window.site_atual['date_time'],
+                                                 'ant'))
+    main_window.arrow_right_historic.clicked.connect(
+        lambda: load_direction_specific_historic(main_window, main_window.site_atual['name'], main_window.site_atual['date_time'],
+                                                 'prox'))
 
     url = QLineEdit(hot_bar)
     url.setText("https://www.google.com/")
@@ -206,13 +214,13 @@ def add_new_page(main_window):
 
     horizontalLayout.addWidget(options)
 
-    verticalLayout_3.addWidget(hot_bar)
+    container_tab.addWidget(hot_bar)
 
     webEngineView = QWebEngineView(page)
     webEngineView.setObjectName(u"webEngineView")
     webEngineView.setUrl(QUrl(u"about:blank"))
 
-    verticalLayout_3.addWidget(webEngineView)
+    container_tab.addWidget(webEngineView)
 
     webEngineView.load("https://www.google.com/")
     url.returnPressed.connect(
@@ -350,8 +358,8 @@ def add_download_history(main_window, download_data):
     sizePolicy.setHeightForWidth(del_item.sizePolicy().hasHeightForWidth())
     del_item.setSizePolicy(sizePolicy)
     del_item.setCursor(QCursor(Qt.PointingHandCursor))
-    del_item.clicked.connect(lambda: remove_download_history_item(download_data, True, download_item,
-                                                                  main_window.ui.container_downloads_itens_page))
+    del_item.clicked.connect(lambda: remove_download_historic_item(download_data, True, download_item,
+                                                                   main_window.ui.container_downloads_itens_page))
     del_item.setMaximumSize(QSize(40, 40))
     del_item.setStyleSheet(u"QPushButton {\n"
                            "    border: none;\n"
@@ -372,7 +380,7 @@ def add_download_history(main_window, download_data):
 
     horizontalLayout_4.addWidget(del_item)
 
-    main_window.ui.container_downloads_itens_page.addWidget(download_item)
+    main_window.ui.container_downloads_itens_page.insertWidget(download_item)
 
 
 def add_download_notification(main_windows, download_data, show_progress=True) -> QProgressBar:
@@ -417,13 +425,117 @@ def add_download_notification(main_windows, download_data, show_progress=True) -
         return progressBar
 
 
-def load_download_history(main_window):
+def open_historic_site(main_window, site):
+    add_new_page(main_window)
+    last_page = main_window.ui.tabs.count() - 1
+    layout = main_window.ui.tabs.widget(last_page)
+    webview = layout.findChildren(QWebEngineView)
+    if webview:
+        webview[0].load(site)
+
+
+def add_historic_item(main_window, historic_data):
+    if main_window:
+        historic_item = QGroupBox()
+        historic_item.setObjectName(u"historic_item")
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(historic_item.sizePolicy().hasHeightForWidth())
+        font = QFont()
+        font.setFamilies([u"Segoe UI"])
+        font.setBold(True)
+        font.setUnderline(True)
+        icon5 = QIcon()
+        icon5.addFile(u"figs/site.png", QSize(), QIcon.Normal, QIcon.Off)
+        icon6 = QIcon()
+        icon6.addFile(u"figs/x.png", QSize(), QIcon.Normal, QIcon.Off)
+        historic_item.setSizePolicy(sizePolicy)
+        historic_item.setMinimumSize(QSize(400, 50))
+        historic_item.setMaximumSize(QSize(16777215, 60))
+        historic_item.setStyleSheet(u"QGroupBox {\n"
+                                    "	border: 1px solid lightgray;\n"
+                                    "	border-radius: 20px;\n"
+                                    "	width: 100%;\n"
+                                    "}")
+        historic_item.setAlignment(Qt.AlignLeading | Qt.AlignLeft | Qt.AlignTop)
+        horizontalLayout_7 = QHBoxLayout(historic_item)
+        horizontalLayout_7.setSpacing(0)
+        horizontalLayout_7.setObjectName(u"horizontalLayout_7")
+        horizontalLayout_7.setContentsMargins(0, 0, 0, 0)
+        group_dados_historic_site = QGroupBox(historic_item)
+        group_dados_historic_site.setObjectName(u"group_dados_historic_site")
+        group_dados_historic_site.setStyleSheet(u"QGroupBox {\n"
+                                                "	border: none;\n"
+                                                "	margin: 0;\n"
+                                                "	padding: 0;\n"
+                                                "}")
+        verticalLayout_12 = QVBoxLayout(group_dados_historic_site)
+        verticalLayout_12.setObjectName(u"verticalLayout_12")
+        verticalLayout_12.setContentsMargins(0, 0, 0, 0)
+        groupBox_2 = QGroupBox(group_dados_historic_site)
+        groupBox_2.setObjectName(u"groupBox_2")
+        sizePolicy.setHeightForWidth(groupBox_2.sizePolicy().hasHeightForWidth())
+        groupBox_2.setSizePolicy(sizePolicy)
+        groupBox_2.setStyleSheet(u"")
+        verticalLayout_13 = QVBoxLayout(groupBox_2)
+        verticalLayout_13.setObjectName(u"verticalLayout_13")
+        verticalLayout_13.setContentsMargins(10, 0, 0, 0)
+        open_site = QCommandLinkButton(groupBox_2)
+        open_site.setText(f"Site: {historic_data['name']}\nData: {historic_data['date_time']}")
+        open_site.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        open_site.setObjectName(u"open_site")
+        sizePolicy.setHeightForWidth(open_site.sizePolicy().hasHeightForWidth())
+        open_site.setSizePolicy(sizePolicy)
+        open_site.clicked.connect(lambda: open_historic_site(main_window, historic_data['name']))
+        open_site.setMaximumSize(QSize(16777215, 16777215))
+        open_site.setFont(font)
+        open_site.setIcon(icon5)
+
+        verticalLayout_13.addWidget(open_site)
+
+        verticalLayout_12.addWidget(groupBox_2)
+
+        horizontalLayout_7.addWidget(group_dados_historic_site)
+
+        del_item_historic = QPushButton(historic_item)
+        del_item_historic.setObjectName(u"del_item_historic")
+        sizePolicy.setHeightForWidth(del_item_historic.sizePolicy().hasHeightForWidth())
+        del_item_historic.setSizePolicy(sizePolicy)
+        del_item_historic.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        del_item_historic.clicked.connect(
+            lambda: remove_historic_item(site=historic_data['name'], date_time=historic_data['date_time'],
+                                         remove_view=True, widget=historic_item,
+                                         layout=main_window.ui.container_historic_page))
+        del_item_historic.setMaximumSize(QSize(40, 40))
+        del_item_historic.setMinimumSize(QSize(40, 40))
+        del_item_historic.setStyleSheet(u"QPushButton {\n"
+                                        "    border: none;\n"
+                                        "	border-radius: 15px;\n"
+                                        "	background-color: none;\n"
+                                        "	text-align: center;\n"
+                                        "	color: white;\n"
+                                        "}\n"
+                                        "\n"
+                                        "QPushButton:hover {\n"
+                                        "	transition: 1s;\n"
+                                        "	transition-delay: 1s;\n"
+                                        "	background-color: lightgray;\n"
+                                        "}")
+        del_item_historic.setIcon(icon6)
+
+        horizontalLayout_7.addWidget(del_item_historic)
+
+        main_window.ui.container_historic_page.insertWidget(0, historic_item)
+
+
+def load_download_historic(main_window):
     layout = main_window.ui.container_downloads_itens_page.layout()
     while layout.count():
         child = layout.takeAt(0)
         if child.widget():
             child.widget().deleteLater()
-    history = recover_download_history()
+    history = recover_download_historic()
 
     if bool(history):
         for download in history['Files']:
@@ -436,7 +548,30 @@ def load_download_notificatios(main_window):
         child = layout.takeAt(0)
         if child.widget():
             child.widget().deleteLater()
-    history = recover_download_history(file_saved='download_notifications.json')
+    history = recover_download_historic(file_saved='download_notifications.json')
     if bool(history):
         for download in history['Files']:
             add_download_notification(main_windows=main_window, download_data=download, show_progress=False)
+
+
+def load_historic(main_window):
+    layout = main_window.ui.container_historic_page.layout()
+    while layout.count():
+        child = layout.takeAt(0)
+        if child.widget():
+            child.widget().deleteLater()
+    history = recover_historic()
+
+    if bool(history):
+        for site in history['Sites']:
+            add_historic_item(main_window=main_window, historic_data=site)
+
+
+def load_direction_specific_historic(main_window, site: str, date_time: str, direc: str):
+    tab = main_window.ui.tabs.currentWidget()
+    site_procurado = recover_adjacent_historic(site, date_time, direc)
+    if bool(site_procurado):
+        webview = tab.findChildren(QWebEngineView)
+        print(webview)
+        if webview:
+            webview[0].load(site_procurado)
