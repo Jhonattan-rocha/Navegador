@@ -11,15 +11,19 @@ from Pages.Implementaion import Default
 from Pages.main_page import Main_page
 
 
-class Widget(QWidget):
-    def __init__(self, parent=None):
+class Main(QWidget):
+    def __init__(self, parent=None, new_tab: Default = None, title: str = ""):
         super().__init__(parent)
         self.ui = Main_page()
         self.ui.setupUi(self)
         self.dialog_ops = None
         self.dialog_download = None
         self.site_atual: dict = {}
-        self.ui.tabs.addTab(Default(self, main_window=self).ui.page, "Nova Página")
+
+        if not new_tab:
+            self.ui.tabs.addTab(Default(self, main_window=self).ui.page, "Nova Página")
+        else:
+            self.ui.tabs.addTab(new_tab.ui.page, title)
         self.ui.tabs.tabCloseRequested.connect(self.close_tab)
 
     def close_tab(self, index) -> None:
@@ -35,6 +39,6 @@ class Widget(QWidget):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    widget = Widget()
+    widget = Main()
     widget.show()
     sys.exit(app.exec())

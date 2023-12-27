@@ -65,14 +65,17 @@ def register_historic(site: str, cookies: list,
         file_read = file.read()
         json_file = {}
         if not file_read:
-            json_file = {"Sites": [{"name": f"{site}", "cookies": cookies, "date_time": f"{download_time}"}]}
+            json_file = {"Sites": [{"id": 0, "name": f"{site}", "cookies": cookies, "date_time": f"{download_time}"}]}
         else:
             json_file = json.loads(file_read)
             json_file = dict(json_file)
-            json_file["Sites"].insert(0, {"name": f"{site}", "cookies": cookies, "date_time": f"{download_time}"})
+            json_file["Sites"].insert(0, {"id": len(json_file["Sites"]), "name": f"{site}", "cookies": cookies,
+                                          "date_time": f"{download_time}"})
 
         with open(os.path.abspath(os.path.join('configs', file_saved_main)), 'wb') as file2:
             file2.write(str(json_file).replace("'", '"').encode('utf8'))
+
+        return len(json_file["Sites"])
 
 
 def recover_historic(file_saved: str = 'historic.json') -> dict:
@@ -85,7 +88,7 @@ def recover_historic(file_saved: str = 'historic.json') -> dict:
         return {}
 
 
-def remove_historic_item(site: str, date_time: datetime.datetime,
+def remove_historic_item(id: int,
                          file_saved_main: str = 'historic.json',
                          widget: QWidget = None,
                          layout: QLayout = None,
@@ -97,7 +100,7 @@ def remove_historic_item(site: str, date_time: datetime.datetime,
             js = dict(js)
             js_copy = {'Sites': []}
             for file_saved in js['Sites']:
-                if file_saved['name'] != site and file_saved['date_time'] != date_time:
+                if file_saved['id'] != id:
                     js_copy['Sites'].insert(0, file_saved)
 
             with open(os.path.abspath(os.path.join('configs', file_saved_main)), 'wb') as file2:
@@ -111,21 +114,3 @@ def remove_historic_item(site: str, date_time: datetime.datetime,
     return True
 
 
-def recover_adjacent_historic(site: str, date_time: str, direction: str, file_saved: str = 'historic.json') -> dict:
-    path = os.path.join('configs', file_saved)
-
-    if os.path.exists(path):
-        with open(path, 'r') as file:
-            js = json.load(file)
-
-            for idx, h in enumerate(js['Sites']):
-                if site == h['name'] and date_time == h['date_time']:
-                    if direction == 'ant' and idx > 0:
-                        print(h['name'], site, h['date_time'], date_time)
-                        return js['Sites'][idx - 1]  # Retorna o site anterior
-                    elif direction == 'prox' and idx + 1 < len(js['Sites']):
-                        return js['Sites'][idx + 1]  # Retorna o próximo site
-                    else:
-                        return {}
-
-    return {}

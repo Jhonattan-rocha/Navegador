@@ -1,5 +1,6 @@
 import datetime
 import os.path
+import pprint
 import re
 import threading
 
@@ -16,10 +17,10 @@ from PySide6.QtWidgets import (QGroupBox, QHBoxLayout, QCommandLinkButton,
 from PySide6.QtWidgets import (QLabel)
 from PySide6.QtWidgets import (QPushButton,
                                QVBoxLayout)
-from PySide6.QtWidgets import (QTabWidget, QLineEdit, QWidget)
+from PySide6.QtWidgets import (QWidget)
 
 from DataOperations.register_recover import recover_download_historic, recover_historic, \
-    recover_adjacent_historic, remove_download_historic_item
+    remove_download_historic_item
 from DataOperations.register_recover import register_download_historic, register_historic, remove_historic_item
 from DownloaderManager import Downloader
 from Pages.DefaultSearchPage import DefaultSearchPage
@@ -35,27 +36,53 @@ class Default(QWidget):
         self.ui.setup_ui(self)
         self.main_window = main_window
         self.site_atual: dict = {}
+        self.sites_visitados: list = []
         self.ui.arrow_left_historic.clicked.connect(
-            lambda: Historic.load_direction_specific_historic(self, self.site_atual['name'],
-                                                              self.site_atual['date_time'],
-                                                              'ant'))
+            lambda: self.load_direction_specific_historic('ant'))
         self.ui.arrow_right_historic.clicked.connect(
-            lambda: Historic.load_direction_specific_historic(self, self.site_atual['name'],
-                                                              self.site_atual['date_time'],
-                                                              'prox'))
+            lambda: self.load_direction_specific_historic('prox'))
         self.ui.url.returnPressed.connect(
             lambda web=self.ui.webEngineView, search=self.ui.url: self.search(web_loader=web,
                                                                               search_text=search.text()))
         self.ui.webEngineView.page().profile().downloadRequested.connect(self.download_file)
 
-        self.ui.webEngineView.urlChanged.connect(
-            lambda site, url_input=self.ui.url: self.update_url(url_input, site))
-        self.ui.webEngineView.titleChanged.connect(
-            lambda title, index=self.main_window.ui.tabs.indexOf(self.ui.page),
-                   tabs=self.main_window.ui.tabs: self.update_title(title, index, tabs))
+        self.ui.webEngineView.loadFinished.connect(self.update_url)
+        self.ui.webEngineView.loadFinished.connect(self.update_title)
         self.ui.options.clicked.connect(lambda: self.open_dialog_ops(main_window=main_window))
         self.ui.download_buttton.clicked.connect(
             lambda: Download.open_dialog_download(main_window=main_window))
+
+    # Método para atualizar o estado dos botões de navegação
+    def update_navigation_buttons(self):
+        current_page = self.ui.webEngineView.url().toString()
+        current_index = self.sites_visitados.index(current_page) if current_page in self.sites_visitados else -1
+
+        # Verifica se é possível retroceder ou avançar
+        can_go_back = current_index > 0
+        can_go_forward = current_index < len(self.sites_visitados) - 1
+
+        # Desabilita e ajusta visualmente os botões se não for possível retroceder ou avançar
+        self.ui.arrow_left_historic.setEnabled(can_go_back)
+        self.ui.arrow_left_historic.setStyleSheet(
+            "color: rgba(255, 255, 255, 0.5);" if not can_go_back else "")
+
+        self.ui.arrow_right_historic.setEnabled(can_go_forward)
+        self.ui.arrow_right_historic.setStyleSheet(
+            "color: rgba(255, 255, 255, 0.5);" if not can_go_forward else "")
+
+    def load_direction_specific_historic(self, direc: str):
+        current_page = self.ui.webEngineView.url().toString()
+        current_index = self.sites_visitados.index(current_page) if current_page in self.sites_visitados else -1
+
+        if current_index != -1:
+            new_index = current_index - 1 if direc == 'ant' else current_index + 1
+            try:
+                new_page = self.sites_visitados[new_index]
+                self.ui.webEngineView.load(new_page)
+            except IndexError:
+                print("Index out of range")
+        self.update_navigation_buttons()
+
 
     @staticmethod
     def open_dialog_ops(main_window, view=True):
@@ -81,6 +108,7 @@ class Default(QWidget):
 
             # Criar o diálogo
             dialog = QDialog(main_window)
+            dialog.setWindowModality(Qt.WindowModality.NonModal)
             dialog.setWindowTitle("Opções")
             dialog.setModal(True)  # Permitir interação com a janela principal
             layout = QVBoxLayout(dialog)
@@ -94,20 +122,31 @@ class Default(QWidget):
             main_window.ui.tabs.setTabsClosable(True)
             main_window.dialog_ops['view'].exec()
 
-    def update_url(self, url_input: QLineEdit, url: QUrl) -> None:
-        data = datetime.datetime.now()
-        self.site_atual = {"name": url.toString(), "cookies": [], "date_time": f"{data}"}
-        register_historic(url.toString(), [], data)
-        url_input.setText(url.toString())
-        url_input.setCursorPosition(0)
+    def update_url(self, success) -> None:
+        if success:
+            url = self.ui.webEngineView.url().toString()
+            data = datetime.datetime.now()
+            id = register_historic(url, [], data) - 1
+            self.site_atual = {"id": id, "name": url, "cookies": [], "date_time": f"{data}"}
+
+            page = self.ui.webEngineView.url().toString()
+            if page not in self.sites_visitados:
+                self.sites_visitados.append(page)
+
+            self.ui.url.setText(url)
+            self.ui.url.setCursorPosition(0)
+            self.update_navigation_buttons()
 
     def limit_string(self, text: str, limit: int) -> str:
         if len(text) > limit:
             return text[:limit - 3] + "..."  # Corta o texto e adiciona "..." no final
         return text
 
-    def update_title(self, text: str, index: int, tabs: QTabWidget) -> None:
-        tabs.setTabText(index, self.limit_string(text, 30))
+    def update_title(self, sucess) -> None:
+        if sucess:
+            index = self.main_window.ui.tabs.indexOf(self.ui.page)
+            text = self.ui.webEngineView.title()
+            self.main_window.ui.tabs.setTabText(index, self.limit_string(text, 30))
 
     @staticmethod
     def is_valid_url(url_string: str) -> bool:
@@ -193,6 +232,7 @@ class Download(QWidget):
 
             # Criar o diálogo
             dialog = QDialog(main_window)
+            dialog.setWindowModality(Qt.WindowModality.NonModal)
             dialog.setWindowTitle("Downloads")
             dialog.setModal(True)  # Permitir interação com a janela principal
             layout = QVBoxLayout(dialog)
@@ -450,16 +490,6 @@ class Historic(QWidget):
                 Historic.add_historic_item(main_window=main_window, historic_data=site, historic_page=historic_window)
 
     @staticmethod
-    def load_direction_specific_historic(main_window, site: str, date_time: str, direc: str):
-        tab = main_window.ui.tabs.currentWidget()
-        site_procurado = recover_adjacent_historic(site, date_time, direc)
-        if bool(site_procurado):
-            webview = tab.findChildren(QWebEngineView)
-            print(webview)
-            if webview:
-                webview[0].load(site_procurado)
-
-    @staticmethod
     def open_historic_site(main_window, site):
         default_page = Default(main_window, main_window).ui.page
         main_window.ui.tabs.addTab(default_page, "Nova pagina")
@@ -540,9 +570,9 @@ class Historic(QWidget):
             del_item_historic.setSizePolicy(sizePolicy)
             del_item_historic.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
             del_item_historic.clicked.connect(
-                lambda: remove_historic_item(site=historic_data['name'], date_time=historic_data['date_time'],
+                lambda: remove_historic_item(id=historic_data['id'],
                                              remove_view=True, widget=historic_item,
-                                             layout=main_window.ui.container_historic_page))
+                                             layout=historic_page.ui.container_historic_page))
             del_item_historic.setMaximumSize(QSize(40, 40))
             del_item_historic.setMinimumSize(QSize(40, 40))
             del_item_historic.setStyleSheet(u"QPushButton {\n"

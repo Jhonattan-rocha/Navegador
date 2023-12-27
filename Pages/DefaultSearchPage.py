@@ -2,14 +2,17 @@ from PySide6.QtCore import (QSize, QUrl, Qt)
 from PySide6.QtGui import (QCursor, QFont, QIcon)
 from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import (QGroupBox, QHBoxLayout, QLineEdit, QSizePolicy, QWidget)
-from PySide6.QtWidgets import (QPushButton, QLayout,
-                               QVBoxLayout)
+from PySide6.QtWidgets import (QPushButton, QLayout, QProgressBar, QVBoxLayout)
 
 
 class DefaultSearchPage(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("default_page")
+
+    def update_progress(self, progress):
+        # Atualizar o valor da barra de progresso com base no progresso do carregamento da página
+        self.progress_bar.setValue(progress)
 
     def setup_ui(self, widget):
         sizePolicyExpanding = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
@@ -32,10 +35,17 @@ class DefaultSearchPage(QWidget):
         self.setSizePolicy(sizePolicyExpanding)
         self.page.setSizePolicy(sizePolicyExpanding)
         self.page.setMaximumSize(QSize(16777215, 16777215))
+        self.progress_bar = QProgressBar()
+        self.progress_bar.setMaximum(100)
+        self.progress_bar.setMinimumHeight(5)
+        self.progress_bar.setMaximumHeight(10)
+        self.progress_bar.setTextVisible(False)
+        self.progress_bar.setSizePolicy(sizePolicyExpanding)
         self.container_tab = QVBoxLayout(self.page)
         self.container_tab.setObjectName(u"container_tab")
         self.container_tab.setContentsMargins(0, 0, 0, 0)
         self.container_tab.setSizeConstraint(QVBoxLayout.SizeConstraint.SetDefaultConstraint)
+        self.container_tab.addWidget(self.progress_bar)
         self.hot_bar = QGroupBox(self.page)
         self.hot_bar.setObjectName(u"hot_bar")
         self.hot_bar.setMinimumSize(QSize(300, 40))
@@ -166,7 +176,7 @@ class DefaultSearchPage(QWidget):
         self.webEngineView.setMinimumSize(QSize(0, 0))
         self.webEngineView.setMaximumSize(QSize(16777215, 16777215))
         self.webEngineView.setUrl(QUrl(u"about:blank"))
-
+        self.webEngineView.loadProgress.connect(self.update_progress)
         self.webEngineView.load("https://www.google.com/")
 
         self.container_tab.addWidget(self.webEngineView)
