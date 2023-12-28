@@ -93,7 +93,7 @@ class DraggableTabWidget(QTabWidget):
                 self.update()
                 page.ui.tabs.addTab(new_page.ui.page, name)
             elif 'download' in self.contentWidget.objectName():
-                new_page = Download(parent=page)
+                new_page = Download(parent=page, main_page=page)
                 self.contentWidget.deleteLater()
                 self.update()
                 page.ui.tabs.addTab(new_page.ui.downloads, name)
