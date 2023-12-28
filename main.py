@@ -12,7 +12,7 @@ from Pages.main_page import Main_page
 
 
 class Main(QWidget):
-    def __init__(self, parent=None, new_tab: Default = None, title: str = ""):
+    def __init__(self, parent=None, new_tab=True):
         super().__init__(parent)
         self.ui = Main_page()
         self.ui.setupUi(self)
@@ -20,10 +20,8 @@ class Main(QWidget):
         self.dialog_download = None
         self.site_atual: dict = {}
 
-        if not new_tab:
+        if new_tab:
             self.ui.tabs.addTab(Default(self, main_window=self).ui.page, "Nova Página")
-        else:
-            self.ui.tabs.addTab(new_tab.ui.page, title)
         self.ui.tabs.tabCloseRequested.connect(self.close_tab)
 
     def close_tab(self, index) -> None:

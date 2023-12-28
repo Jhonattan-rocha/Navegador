@@ -31,6 +31,7 @@ class DownloadThread(QThread):
                             if chunk:
                                 f.write(chunk)
                                 bytes_so_far += len(chunk)
+                                print(bytes_so_far, total_size)
                                 if total_size > 0:
                                     percent = (bytes_so_far / total_size) * 100
                                     self.progress_update.emit(percent)
@@ -67,49 +68,3 @@ class Downloader(QObject):
 
     def handle_download_failed(self, suggested_file_name, folder_path):
         self.download_failed.emit(suggested_file_name, folder_path)
-
-    # antido método de download
-    # def download_file_aux(self, suggested_file_name, folder_path, file_name, download_item):
-    #     with requests.get(download_item.url().toString(), stream=True) as r:
-    #         # Verificando se a requisição foi bem sucedida
-    #         if r.status_code == 200:
-    #             total_size = int(r.headers.get('content-length', 0))  # Tamanho total do arquivo
-    #             bytes_so_far = 0  # Inicializando a quantidade de bytes baixados
-    #             chunk_size = 8192  # Tamanho do chunk
-    #
-    #             # Abrindo o arquivo para escrita em modo binário
-    #             try:
-    #                 with open(file_name, 'wb') as f:
-    #                     # Iterando sobre os chunks recebidos e escrevendo no arquivo
-    #                     for chunk in r.iter_content(chunk_size=chunk_size):
-    #                         if chunk:
-    #                             f.write(chunk)
-    #                             bytes_so_far += len(chunk)
-    #                             # Calculando a porcentagem de progresso
-    #                             if total_size > 0:  # Verificando se o tamanho total é conhecido
-    #                                 percent = (bytes_so_far / total_size) * 100
-    #                                 print(f'Progresso: {percent:.2f}%')
-    #                             else:
-    #                                 print('Progresso: Tamanho total desconhecido')
-    #                     threading.Thread(target=register_download_history,
-    #                                      args=(suggested_file_name, folder_path, 'Concluido',
-    #                                            f'{datetime.datetime.now()}')).start()
-    #                     add_download_history(self, download_data={'name': suggested_file_name, 'path': folder_path,
-    #                                                               'status': 'Concluido',
-    #                                                               'download_time': f'{datetime.datetime.now()}'})
-    #             except Exception as e:
-    #                 threading.Thread(target=register_download_history,
-    #                                  args=(
-    #                                      suggested_file_name, folder_path, 'Erro',
-    #                                      f'{datetime.datetime.now()}')).start()
-    #                 add_download_history(self,
-    #                                      download_data={'name': suggested_file_name, 'path': folder_path,
-    #                                                     'status': 'Erro',
-    #                                                     "download_time": f'{datetime.datetime.now()}'})
-    #
-    #         else:
-    #             threading.Thread(target=register_download_history,
-    #                              args=(suggested_file_name, folder_path, 'Erro', f'{datetime.datetime.now()}')).start()
-    #             add_download_history(self,
-    #                                  download_data={'name': suggested_file_name, 'path': folder_path, 'status': 'Erro',
-    #                                                 'download_time': f'{datetime.datetime.now()}'})

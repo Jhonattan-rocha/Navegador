@@ -30,7 +30,7 @@ class DefaultSearchPage(QWidget):
         font.setFamilies([u"Segoe UI"])
         font.setBold(True)
         font.setUnderline(True)
-        self.page = QWidget(widget)
+        self.page = QWidget(parent=widget)
         self.page.setObjectName(u"page")
         self.setSizePolicy(sizePolicyExpanding)
         self.page.setSizePolicy(sizePolicyExpanding)

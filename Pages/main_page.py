@@ -4,6 +4,7 @@ from PySide6.QtWidgets import (QStackedWidget, QTabWidget, QVBoxLayout, QWidget,
 
 from CustomElements.DraggableTabWidget import DraggableTabWidget
 
+
 class Main_page(QWidget):
 
     def setupUi(self, Widget):
@@ -35,7 +36,7 @@ class Main_page(QWidget):
         self.verticalLayout_4 = QVBoxLayout(self.default_page)
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
         self.verticalLayout_4.setContentsMargins(0, 0, 0, 0)
-        self.tabs = DraggableTabWidget(self.default_page)
+        self.tabs = DraggableTabWidget(self.default_page, main_page=self)
         self.tabs.setObjectName(u"tabs")
         self.tabs.setMovable(True)
         self.tabs.setEnabled(True)

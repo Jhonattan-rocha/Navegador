@@ -1,5 +1,6 @@
 from PySide6.QtCore import *
 from PySide6.QtGui import *
+from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import *
 
 
@@ -13,6 +14,7 @@ class DraggableTabWidget(QTabWidget):
         self.tabBar.setMovable(True)
         self.tabBar.onDetachTabSignal.connect(self.detachTab)
         self.tabBar.onMoveTabSignal.connect(self.moveTab)
+        self.tabBar.onAttchTabSignal.connect(self.attachTab)
         self.main_page = main_page
         self.setTabBar(self.tabBar)
 
@@ -39,14 +41,13 @@ class DraggableTabWidget(QTabWidget):
             icon = self.windowIcon()
         contentWidget = self.widget(index)
         contentWidgetRect = contentWidget.frameGeometry()
-
         existing_detached_tabs = [w for w in self.parent().children() if isinstance(w, self.DetachedTab)]
         for detached_tab in existing_detached_tabs:
             if detached_tab.contentWidget == contentWidget:
                 detached_tab.activateWindow()
                 return
 
-        detachedTab = self.DetachedTab(contentWidget, self.parentWidget(), self.main_page)
+        detachedTab = self.DetachedTab(contentWidget, self.parentWidget(), self.main_page, name)
         detachedTab.setWindowModality(Qt.WindowModality.NonModal)
         detachedTab.setWindowTitle(name)
         detachedTab.setWindowIcon(icon)
@@ -58,27 +59,50 @@ class DraggableTabWidget(QTabWidget):
 
     @Slot(QWidget, str, QIcon, name='attachTab')
     def attachTab(self, contentWidget, name, icon):
+        # Setando a guia como filha do QTabWidget atual
         contentWidget.setParent(self)
+
+        # Obtendo o índice onde a guia será inserida
         index = self.count()
+
+        # Inserindo a guia no QTabWidget atual
         index = self.insertTab(index, contentWidget, icon, name)
 
+        # Definindo a guia recém-inserida como a guia atual, se inserida com sucesso
         if index > -1:
             self.setCurrentIndex(index)
 
     class DetachedTab(QWidget):
         onCloseSignal = Signal(QWidget, str, QIcon, name='onCloseSignal')
 
-        def __init__(self, contentWidget: QWidget, parent=None, main_page=None):
+        def __init__(self, contentWidget: QWidget, parent=None, main_page=None, name="Nova página"):
             super().__init__(parent)
             self.contentWidget = contentWidget
-            layout = QVBoxLayout()
-            layout.addWidget(self.contentWidget)
-            self.setLayout(layout)
 
             from main import Main
-            page = Main()
-            page.ui.tabs.addTab(self, self.windowTitle())
-            page.ui.tabs.removeTab(1)
+            from Pages.Implementaion import Default, Historic, Download
+
+            page = Main(new_tab=False)
+
+            old_page = self.contentWidget.findChildren(QWebEngineView)
+            if bool(old_page):
+                url = old_page[0].url().toString()
+                new_page = Default(parent=page, main_window=page)
+                new_page.ui.webEngineView.load(url)
+                self.contentWidget.deleteLater()
+                self.update()
+                page.ui.tabs.addTab(new_page.ui.page, name)
+            elif 'download' in self.contentWidget.objectName():
+                new_page = Download(parent=page)
+                self.contentWidget.deleteLater()
+                self.update()
+                page.ui.tabs.addTab(new_page.ui.downloads, name)
+            elif 'historic' in self.contentWidget.objectName():
+                new_page = Historic(parent=page, main_page=page)
+                self.contentWidget.deleteLater()
+                self.update()
+                page.ui.tabs.addTab(new_page.ui.historic, name)
+
             page.show()
 
         def event(self, event):
@@ -94,6 +118,7 @@ class DraggableTabWidget(QTabWidget):
     class TabBar(QTabBar):
         onDetachTabSignal = Signal(int, QPoint, name='onDetachTabSignal')
         onMoveTabSignal = Signal(int, int, name='onMoveTabSignal')
+        onAttchTabSignal = Signal(QWidget, str, QIcon)
 
         def __init__(self, parent=None):
             super().__init__(parent)
@@ -179,4 +204,7 @@ class DraggableTabWidget(QTabWidget):
             if fromIndex != -1 and toIndex != -1 and fromIndex != toIndex:
                 self.onMoveTabSignal.emit(fromIndex, toIndex)
                 return
+
+            if fromIndex != -1 and toIndex != -1 and fromIndex == toIndex:
+                self.onAttchTabSignal.emit(self, self.objectName(), self.windowIcon())
             super().dropEvent(event)

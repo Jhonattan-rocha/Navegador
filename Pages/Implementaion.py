@@ -1,6 +1,5 @@
 import datetime
 import os.path
-import pprint
 import re
 import threading
 
@@ -32,9 +31,12 @@ class Default(QWidget):
 
     def __init__(self, parent=None, main_window=None):
         super().__init__(parent)
-        self.ui = DefaultSearchPage()
+        self.ui = DefaultSearchPage(parent=parent)
         self.ui.setup_ui(self)
         self.main_window = main_window
+        if not self.main_window.dialog_download or not self.main_window.dialog_ops:
+            self.open_dialog_ops(view=False)
+            Download(main_page=self.main_window).open_dialog_download(view=False)
         self.site_atual: dict = {}
         self.sites_visitados: list = []
         self.ui.arrow_left_historic.clicked.connect(
@@ -48,9 +50,9 @@ class Default(QWidget):
 
         self.ui.webEngineView.loadFinished.connect(self.update_url)
         self.ui.webEngineView.loadFinished.connect(self.update_title)
-        self.ui.options.clicked.connect(lambda: self.open_dialog_ops(main_window=main_window))
+        self.ui.options.clicked.connect(lambda: self.open_dialog_ops())
         self.ui.download_buttton.clicked.connect(
-            lambda: Download.open_dialog_download(main_window=main_window))
+            lambda: Download(main_page=self.main_window).open_dialog_download())
 
     # Método para atualizar o estado dos botões de navegação
     def update_navigation_buttons(self):
@@ -83,11 +85,9 @@ class Default(QWidget):
                 print("Index out of range")
         self.update_navigation_buttons()
 
-
-    @staticmethod
-    def open_dialog_ops(main_window, view=True):
-        if not main_window.dialog_ops:
-            main_window.ui.tabs.setTabsClosable(True)
+    def open_dialog_ops(self, view=True):
+        if not self.main_window.dialog_ops:
+            self.main_window.ui.tabs.setTabsClosable(True)
             loader = QUiLoader()
             ui_file = QFile(os.path.abspath(os.path.join("Pages", "dialog_ops.ui")))
             ui_file.open(QFile.ReadOnly)
@@ -96,18 +96,18 @@ class Default(QWidget):
 
             add_page = dialog_widget.findChild(QPushButton, 'add_page')
             add_page.clicked.connect(
-                lambda: main_window.ui.tabs.addTab(Default(main_window, main_window).ui.page, "Nova Página"))
+                lambda: self.main_window.ui.tabs.addTab(Default(self.main_window, self.main_window).ui.page, "Nova Página"))
 
             download_page = dialog_widget.findChild(QPushButton, 'donwloads_page')
             download_page.clicked.connect(
-                lambda: main_window.ui.tabs.addTab(Download(main_window).ui.downloads, "Downloads"))
+                lambda: self.main_window.ui.tabs.addTab(Download(self.main_window).ui.downloads, "Downloads"))
 
             historic_page = dialog_widget.findChild(QPushButton, 'historic_page')
             historic_page.clicked.connect(
-                lambda: main_window.ui.tabs.addTab(Historic(main_window, main_window).ui.historic, "Histórico"))
+                lambda: self.main_window.ui.tabs.addTab(Historic(self.main_window, self.main_window).ui.historic, "Histórico"))
 
             # Criar o diálogo
-            dialog = QDialog(main_window)
+            dialog = QDialog(self.main_window)
             dialog.setWindowModality(Qt.WindowModality.NonModal)
             dialog.setWindowTitle("Opções")
             dialog.setModal(True)  # Permitir interação com a janela principal
@@ -115,12 +115,12 @@ class Default(QWidget):
             layout.addWidget(dialog_widget)
 
             # Exibir o diálogo modalmente
-            main_window.dialog_ops = {"fields": dialog_widget, "view": dialog}
+            self.main_window.dialog_ops = {"fields": dialog_widget, "view": dialog}
             if view:
                 dialog.exec()
         else:
-            main_window.ui.tabs.setTabsClosable(True)
-            main_window.dialog_ops['view'].exec()
+            self.main_window.ui.tabs.setTabsClosable(True)
+            self.main_window.dialog_ops['view'].exec()
 
     def update_url(self, success) -> None:
         if success:
@@ -199,7 +199,11 @@ class Default(QWidget):
         downloader.download_file(download_item.url().toString(), folder_path, suggested_file_name, progress_bar)
 
     def handle_progress(self, percent: float, progress_bar):
-        progress_bar.setValue(percent)
+        try:
+            print(progress_bar, percent)
+            progress_bar.setValue(percent)
+        except Exception as e:
+            print(e)
 
     def handle_download_finished(self, suggested_file_name, folder_path):
         threading.Thread(target=register_download_historic,
@@ -215,15 +219,14 @@ class Download(QWidget):
 
     def __init__(self, parent=None, main_page=None):
         super().__init__(parent)
-        self.ui = DownloadsPage()
+        self.ui = DownloadsPage(self)
         self.ui.setup_ui(self)
         self.ui.arrow_left_back.hide()
         self.main_page = main_page
         self.load_download_historic(self)
 
-    @staticmethod
-    def open_dialog_download(main_window, view=True):
-        if not main_window.dialog_download:
+    def open_dialog_download(self, view=True):
+        if not self.main_page.dialog_download:
             loader = QUiLoader()
             ui_file = QFile(os.path.abspath(os.path.join("Pages", "dialog_downloads.ui")))
             ui_file.open(QFile.ReadOnly)
@@ -231,7 +234,7 @@ class Download(QWidget):
             ui_file.close()
 
             # Criar o diálogo
-            dialog = QDialog(main_window)
+            dialog = QDialog(self.main_page)
             dialog.setWindowModality(Qt.WindowModality.NonModal)
             dialog.setWindowTitle("Downloads")
             dialog.setModal(True)  # Permitir interação com a janela principal
@@ -239,13 +242,13 @@ class Download(QWidget):
             layout.addWidget(dialog_widget)
 
             # Exibir o diálogo modalmente
-            main_window.dialog_download = {"fields": dialog_widget, "view": dialog}
-            Download.load_download_notificatios(main_window.dialog_download)
+            self.main_page.dialog_download = {"fields": dialog_widget, "view": dialog}
+            Download.load_download_notificatios(self.main_page.dialog_download)
 
             if view:
                 dialog.exec()
         else:
-            main_window.dialog_download['view'].exec()
+            self.main_page.dialog_download['view'].exec()
 
     @staticmethod
     def load_download_historic(main_window):
@@ -491,7 +494,7 @@ class Historic(QWidget):
 
     @staticmethod
     def open_historic_site(main_window, site):
-        default_page = Default(main_window, main_window).ui.page
+        default_page = Default(main_window, main_window=main_window).ui.page
         main_window.ui.tabs.addTab(default_page, "Nova pagina")
         last_page = main_window.ui.tabs.count() - 1
         layout = main_window.ui.tabs.widget(last_page)
