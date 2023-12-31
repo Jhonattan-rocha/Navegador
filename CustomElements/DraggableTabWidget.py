@@ -6,8 +6,12 @@ from PySide6.QtWidgets import *
 
 class DraggableTabWidget(QTabWidget):
     tabMovedToAnotherMainPage = Signal(QWidget, str, QIcon, name='tabMovedToAnotherMainPage')
+    main_instances = []
 
-    def __init__(self, parent=None, main_page=None):
+    def __del__(self):
+        self.__class__.main_instances.remove(self.parent().implementation)
+
+    def __init__(self, parent=None):
         super().__init__(parent)
 
         self.tabBar = self.TabBar(self)
@@ -15,8 +19,8 @@ class DraggableTabWidget(QTabWidget):
         self.tabBar.onDetachTabSignal.connect(self.detachTab)
         self.tabBar.onMoveTabSignal.connect(self.moveTab)
         self.tabBar.onAttchTabSignal.connect(self.attachTab)
-        self.main_page = main_page
         self.setTabBar(self.tabBar)
+        self.__class__.main_instances.append(self.parent().implementation)
 
     @Slot(QWidget, str, QIcon, name='attachTabToMainPage')
     def attachTabToMainPage(self, contentWidget, name, icon):
@@ -47,7 +51,7 @@ class DraggableTabWidget(QTabWidget):
                 detached_tab.activateWindow()
                 return
 
-        detachedTab = self.DetachedTab(contentWidget, self.parentWidget(), self.main_page, name)
+        detachedTab = self.DetachedTab(contentWidget, self.parentWidget(), name)
         detachedTab.setWindowModality(Qt.WindowModality.NonModal)
         detachedTab.setWindowTitle(name)
         detachedTab.setWindowIcon(icon)
@@ -75,7 +79,7 @@ class DraggableTabWidget(QTabWidget):
     class DetachedTab(QWidget):
         onCloseSignal = Signal(QWidget, str, QIcon, name='onCloseSignal')
 
-        def __init__(self, contentWidget: QWidget, parent=None, main_page=None, name="Nova página"):
+        def __init__(self, contentWidget: QWidget, parent=None, name="Nova página"):
             super().__init__(parent)
             self.contentWidget = contentWidget
 
@@ -200,11 +204,13 @@ class DraggableTabWidget(QTabWidget):
 
             fromIndex = self.tabAt(self.dragStartPos)
             toIndex = self.tabAt(self.dragDropedPos)
-
+            print(f"from: {fromIndex}, to: {toIndex}")
+            print(self.dragStartPos.toTuple(), self.dragDropedPos.toTuple())
             if fromIndex != -1 and toIndex != -1 and fromIndex != toIndex:
                 self.onMoveTabSignal.emit(fromIndex, toIndex)
                 return
 
-            if fromIndex != -1 and toIndex != -1 and fromIndex == toIndex:
-                self.onAttchTabSignal.emit(self, self.objectName(), self.windowIcon())
+            if fromIndex == -1 or fromIndex == toIndex:
+                for m in self.parent().__class__.main_instances:
+                    print(m)
             super().dropEvent(event)

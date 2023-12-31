@@ -61,7 +61,7 @@ def remove_download_historic_item(download_data: dict, remove_view: bool = False
 
 def register_historic(site: str, cookies: list,
                       download_time: datetime.datetime, file_saved_main: str = 'historic.json'):
-    with open(os.path.abspath(os.path.join('configs', file_saved_main)), 'rb') as file:
+    with open(os.path.abspath(os.path.join('configs', file_saved_main)), 'rb+') as file:
         file_read = file.read()
         json_file = {}
         if not file_read:

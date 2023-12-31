@@ -25,6 +25,7 @@ class DownloadsPage(QWidget):
         icon4.addFile(u"figs/dotdotdot.png", QSize(), QIcon.Normal, QIcon.Off)
 
         self.downloads = QWidget(widget)
+        self.downloads.implementaion = widget
         self.setSizePolicy(sizePolicyExpanding)
         self.downloads.setObjectName(u"downloads")
         self.downloads.setSizePolicy(sizePolicyExpanding)

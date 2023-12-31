@@ -1,0 +1,54 @@
+{
+  "Cookies": [
+    {
+      "domain": ".google.com",
+      "cookie": "Ackid1Rytw5EXgBVUdlLUwvv8x04ypwK8HekVqIFa9LW11zJFQ_lDS2vnw",
+      "name": "AEC"
+    },
+    {
+      "domain": ".google.com",
+      "cookie": "19037049-1:",
+      "name": "OGPC"
+    },
+    {
+      "domain": "ogs.google.com",
+      "cookie": "7361342_68_64_73560_68_416340",
+      "name": "OTZ"
+    },
+    {
+      "domain": ".google.com",
+      "cookie": "-19037049:",
+      "name": "OGP"
+    },
+    {
+      "domain": ".google.com",
+      "cookie": "ACX8J6Py3sSPk55NdX-CjeMF7kU36CMLEacs19sFAGNfd4ldm5Yc70r2vD5hBhiH7gKdxABgau6S_tprcebod3XbfmBkG_zZZTk",
+      "name": "SNID"
+    },
+    {
+      "domain": "www.google.com",
+      "cookie": "gywl8pyBLpIkgCmcapqN1YPaEyLWy1jR1FV96CAwCwEAAAA",
+      "name": "DV"
+    },
+    {
+      "domain": ".youtube.com",
+      "cookie": "lnbKYKwEaxk",
+      "name": "YSC"
+    },
+    {
+      "domain": ".youtube.com",
+      "cookie": "Axruiix_0L8",
+      "name": "VISITOR_INFO1_LIVE"
+    },
+    {
+      "domain": ".google.com",
+      "cookie": "511=Pm4V9N7ItFInRn00na_V_XnLYipjyX34v0eQ7pRYY8Z1vvIjU2zDX32d1ClXzlFdRkAkFPQHZI2VUtS3QJ1X-8VOg5zAlPLPZlpg8C6OgiiJawEVtwy8rkfKeq_tod_DAowJI8kGL1BIMRU-E-d790WnAKemlr0VsaAGW5ulry9rb3TxOxwL0vc",
+      "name": "NID"
+    },
+    {
+      "domain": ".google.com",
+      "cookie": "2023-12-31-01",
+      "name": "1P_JAR"
+    }
+  ]
+}

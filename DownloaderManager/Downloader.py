@@ -1,8 +1,11 @@
+import datetime
 import os.path
 
 import requests
 from PySide6.QtCore import (QThread, Signal, QObject, Slot)
 from PySide6.QtWidgets import (QProgressBar)
+
+from DataOperations.register_recover import register_download_historic
 
 
 class DownloadThread(QThread):
@@ -31,7 +34,6 @@ class DownloadThread(QThread):
                             if chunk:
                                 f.write(chunk)
                                 bytes_so_far += len(chunk)
-                                print(bytes_so_far, total_size)
                                 if total_size > 0:
                                     percent = (bytes_so_far / total_size) * 100
                                     self.progress_update.emit(percent)
@@ -54,6 +56,9 @@ class Downloader(QObject):
 
     @Slot(str, str, str)
     def download_file(self, url, folder_path, suggested_file_name, progress_bar: QProgressBar):
+        register_download_historic(suggested_file_name, folder_path, 'Baixando', datetime.datetime.now(),
+                                   'download_notifications.json')
+
         self.download_thread = DownloadThread(url, folder_path, suggested_file_name)
         self.download_thread.progress_update.connect(lambda percent: self.handle_progress(percent, progress_bar))
         self.download_thread.download_finished.connect(self.handle_download_finished)

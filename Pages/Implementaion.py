@@ -3,13 +3,14 @@ import os.path
 import re
 import threading
 
-from PySide6.QtCore import (QFile)
+from PySide6.QtCore import (QFile, QStringListModel, QByteArray)
 from PySide6.QtCore import (QSize, QUrl, Qt)
 from PySide6.QtGui import (QCursor, QDesktopServices,
                            QFont, QIcon, QPixmap)
+from PySide6.QtNetwork import QNetworkCookie
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWebEngineWidgets import QWebEngineView
-from PySide6.QtWidgets import (QDialog)
+from PySide6.QtWidgets import (QDialog, QCompleter)
 from PySide6.QtWidgets import (QFileDialog)
 from PySide6.QtWidgets import (QGroupBox, QHBoxLayout, QCommandLinkButton,
                                QSizePolicy, QLayout, QProgressBar)
@@ -18,6 +19,8 @@ from PySide6.QtWidgets import (QPushButton,
                                QVBoxLayout)
 from PySide6.QtWidgets import (QWidget)
 
+from DataOperations.TRIEManager import Trie
+from DataOperations.cookies import save_cookies, recover_cookies, remove_cookie
 from DataOperations.register_recover import recover_download_historic, recover_historic, \
     remove_download_historic_item
 from DataOperations.register_recover import register_download_historic, register_historic, remove_historic_item
@@ -36,7 +39,7 @@ class Default(QWidget):
         self.main_window = main_window
         if not self.main_window.dialog_download or not self.main_window.dialog_ops:
             self.open_dialog_ops(view=False)
-            Download(main_page=self.main_window).open_dialog_download(view=False)
+            Download(self.main_window, self.main_window).open_dialog_download(view=False)
         self.site_atual: dict = {}
         self.sites_visitados: list = []
         self.ui.arrow_left_historic.clicked.connect(
@@ -44,15 +47,65 @@ class Default(QWidget):
         self.ui.arrow_right_historic.clicked.connect(
             lambda: self.load_direction_specific_historic('prox'))
         self.ui.url.returnPressed.connect(
-            lambda web=self.ui.webEngineView, search=self.ui.url: self.search(web_loader=web,
-                                                                              search_text=search.text()))
+            lambda: self.search(web_loader=self.ui.webEngineView,
+                                search_text=self.ui.url.text()))
         self.ui.webEngineView.page().profile().downloadRequested.connect(self.download_file)
 
         self.ui.webEngineView.loadFinished.connect(self.update_url)
         self.ui.webEngineView.loadFinished.connect(self.update_title)
         self.ui.options.clicked.connect(lambda: self.open_dialog_ops())
         self.ui.download_buttton.clicked.connect(
-            lambda: Download(main_page=self.main_window).open_dialog_download())
+            lambda: Download(self.main_window, self.main_window).open_dialog_download())
+
+        self.profile = self.ui.webEngineView.page().profile()
+
+        self.cookie_store = self.profile.cookieStore()
+        self.cookie_store.cookieAdded.connect(self.on_cookie_added)
+        self.cookie_store.cookieRemoved.connect(self.on_cookie_removed)
+
+        self.trie = Trie()
+
+        completer = QCompleter()
+        self.ui.url.setCompleter(completer)
+        self.ui.url.textChanged.connect(self.on_text_changed)
+
+        threading.Thread(target=self.load_cookies, args=()).start()
+        threading.Thread(target=self.load_historic_in_trie, args=()).start()
+
+    def on_cookie_added(self, cookie):
+        dados = {'name': cookie.name().data().decode(), 'cookie': cookie.value().data().decode(),
+                 'domain': cookie.domain()}
+        threading.Thread(target=save_cookies, args=(dados,)).start()
+
+    def on_cookie_removed(self, cookie):
+        threading.Thread(target=remove_cookie,
+                         args=(cookie.name().data().decode(), cookie.value().data().decode())).start()
+
+    def load_cookies(self):
+        cookies = recover_cookies()
+        if bool(cookies):
+            for cook in cookies['Cookies']:
+                cookie = QNetworkCookie(
+                    name=QByteArray(cook['name'].encode()),
+                    value=QByteArray(cook['cookie'].encode())
+                )
+                cookie.setDomain(cook['domain'])
+                self.cookie_store.setCookie(cookie, cook['domain'])
+
+    def load_historic_in_trie(self):
+        historic = recover_historic()
+
+        if bool(historic):
+            for his in historic['Sites']:
+                self.trie.insert(his['name'])
+
+    def on_text_changed(self, text):
+        autocomplete_suggestions = self.trie.search(text.lower())  # Pesquisa na TRIE com o texto atual
+        completer = self.ui.url.completer()
+        model = QStringListModel()
+        model.setStringList([""] if not autocomplete_suggestions else autocomplete_suggestions)
+        completer.setModel(model)
+        self.ui.url.setCompleter(completer)
 
     # Método para atualizar o estado dos botões de navegação
     def update_navigation_buttons(self):
@@ -96,15 +149,18 @@ class Default(QWidget):
 
             add_page = dialog_widget.findChild(QPushButton, 'add_page')
             add_page.clicked.connect(
-                lambda: self.main_window.ui.tabs.addTab(Default(self.main_window, self.main_window).ui.page, "Nova Página"))
+                lambda: self.main_window.ui.tabs.addTab(Default(self.main_window, self.main_window).ui.page,
+                                                        "Nova Página"))
 
             download_page = dialog_widget.findChild(QPushButton, 'donwloads_page')
             download_page.clicked.connect(
-                lambda: self.main_window.ui.tabs.addTab(Download(self.main_window).ui.downloads, "Downloads"))
+                lambda: self.main_window.ui.tabs.addTab(Download(self.main_window, self.main_window).ui.downloads,
+                                                        "Downloads"))
 
             historic_page = dialog_widget.findChild(QPushButton, 'historic_page')
             historic_page.clicked.connect(
-                lambda: self.main_window.ui.tabs.addTab(Historic(self.main_window, self.main_window).ui.historic, "Histórico"))
+                lambda: self.main_window.ui.tabs.addTab(Historic(self.main_window, self.main_window).ui.historic,
+                                                        "Histórico"))
 
             # Criar o diálogo
             dialog = QDialog(self.main_window)
@@ -162,6 +218,7 @@ class Default(QWidget):
         return bool(re.match(url_pattern, url_string))
 
     def search(self, web_loader: QWebEngineView, search_text: str) -> None:
+        print(self.profile.persistentCookiesPolicy())
         if self.is_valid_url(search_text):
             url = f"{search_text}"
 
@@ -192,15 +249,10 @@ class Default(QWidget):
                                                                                               suggested_file_name)})
         downloader.progress_update.connect(lambda percent: self.handle_progress(percent, progress_bar),
                                            Qt.ConnectionType.QueuedConnection)
-
-        threading.Thread(target=register_download_historic,
-                         args=(suggested_file_name, folder_path, 'Baixando',
-                               f'{datetime.datetime.now()}', 'download_notifications.json')).start()
         downloader.download_file(download_item.url().toString(), folder_path, suggested_file_name, progress_bar)
 
     def handle_progress(self, percent: float, progress_bar):
         try:
-            print(progress_bar, percent)
             progress_bar.setValue(percent)
         except Exception as e:
             print(e)
@@ -223,7 +275,26 @@ class Download(QWidget):
         self.ui.setup_ui(self)
         self.ui.arrow_left_back.hide()
         self.main_page = main_page
-        self.load_download_historic(self)
+        self.load_download_historic(limit=10)
+
+        self.ui.scrollAreaDownloads.verticalScrollBar().valueChanged.connect(self.scroll_event)
+
+        self.loaded_items = 0
+        self.items_per_load = 10  # Número de itens a serem carregados a cada vez
+
+    def load_more_items(self):
+        downloads = recover_download_historic()
+        items_to_load = downloads['Files'][self.loaded_items:self.loaded_items + self.items_per_load]
+
+        for download_data in items_to_load:
+            Download.add_download_history(main_window=self, download_data=download_data)
+
+        self.loaded_items += self.items_per_load
+
+    def scroll_event(self):
+        scrollbar = self.ui.scrollAreaDownloads.verticalScrollBar()
+        if scrollbar.value() >= scrollbar.maximum() - 100:  # Verifica se o usuário está próximo do final
+            self.load_more_items()
 
     def open_dialog_download(self, view=True):
         if not self.main_page.dialog_download:
@@ -243,25 +314,30 @@ class Download(QWidget):
 
             # Exibir o diálogo modalmente
             self.main_page.dialog_download = {"fields": dialog_widget, "view": dialog}
-            Download.load_download_notificatios(self.main_page.dialog_download)
+            # Download.load_download_notificatios(self.main_page.dialog_download)
 
             if view:
                 dialog.exec()
         else:
             self.main_page.dialog_download['view'].exec()
 
-    @staticmethod
-    def load_download_historic(main_window):
-        layout = main_window.ui.container_downloads_itens_page.layout()
+    def load_download_historic(self, limit: int):
+        layout = self.ui.container_downloads_itens_page.layout()
         while layout.count():
             child = layout.takeAt(0)
             if child.widget():
                 child.widget().deleteLater()
         history = recover_download_historic()
 
+        self.loaded_items = 0
+        self.items_per_load = 10
+
         if bool(history):
+            cont = 0
             for download in history['Files']:
-                Download.add_download_history(main_window=main_window, download_data=download)
+                if cont <= limit:
+                    Download.add_download_history(main_window=self, download_data=download)
+                    cont += 1
 
     @staticmethod
     def load_download_notificatios(main_window):
@@ -424,7 +500,7 @@ class Download(QWidget):
 
         horizontalLayout_4.addWidget(del_item)
 
-        main_window.ui.container_downloads_itens_page.insertWidget(0, download_item)
+        main_window.ui.container_downloads_itens_page.addWidget(download_item)
 
     @staticmethod
     def add_download_notification(main_windows, download_data, show_progress=True) -> QProgressBar:
@@ -464,7 +540,7 @@ class Download(QWidget):
             verticalLayout_3.addWidget(progressBar)
 
             (main_windows['fields'].findChild(QLayout, 'container_download_notifications')
-             .insertWidget(0, download_item_list))
+             .addWidget(download_item_list))
 
             return progressBar
 
@@ -477,20 +553,46 @@ class Historic(QWidget):
         self.ui.setup_ui(self)
         self.ui.arrow_left_back_historic.hide()
         self.main_page = main_page
-        self.load_historic(self.main_page, self)
+        self.load_historic(10)
+        self.ui.scrollAreaHistoric.verticalScrollBar().valueChanged.connect(self.scroll_event)
 
-    @staticmethod
-    def load_historic(main_window, historic_window):
-        layout = historic_window.ui.container_historic_page.layout()
+        self.loaded_items = 0
+        self.items_per_load = 10  # Número de itens a serem carregados a cada vez
+
+    def load_more_items(self):
+        history = recover_historic()
+        items_to_load = history['Sites'][self.loaded_items:self.loaded_items + self.items_per_load]
+
+        for site in items_to_load:
+            Historic.add_historic_item(main_window=self.main_page, historic_data=site, historic_page=self)
+
+        self.loaded_items += self.items_per_load
+
+    def scroll_event(self):
+        scrollbar = self.ui.scrollAreaHistoric.verticalScrollBar()
+        if scrollbar.value() >= scrollbar.maximum() - 100:  # Verifica se o usuário está próximo do final
+            self.load_more_items()
+
+    def load_historic(self, limit: int):
+        layout = self.ui.container_historic_page.layout()
         while layout.count():
             child = layout.takeAt(0)
             if child.widget():
                 child.widget().deleteLater()
         history = recover_historic()
 
+        self.loaded_items = 0
+        self.items_per_load = 10
+
         if bool(history):
+            cont = 0
             for site in history['Sites']:
-                Historic.add_historic_item(main_window=main_window, historic_data=site, historic_page=historic_window)
+                if cont <= limit:
+                    Historic.add_historic_item(main_window=self.main_page, historic_data=site,
+                                               historic_page=self)
+                    cont += 1
+                else:
+                    break
 
     @staticmethod
     def open_historic_site(main_window, site):
@@ -595,4 +697,4 @@ class Historic(QWidget):
 
             horizontalLayout_7.addWidget(del_item_historic)
 
-            historic_page.ui.container_historic_page.insertWidget(0, historic_item)
+            historic_page.ui.container_historic_page.addWidget(historic_item)

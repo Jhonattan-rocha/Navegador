@@ -1,11 +1,15 @@
+import os
+
 from PySide6.QtCore import (QSize, QUrl, Qt)
 from PySide6.QtGui import (QCursor, QFont, QIcon)
+from PySide6.QtWebEngineCore import QWebEngineProfile, QWebEnginePage
 from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import (QGroupBox, QHBoxLayout, QLineEdit, QSizePolicy, QWidget)
 from PySide6.QtWidgets import (QPushButton, QLayout, QProgressBar, QVBoxLayout)
 
 
 class DefaultSearchPage(QWidget):
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("default_page")
@@ -31,6 +35,7 @@ class DefaultSearchPage(QWidget):
         font.setBold(True)
         font.setUnderline(True)
         self.page = QWidget(parent=widget)
+        self.page.implementaion = widget
         self.page.setObjectName(u"page")
         self.setSizePolicy(sizePolicyExpanding)
         self.page.setSizePolicy(sizePolicyExpanding)
@@ -171,6 +176,11 @@ class DefaultSearchPage(QWidget):
         self.container_tab.addWidget(self.hot_bar)
 
         self.webEngineView = QWebEngineView(self.page)
+        self.profile = self.webEngineView.page().profile().defaultProfile()
+        self.profile.setPersistentCookiesPolicy(QWebEngineProfile.PersistentCookiesPolicy.ForcePersistentCookies)
+        self.profile.setPersistentStoragePath(os.path.abspath("Cookies"))
+        self.profile.setCachePath(os.path.abspath("PersistedDatas"))
+        self.profile.setDownloadPath(os.path.abspath("PersistedDatas"))
         self.webEngineView.setObjectName(u"webEngineView")
         self.webEngineView.setSizePolicy(sizePolicyExpanding)
         self.webEngineView.setMinimumSize(QSize(0, 0))

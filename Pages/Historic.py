@@ -33,6 +33,7 @@ class HistoricPage(QWidget):
         font.setUnderline(True)
 
         self.historic = QWidget(widget)
+        self.historic.implementaion = widget
         self.historic.setObjectName(u"historic")
         self.container_historic_page_2 = QVBoxLayout(self.historic)
         self.container_historic_page_2.setSizeConstraint(QVBoxLayout.SizeConstraint.SetDefaultConstraint)

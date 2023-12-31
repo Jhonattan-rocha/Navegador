@@ -30,19 +30,40 @@ class Main_page(QWidget):
         self.stacked_pages.setContentsMargins(0, 0, 0, 0)
         self.stacked_pages.setEnabled(True)
         self.default_page = QWidget()
+        self.default_page.implementation = Widget
         self.default_page.setObjectName(u"default_page")
         self.default_page.setEnabled(True)
         self.default_page.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_4 = QVBoxLayout(self.default_page)
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
         self.verticalLayout_4.setContentsMargins(0, 0, 0, 0)
-        self.tabs = DraggableTabWidget(self.default_page, main_page=self)
+        self.tabs = DraggableTabWidget(self.default_page)
         self.tabs.setObjectName(u"tabs")
         self.tabs.setMovable(True)
         self.tabs.setEnabled(True)
         self.tabs.setTabPosition(QTabWidget.TabPosition.South)
         self.tabs.setElideMode(Qt.TextElideMode.ElideMiddle)
         self.tabs.setTabsClosable(False)
+
+        self.tabs.setStyleSheet("""
+        QTabBar::tab {
+            border-radius: 10px;
+            padding: 5px;
+            border: 1px solid black;
+        }
+        QTabBar::tab:selected {
+            background-color: lightgray; /* Cor de fundo da aba selecionada */
+            border-top-left-radius: 0px;
+            border-top-right-radius: 0px;
+            border-top-color: none;
+        }
+
+        QTabBar {
+            margin-bottom: 10px; /* Espaçamento abaixo das abas */
+            margin-left: 10px; /* Espaçamento à esquerda das abas */
+            margin-right: 10px; /* Espaçamento à direita das abas */
+        }
+        """)
 
         self.verticalLayout_4.addWidget(self.tabs)
 
