@@ -35,7 +35,7 @@ class DefaultSearchPage(QWidget):
         font.setBold(True)
         font.setUnderline(True)
         self.page = QWidget(parent=widget)
-        self.page.implementaion = widget
+        self.page.implementation = widget
         self.page.setObjectName(u"page")
         self.setSizePolicy(sizePolicyExpanding)
         self.page.setSizePolicy(sizePolicyExpanding)

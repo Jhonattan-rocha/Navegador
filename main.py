@@ -5,7 +5,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import (QApplication, QWidget)
 
-from Pages.Implementaion import Default, Historic, Download
+from Pages.Implementation import Default, Historic, Download
 from Pages.ShortCuts import ShortcutManager
 # Important:
 # You need to run the following command to generate the main_page.py file
@@ -70,9 +70,9 @@ class Main(QWidget):
             if bool(web):
                 web[0].reload()
         elif 'historic' in name:
-            page.implementaion.load_historic(10)
+            page.implementation.load_historic(10)
         elif 'downloads' in name:
-            page.implementaion.load_download_historic(10)
+            page.implementation.load_download_historic(10)
 
     def close_tab(self, index) -> None:
         tabs = self.ui.tabs.count()

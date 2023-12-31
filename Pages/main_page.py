@@ -37,7 +37,7 @@ class Main_page(QWidget):
         self.verticalLayout_4 = QVBoxLayout(self.default_page)
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
         self.verticalLayout_4.setContentsMargins(0, 0, 0, 0)
-        self.tabs = DraggableTabWidget(self.default_page)
+        self.tabs = DraggableTabWidget(self.default_page, main_page=Widget)
         self.tabs.setObjectName(u"tabs")
         self.tabs.setMovable(True)
         self.tabs.setEnabled(True)

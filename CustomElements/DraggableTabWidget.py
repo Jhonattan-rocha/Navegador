@@ -1,7 +1,7 @@
-from PySide6.QtCore import *
-from PySide6.QtGui import *
+from PySide6.QtCore import Qt, Signal, Slot, QPoint, QEvent, QMimeData
+from PySide6.QtGui import QAction, QIcon, QMouseEvent, QDrag, QPainter, QPixmap, QCursor, QColor
 from PySide6.QtWebEngineWidgets import QWebEngineView
-from PySide6.QtWidgets import *
+from PySide6.QtWidgets import QWidget, QTabWidget, QMenu, QTabBar, QApplication
 
 
 class DraggableTabWidget(QTabWidget):
@@ -9,18 +9,66 @@ class DraggableTabWidget(QTabWidget):
     main_instances = []
 
     def __del__(self):
-        self.__class__.main_instances.remove(self.parent().implementation)
+        self.__class__.main_instances.remove(self.main_page)
 
-    def __init__(self, parent=None):
+    def show_context_menu(self, event):
+        menu = QMenu(self)
+        join_action = QAction("Juntar abas", self)
+        join_action.triggered.connect(self.join_tabs)
+        close_action = QAction("Fechar aba", self)
+        close_action.triggered.connect(self.close_tab)
+        closes_action = QAction("Fechar abas", self)
+        closes_action.triggered.connect(self.close_tabs)
+
+        menu.addAction(close_action)
+        menu.addAction(closes_action)
+        menu.addAction(join_action)
+        menu.exec(self.mapToGlobal(event))
+
+    def join_tabs(self):
+        main_instances = self.__class__.main_instances
+
+        # Verifica se há pelo menos duas instâncias
+        if len(main_instances) >= 1:
+            main_window_to_receive_tabs = self.main_page
+
+            # Itera sobre as instâncias a partir da segunda
+            for instance in main_instances:
+                if instance != self.main_page:
+                    tabs_to_transfer = instance.ui.tabs
+
+                    # Transfere as abas para a primeira main_window
+                    for index in range(tabs_to_transfer.count() - 1, -1, -1):
+                        widget = tabs_to_transfer.widget(index)
+                        if widget:
+                            tabs_to_transfer.removeTab(index)
+                            main_window_to_receive_tabs.ui.tabs.addTab(widget,
+                                                                       widget.implementation.ui.webEngineView.title())
+                    instance.close()
+
+    def close_tab(self):
+        current_index = self.currentIndex()
+        self.removeTab(current_index)
+
+    def close_tabs(self):
+        cont = self.count()
+        for i in range(cont):
+            self.removeTab(i)
+        self.parent().implementation.close()
+
+    def __init__(self, parent=None, main_page=None):
         super().__init__(parent)
 
         self.tabBar = self.TabBar(self)
         self.tabBar.setMovable(True)
         self.tabBar.onDetachTabSignal.connect(self.detachTab)
         self.tabBar.onMoveTabSignal.connect(self.moveTab)
-        self.tabBar.onAttchTabSignal.connect(self.attachTab)
+        self.tabBar.onAttchTabSignal.connect(self.join_tabs)
         self.setTabBar(self.tabBar)
         self.__class__.main_instances.append(self.parent().implementation)
+        self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.show_context_menu)
+        self.main_page = main_page
 
     @Slot(QWidget, str, QIcon, name='attachTabToMainPage')
     def attachTabToMainPage(self, contentWidget, name, icon):
@@ -84,7 +132,7 @@ class DraggableTabWidget(QTabWidget):
             self.contentWidget = contentWidget
 
             from main import Main
-            from Pages.Implementaion import Default, Historic, Download
+            from Pages.Implementation import Default, Historic, Download
 
             page = Main(new_tab=False)
 
@@ -122,7 +170,7 @@ class DraggableTabWidget(QTabWidget):
     class TabBar(QTabBar):
         onDetachTabSignal = Signal(int, QPoint, name='onDetachTabSignal')
         onMoveTabSignal = Signal(int, int, name='onMoveTabSignal')
-        onAttchTabSignal = Signal(QWidget, str, QIcon)
+        onAttchTabSignal = Signal()
 
         def __init__(self, parent=None):
             super().__init__(parent)
@@ -204,13 +252,11 @@ class DraggableTabWidget(QTabWidget):
 
             fromIndex = self.tabAt(self.dragStartPos)
             toIndex = self.tabAt(self.dragDropedPos)
-            print(f"from: {fromIndex}, to: {toIndex}")
-            print(self.dragStartPos.toTuple(), self.dragDropedPos.toTuple())
+
             if fromIndex != -1 and toIndex != -1 and fromIndex != toIndex:
                 self.onMoveTabSignal.emit(fromIndex, toIndex)
                 return
 
             if fromIndex == -1 or fromIndex == toIndex:
-                for m in self.parent().__class__.main_instances:
-                    print(m)
+                self.onAttchTabSignal.emit()
             super().dropEvent(event)
