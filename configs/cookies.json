@@ -2,12 +2,12 @@
   "Cookies": [
     {
       "domain": ".google.com",
-      "cookie": "Ackid1RX-HxqkPAGmfSwsLxMIPk-ZNcqhB3M1CdteaNJVjO4CXcbupBZEqE",
+      "cookie": "Ackid1RGbFIRVsx8SOkd2UPFbzqzNLX-BN5lZgTEyK69JnEO3cgqfKqKONk",
       "name": "AEC"
     },
     {
       "domain": "ogs.google.com",
-      "cookie": "7364273_68_64_73560_68_416340",
+      "cookie": "7364383_68_64_73560_68_416340",
       "name": "OTZ"
     },
     {
@@ -17,7 +17,7 @@
     },
     {
       "domain": ".google.com",
-      "cookie": "ACX8J6OYod_Ntxz19ICZlgNNQq5RnQ6DaRzj6WYdJRmdsTJRolkxsKeJo5lqhhrsfwI-3T6V59FGTbfAon6OHXL3jB-FJNSbUg",
+      "cookie": "ACX8J6M5JbDbTob45GEpkws44Saq2uvzOHjddnOtjtnEXfjKsnoF5B0fLo-3YPACLGG8OleygZnDV5M7DsW3F2oPRGhjRhLpNok",
       "name": "SNID"
     },
     {
@@ -42,7 +42,7 @@
     },
     {
       "domain": ".oaistatic.com",
-      "cookie": "saO6hWduhQHqqKLzudNAt_PLFtVIdaGYpr0MskiWePo-1704149299-1-AQdXnn/zF9kyX6T9NyB4fl7lsQYkDG6xhqLTlJZJ/83SLkptbXCj3yyjeVwWJZFHd0EvP4y1qV0ltlls/TuYT6E=",
+      "cookie": "arehoxn_pDvh2Xy3aAeW1xm6scAdh5uuQS3okzpKrMQ-1704163868-1-AVlSInC8det/JzQOYUyg4Vz1IErS57wm74wurASObS74eRIJn3J2D/hihK38568/tD/x9AAdqFepxWvtfeL06/4=",
       "name": "__cf_bm"
     },
     {
@@ -132,43 +132,38 @@
     },
     {
       "domain": ".speedtest.net",
-      "cookie": "1704235700738",
+      "cookie": "1704250269794",
       "name": "panoramaId_expiry"
     },
     {
       "domain": "www.speedtest.net",
-      "cookie": "%7B%22TDID%22%3A%2217392cfd-f9bd-4845-a3a1-2cce370571cd%22%2C%22TDID_LOOKUP%22%3A%22FALSE%22%2C%22TDID_CREATED_AT%22%3A%222024-01-01T22%3A48%3A20%22%7D",
+      "cookie": "%7B%22TDID%22%3A%229010a42b-0e92-4ccc-bb98-e7d1e4cc2516%22%2C%22TDID_LOOKUP%22%3A%22FALSE%22%2C%22TDID_CREATED_AT%22%3A%222024-01-02T02%3A51%3A09%22%7D",
       "name": "pbjs-unifiedid"
     },
     {
       "domain": ".speedtest.net",
-      "cookie": "96190ea4-8a0f-426b-b2ac-81c94c0ea859",
+      "cookie": "9ce3018d-93c9-4bb8-8eec-42101010c914",
       "name": "zd_session_id"
     },
     {
       "domain": ".tappx.com",
-      "cookie": "c2d30e78-d96b-4042-b7cc-87a0d627a149f1a",
+      "cookie": "c2df7869-03af-4ab4-bfe4-f03bcec5e469f1a",
       "name": "TXUSERID"
     },
     {
       "domain": ".go.sonobi.com",
-      "cookie": "31614501",
+      "cookie": "31629070",
       "name": "__uir_ex"
     },
     {
       "domain": ".go.sonobi.com",
-      "cookie": "31614501",
+      "cookie": "31629070",
       "name": "__uir_a9"
     },
     {
       "domain": ".go.sonobi.com",
-      "cookie": "31614501",
+      "cookie": "31629070",
       "name": "__uir_z1"
-    },
-    {
-      "domain": ".go.sonobi.com",
-      "cookie": "s8578|ZZNBO",
-      "name": "HAPLB8G"
     },
     {
       "domain": "bh.contextweb.com",
@@ -177,22 +172,22 @@
     },
     {
       "domain": ".openx.net",
-      "cookie": "537072971|17392cfd-f9bd-4845-a3a1-2cce370571cd|1704149302653852",
+      "cookie": "537072971|9010a42b-0e92-4ccc-bb98-e7d1e4cc2516|1704163871429168",
       "name": "univ_id"
     },
     {
       "domain": ".doubleclick.net",
-      "cookie": "AHWqTUkECbS3fUesHSUUn3BPoZ0KOEwtjSC8G_8rfdsR1bm-72lx4ndSEyRIfviYmhc",
+      "cookie": "AHWqTUnHZKDU0GRTuts9Z0HOlO4y2dRkT4LqwGsMpTzjavaMBFz1VKCntS88BiKqXm0",
       "name": "IDE"
     },
     {
       "domain": ".go.sonobi.com",
-      "cookie": "135783252200941094",
+      "cookie": "135845821284523790",
       "name": "__uir_td"
     },
     {
       "domain": ".smartadserver.com",
-      "cookie": "8761591090896664710",
+      "cookie": "5470970878812515162",
       "name": "pid"
     },
     {
@@ -202,32 +197,17 @@
     },
     {
       "domain": ".go.sonobi.com",
-      "cookie": "CAESENc7gWbGH0f7OLMfBxuOIYM||1",
+      "cookie": "CAESECfiXEFoCiky_iharcfILtw||1",
       "name": "__uin_eb"
     },
     {
       "domain": ".go.sonobi.com",
-      "cookie": "135783252200941094",
+      "cookie": "135845821284523790",
       "name": "__uir_eb"
     },
     {
-      "domain": ".srv.stackadapt.com",
-      "cookie": "s%3A0-10da8942-797d-5ea4-48b5-1751001b1d97.NeKLxIxqG9CyX6DxZdnuhFfWQXWMvdv1ZRSqGftO8qE",
-      "name": "sa-user-id"
-    },
-    {
-      "domain": "sync.srv.stackadapt.com",
-      "cookie": "s%3AENqJQnl9XqRItRdRABsdly2q5d0.L32extDZPO0iib6NrnrdNJUrJ234ox1iQI1OmzBN4HY",
-      "name": "sa-user-id-v2"
-    },
-    {
-      "domain": "sync.srv.stackadapt.com",
-      "cookie": "s%3AAQAKIOASq-nUxjuPmDjXaEah37f7vz_uWTygAa_FFkl-q8rYEOYBGAQgt4LNrAYwAToECLubaEIEdKs0vw.eqkFrMJf1I9G7sA3BBAYAjI8b%2FIC0ARPGag5TJhurKw",
-      "name": "sa-user-id-v3"
-    },
-    {
       "domain": ".go.sonobi.com",
-      "cookie": "135783252200941094",
+      "cookie": "135845868529164057",
       "name": "__uir_zt"
     },
     {
@@ -237,7 +217,7 @@
     },
     {
       "domain": ".go.sonobi.com",
-      "cookie": "135783252200941094",
+      "cookie": "135845825579491087",
       "name": "__uir_an"
     },
     {
@@ -247,32 +227,32 @@
     },
     {
       "domain": ".go.sonobi.com",
-      "cookie": "135783252200941094",
+      "cookie": "135845825579491087",
       "name": "__uir_oa"
     },
     {
       "domain": ".go.sonobi.com",
-      "cookie": "OPUd7446380c5274ada93cd98afcb9c0916",
+      "cookie": "OPUb53fc99dfd3a4226a18ac8d1f1d6271d",
       "name": "__uin_oa"
     },
     {
       "domain": ".go.sonobi.com",
-      "cookie": "135783252200941094",
+      "cookie": "135845825579491087",
       "name": "__uir_st"
     },
     {
       "domain": ".go.sonobi.com",
-      "cookie": "ENqJQnl9XqRItRdRABsdly2q5d0",
+      "cookie": "qge5-ErKW5pywO9DNZH9SmdY6co",
       "name": "__uin_st"
     },
     {
       "domain": ".go.sonobi.com",
-      "cookie": "968907274209182685",
+      "cookie": "979321841129107855",
       "name": "__uin_zt"
     },
     {
       "domain": ".tappx.com",
-      "cookie": "OPUe11209ec470b4bddbdca10190f450092",
+      "cookie": "OPU620be8dab906485b8444ee489c973fbc",
       "name": "TXCSDMN_1135"
     },
     {
@@ -287,37 +267,37 @@
     },
     {
       "domain": ".go.sonobi.com",
-      "cookie": "gfFGTi-sBzAyaWCETsRE4KJRCAt7HRoQ4sBgTVpFux0",
+      "cookie": "jFY5knZ1bdg2RKVJI3U9yAFh_4BOdxv6gtz21K4CI-s",
       "name": "__uin_rh"
     },
     {
       "domain": ".tappx.com",
-      "cookie": "03ffcd7e-6ca8-446c-b1e9-ad8084c0b5a3",
+      "cookie": "12dafca1-40f6-4ed6-9794-d5122e68af45",
       "name": "TXCSDMN_253"
     },
     {
       "domain": ".richaudience.com",
-      "cookie": "e9dafe56-6032-41e8-8128-1zz1704149282",
+      "cookie": "d3d6e981-1732-4538-840d-1zz1704163856",
       "name": "pdid"
     },
     {
       "domain": ".c.appier.net",
-      "cookie": "CliPvU7GAP-i597XN0GTZQ",
+      "cookie": "zgIPg26HDjmSjZVkIHqTZQ",
       "name": "_auid"
     },
     {
       "domain": ".go.sonobi.com",
-      "cookie": "135783256495908391",
+      "cookie": "135845872824131354",
       "name": "__uir_rh"
     },
     {
       "domain": ".tynt.com",
-      "cookie": "%5B%7B%22p%22%3A%22fcb82aaae3%22%2C%22f%22%3A1%2C%22ts%22%3A1704149303800%7D%2C%7B%22p%22%3A%22002f98d420%22%2C%22f%22%3A1%2C%22ts%22%3A1704149303800%7D%5D",
+      "cookie": "%5B%7B%22p%22%3A%22fcb82aaae3%22%2C%22f%22%3A1%2C%22ts%22%3A1704163872867%7D%2C%7B%22p%22%3A%22002f98d420%22%2C%22f%22%3A1%2C%22ts%22%3A1704163872867%7D%5D",
       "name": "pids"
     },
     {
       "domain": ".tappx.com",
-      "cookie": "e9dafe56-6032-41e8-8128-1zz1704149282",
+      "cookie": "d3d6e981-1732-4538-840d-1zz1704163856",
       "name": "TXCSDMN_108"
     },
     {
@@ -342,28 +322,23 @@
     },
     {
       "domain": ".tappx.com",
-      "cookie": "CliPvU7GAP-i597XN0GTZQ",
+      "cookie": "zgIPg26HDjmSjZVkIHqTZQ",
       "name": "TXCSDMN_728"
     },
     {
       "domain": ".tappx.com",
-      "cookie": "212404184437305",
+      "cookie": "212403058344945",
       "name": "TXCSDMN_58"
     },
     {
       "domain": ".bttrack.com",
-      "cookie": "2uKlc8-sIBd987FnJ3i9H-b-BwgDX9P7C3U4nXG1IUMOvENtCPa_qoZP4GXWnY8vIWr2DwSzCpQC4TM1",
+      "cookie": "2uKlc8-sIBd987Fnp3_DG5-Hf4oCJ9b_cXY4nXLIJrtyRENuCPK_qfyy4WPW0zS2kWFVpKP0lbMC0",
       "name": "GLOBALID"
     },
     {
       "domain": ".pubmatic.com",
-      "cookie": "6810-17392cfd-f9bd-4845-a3a1-2cce370571cd&KRTB&22918-17392cfd-f9bd-4845-a3a1-2cce370571cd&KRTB&22926-17392cfd-f9bd-4845-a3a1-2cce370571cd&KRTB&23031-17392cfd-f9bd-4845-a3a1-2cce370571cd",
+      "cookie": "6810-9010a42b-0e92-4ccc-bb98-e7d1e4cc2516&KRTB&22918-9010a42b-0e92-4ccc-bb98-e7d1e4cc2516&KRTB&22926-9010a42b-0e92-4ccc-bb98-e7d1e4cc2516&KRTB&23031-9010a42b-0e92-4ccc-bb98-e7d1e4cc2516",
       "name": "KRTBCOOKIE_377"
-    },
-    {
-      "domain": ".tappx.com",
-      "cookie": "RX-34bf66e9-1a7b-463d-b77d-d166dc55da13-005",
-      "name": "TXCSDMN_162"
     },
     {
       "domain": ".rlcdn.com",
@@ -372,22 +347,22 @@
     },
     {
       "domain": ".pubmatic.com",
-      "cookie": "22987-CAESEB-plGM5OUY8TY6hHLlNlgQ&KRTB&23025-CAESEB-plGM5OUY8TY6hHLlNlgQ&KRTB&23386-CAESEB-plGM5OUY8TY6hHLlNlgQ",
+      "cookie": "22987-CAESEIm2adNZ650k_tUUsbB5-jw&KRTB&23025-CAESEIm2adNZ650k_tUUsbB5-jw&KRTB&23386-CAESEIm2adNZ650k_tUUsbB5-jw",
       "name": "KRTBCOOKIE_80"
     },
     {
       "domain": ".pubmatic.com",
-      "cookie": "19421-uid:20533A34F24C43A99B485D90E7670DDE&KRTB&23486-uid:20533A34F24C43A99B485D90E7670DDE&KRTB&23489-uid:20533A34F24C43A99B485D90E7670DDE&KRTB&23539-uid:20533A34F24C43A99B485D90E7670DDE",
+      "cookie": "19421-uid:06602D8BAB4C4BA5A7486F1848F68734&KRTB&23486-uid:06602D8BAB4C4BA5A7486F1848F68734&KRTB&23489-uid:06602D8BAB4C4BA5A7486F1848F68734&KRTB&23539-uid:06602D8BAB4C4BA5A7486F1848F68734",
       "name": "KRTBCOOKIE_148"
     },
     {
       "domain": ".linkedin.com",
-      "cookie": "\"v=2&faf48054-baa7-4af8-8afe-68fb2f68f83e\"",
+      "cookie": "\"v=2&aabcd673-3eea-47cc-8e58-d77c5c3aec45\"",
       "name": "bcookie"
     },
     {
       "domain": ".linkedin.com",
-      "cookie": "\"b=VGST05:s=V:r=V:a=V:p=V:g=2946:u=1:x=1:i=1704149304:t=1704235704:v=2:sig=AQEXWldH_SwT-ILHv8M6FHPAqdz5TgzS\"",
+      "cookie": "\"b=OGST03:s=O:r=O:a=O:p=O:g=3084:u=1:x=1:i=1704163873:t=1704250273:v=2:sig=AQFSJsGVd5g9i_66OUD2tWIsGCeL_nQj\"",
       "name": "lidc"
     },
     {
@@ -397,17 +372,17 @@
     },
     {
       "domain": ".go.sonobi.com",
-      "cookie": "135783256495908391",
+      "cookie": "135845859939229463",
       "name": "__uir_bw"
     },
     {
       "domain": ".go.sonobi.com",
-      "cookie": "11f6f77c-badf-41e1-8cdb-5e3c690e74d3",
+      "cookie": "35cc99ce-b27e-4e1d-a43e-d3b68720e949",
       "name": "__uin_bw"
     },
     {
       "domain": ".connatix.com",
-      "cookie": "32b582bd81b04ed6b89a847c4d3c6e13",
+      "cookie": "6bbaec979ccc425b8162e800e86f7c78",
       "name": "cnx_userId"
     },
     {
@@ -417,7 +392,7 @@
     },
     {
       "domain": ".mathtag.com",
-      "cookie": "a7fb6593-2a31-4100-8570-18b0c2d806e9",
+      "cookie": "rbcr-60b9a120-da8c-45c0-8114-9d36c92ecd29",
       "name": "uuid"
     },
     {
@@ -437,7 +412,7 @@
     },
     {
       "domain": ".krxd.net",
-      "cookie": "QArA6_Cs",
+      "cookie": "QAsX1_4V",
       "name": "_kuid_"
     },
     {
@@ -446,18 +421,13 @@
       "name": "KRTBCOOKIE_279"
     },
     {
-      "domain": ".hb.yahoo.net",
-      "cookie": "LQVIHTWE-H-LXR3~~63",
-      "name": "data-mag"
-    },
-    {
       "domain": ".blismedia.com",
       "cookie": "65934138CBE512E4B2E3529FBLIS",
       "name": "b"
     },
     {
       "domain": ".primis.tech",
-      "cookie": "65934139471cf",
+      "cookie": "65937a219a229",
       "name": "csuuid"
     },
     {
@@ -482,7 +452,7 @@
     },
     {
       "domain": ".openx.net",
-      "cookie": "v2|1704149302|vMgavPkWgy",
+      "cookie": "v2|1704163871|vMgavPkWgy",
       "name": "pd"
     },
     {
@@ -536,109 +506,29 @@
       "name": "KRTBCOOKIE_466"
     },
     {
-      "domain": ".speedtest.net",
-      "cookie": "1647b40882de4865835635741f40f141",
-      "name": "h_zdbb"
-    },
-    {
-      "domain": ".speedtest.net",
-      "cookie": "543a3ff2-7053-4bb6-94a1-dc9a4257f348",
-      "name": "_pubcid"
-    },
-    {
-      "domain": ".speedtest.net",
-      "cookie": "0Cw6LNAs7Q%3D%3D",
-      "name": "_pubcid_cst"
-    },
-    {
-      "domain": "www.speedtest.net",
-      "cookie": "0Cw6LNAs7Q%3D%3D",
-      "name": "pbjs-unifiedid_cst"
-    },
-    {
-      "domain": ".speedtest.net",
-      "cookie": "s%3AMJDA6tEAsMzRAAgTzaT38NqwT81e_TqA.O6MNvijoI8oDNDRrAosu%2BOVbQeBo%2BinTby%2B9S19hg7I",
-      "name": "st4-sid"
-    },
-    {
-      "domain": ".speedtest.net",
-      "cookie": "eyJ6ZGJiIjoiMTY0N2I0MDg4MmRlNDg2NTgzNTYzNTc0MWY0MGYxNDEiLCJmcGlkIjpudWxsLCJwcGlkIjoiMTY0N2I0MDg4MmRlNDg2NTgzNTYzNTc0MWY0MGYxNDEiLCJ1ZV9tMnMiOiIiLCJsY2xfaWQiOiIiLCJsb2MiOiJodHRwczovL3d3dy5zcGVlZHRlc3QubmV0L3B0IiwicHZfaWQiOiJmOTMzN2M2Yy1hMmJkLTRlYjYtOTc1YS01MWY4Zjk3YTgwNTYiLCJzZXNzX2lkIjoiOTYxOTBlYTQtOGEwZi00MjZiLWIyYWMtODFjOTRjMGVhODU5In0=",
-      "name": "zpack"
-    },
-    {
-      "domain": ".speedtest.net",
-      "cookie": "ID=586bb7e775c0f9dd:T=1704149301:RT=1704149301:S=ALNI_MYoRZ72spXozykQ5fJoNRaJ2OC4ng",
-      "name": "__gads"
-    },
-    {
-      "domain": ".speedtest.net",
-      "cookie": "UID=00000a05c7c45f2d:T=1704149301:RT=1704149301:S=ALNI_MYSB5iD9OlxC9vJoYQt-bcb7uRo6A",
-      "name": "__gpi"
-    },
-    {
-      "domain": ".media.net",
-      "cookie": "3471509057468541000V10",
-      "name": "visitor-id"
-    },
-    {
-      "domain": ".openx.net",
-      "cookie": "192049f2-a48c-0717-053c-b0fba6e6db2a|1704149302",
-      "name": "i"
-    },
-    {
-      "domain": ".demdex.net",
-      "cookie": "29250916519677992071166426735645698638",
-      "name": "demdex"
-    },
-    {
       "domain": ".w55c.net",
       "cookie": "5",
       "name": "matchcasale"
     },
     {
       "domain": ".rfihub.com",
-      "cookie": "H4sIAAAAAAAA_-MSsjS3NDYytDAxNDQyNDcCskyF-Ax1w40CI6t0jd2Li4NDAI6dsU0kAAAA",
+      "cookie": "H4sIAAAAAAAA_-MSsjS3NDYytDAxNDSyNDQwtzA1FeIz1A3yT4k38XLJLckJTAIA6dz7FSQAAAA",
       "name": "rud"
     },
     {
       "domain": ".rfihub.com",
-      "cookie": "H4sIAAAAAAAA__vFyGtobmBiaGJpbGBsYGYJAOiJq1AQAAAA",
+      "cookie": "H4sIAAAAAAAA_1slymtobmBiaGZsYWFkZG4BAE3qKj8QAAAA",
       "name": "eud"
     },
     {
       "domain": ".mfadsrvr.com",
-      "cookie": "!sovrn,1704149304",
+      "cookie": "!sovrn,1704163873",
       "name": "ssh"
     },
     {
-      "domain": ".3lift.com",
-      "cookie": "838149031182546664732",
-      "name": "tluid"
-    },
-    {
-      "domain": ".liadm.com",
-      "cookie": "24c447fd-64d4-49c3-8409-ba6f91bca6ba",
-      "name": "lidid"
-    },
-    {
-      "domain": ".betweendigital.com",
-      "cookie": "sjc1",
-      "name": "dc"
-    },
-    {
-      "domain": ".betweendigital.com",
-      "cookie": "ZZNBNwAHO5BCIHXW9RJvmO4QGtTSSN4-yLXMzA==",
-      "name": "ut"
-    },
-    {
       "domain": ".rfihub.com",
-      "cookie": "H4sIAAAAAAAA_-MSsjS3NDYytDAxNDQyNDcCskyF-Ax1w40CI6t0jd2Li4NDAI6dsU0kAAAA",
+      "cookie": "H4sIAAAAAAAA_-MSsjS3NDYytDAxNDSyNDQwtzA1FeIz1A3yT4k38XLJLckJTAIA6dz7FSQAAAA",
       "name": "ruds"
-    },
-    {
-      "domain": ".tappx.com",
-      "cookie": "72c0bb41-dc0a-5502-bf30-b77cdaa3f64b",
-      "name": "TXCSDMN_724"
     },
     {
       "domain": ".lijit.com",
@@ -647,22 +537,17 @@
     },
     {
       "domain": ".creativecdn.com",
-      "cookie": "nY52oGL8iGKZp9fzyE8H",
+      "cookie": "fNh5A9pik8Cy0sKD19ce",
       "name": "u"
     },
     {
-      "domain": ".mfadsrvr.com",
-      "cookie": "b258da3f-63c8-454b-81e1-0e6a18ab9a89",
-      "name": "tuuid"
-    },
-    {
       "domain": ".creativecdn.com",
-      "cookie": "nY52oGL8iGKZp9fzyE8H_1704149303283",
+      "cookie": "fNh5A9pik8Cy0sKD19ce_1704163882516",
       "name": "g"
     },
     {
       "domain": ".creativecdn.com",
-      "cookie": "1704149303",
+      "cookie": "1704163882",
       "name": "ts"
     },
     {
@@ -671,13 +556,8 @@
       "name": "wfivefivec"
     },
     {
-      "domain": ".bidswitch.net",
-      "cookie": "1704149303",
-      "name": "c"
-    },
-    {
       "domain": ".speedtest.net",
-      "cookie": "2024-01-01T22:48:31.903Z",
+      "cookie": "2024-01-02T02:51:19.891Z",
       "name": "OptanonAlertBoxClosed"
     },
     {
@@ -686,74 +566,9 @@
       "name": "zdconsent"
     },
     {
-      "domain": ".speedtest.net",
-      "cookie": "isGpcEnabled=0&datestamp=Mon+Jan+01+2024+19%3A48%3A31+GMT-0300+(Hor%C3%A1rio+Padr%C3%A3o+de+Bras%C3%ADlia)&version=202312.1.0&browserGpcFlag=0&isIABGlobal=false&hosts=H225%3A1%2CH796%3A1%2CH845%3A1%2CH36%3A1%2CH71%3A1%2CH1%3A1%2CH2%3A1%2CH137%3A1%2Clie%3A1%2CH4%3A1%2CH205%3A1%2Clqf%3A1%2CH9%3A1%2CH908%3A1%2CH11%3A1%2CH12%3A1%2CH814%3A1%2CH283%3A1%2CH15%3A1%2CH16%3A1%2CH17%3A1%2CH196%3A1%2CH18%3A1%2CH23%3A1%2CH26%3A1%2CH32%3A1%2CH33%3A1%2CH1109%3A1%2CH190%3A1%2CH35%3A1%2CH159%3A1%2CH140%3A1%2CH38%3A1%2CH39%3A1%2CH171%3A1%2CH43%3A1%2CH44%3A1%2CH375%3A1%2CH45%3A1%2CH290%3A1%2CH132%3A1%2Cgoh%3A1%2CH49%3A1%2CH51%3A1%2CH52%3A1%2CH54%3A1%2Ckoq%3A1%2CH55%3A1%2CH57%3A1%2CH58%3A1%2CH894%3A1%2Ccpg%3A1%2CH67%3A1%2CH69%3A1%2CH70%3A1%2CH798%3A1%2CH73%3A1%2Cwjt%3A1%2CH76%3A1%2CH245%3A1%2Cfgs%3A1%2CH78%3A1%2CH184%3A1%2CH298%3A1%2CH79%3A1%2CH810%3A1%2CH85%3A1%2CH86%3A1%2CH87%3A1%2Cyyf%3A1%2CH89%3A1%2CH246%3A1%2CH191%3A1%2CH547%3A1%2CH93%3A1%2CH94%3A1%2CH95%3A1&consentId=c50e6c6c-350a-44cb-a766-6251cc34eeb1&interactionCount=1&landingPath=NotLandingPage&GPPCookiesCount=1&groups=C0001%3A1%2CC0003%3A1%2CC0002%3A1%2CC0004%3A1%2COSSTA_BG%3A1&genVendors=",
-      "name": "OptanonConsent"
-    },
-    {
-      "domain": ".speedtest.net",
-      "cookie": "DBABLA~BVQqAAAACWA.QA",
-      "name": "OTGPPConsent"
-    },
-    {
-      "domain": ".lijit.com",
-      "cookie": "b258da3f-63c8-454b-81e1-0e6a18ab9a89",
-      "name": "_ljtrtb_87"
-    },
-    {
-      "domain": ".speedtest.net",
-      "cookie": "GA1.2.869487645.1704149309",
-      "name": "_ga"
-    },
-    {
-      "domain": ".speedtest.net",
-      "cookie": "GA1.2.673286967.1704149312",
-      "name": "_gid"
-    },
-    {
-      "domain": ".speedtest.net",
-      "cookie": "deleted",
-      "name": "_ga_KKLSRK6J1Z"
-    },
-    {
-      "domain": "www.speedtest.net",
-      "cookie": "1---",
-      "name": "usprivacy"
-    },
-    {
-      "domain": ".bidr.io",
-      "cookie": "ok",
-      "name": "bitoIsSecure"
-    },
-    {
       "domain": ".lijit.com",
       "cookie": "AAJNnk7LJoIAABZglkbN-g",
       "name": "_ljtrtb_85"
-    },
-    {
-      "domain": ".lijit.com",
-      "cookie": "eJwdjEsOgjAUAO%2FStS9p6Rd3LbyKyoamAbdFgbjSBE38xLuLbicz8yYZWROPgkmNFnNOhZbOlZ6WHp3SvJBoKVkRQxevbtptFTuECupD4D%2BsFjyNfhPPMLuXfaauwDgHFPtdKOxNV%2BHSiNlNsb36%2B%2BN%2F0kvSZ9KcEh9B8aMBIUUPhg0M6KASM6nPk8nJ5wtpAylv",
-      "name": "ljtrtb"
-    },
-    {
-      "domain": ".lijit.com",
-      "cookie": "eJyrVrIwULIyNDcwNTa1sDQw1lEyQuVamKLxzdD45sj8WgCKphAw",
-      "name": "ljtrtbexp"
-    },
-    {
-      "domain": ".tapad.com",
-      "cookie": "1704149303425",
-      "name": "TapAd_TS"
-    },
-    {
-      "domain": ".tapad.com",
-      "cookie": "1!46",
-      "name": "TapAd_3WAY_SYNCS"
-    },
-    {
-      "domain": ".turn.com",
-      "cookie": "5935463425703395280",
-      "name": "uid"
     },
     {
       "domain": ".sitescout.com",
@@ -771,13 +586,8 @@
       "name": "ANON_ID"
     },
     {
-      "domain": ".adsrvr.org",
-      "cookie": "17392cfd-f9bd-4845-a3a1-2cce370571cd",
-      "name": "TDID"
-    },
-    {
       "domain": ".simpli.fi",
-      "cookie": "FE4157EAE930475BBDF0DFEB673C5EA0",
+      "cookie": "06602D8BAB4C4BA5A7486F1848F68734",
       "name": "suid"
     },
     {
@@ -787,48 +597,13 @@
     },
     {
       "domain": ".adnxs.com",
-      "cookie": "dTM7k!M4.gD>6NRF']wIg2ImHEd)Ux!A#FZ.CK$wNl!cS9]@9KQw/r=glViclk?wsk0dheAGA^NkjrV^%vaK^0U1]4a8aGw=fw_kRDb2a'-i#@=n@U?J^/3w'!5x(TAzJIiee.zRO#)f9<XI6@'s>TkTHWd",
+      "cookie": "dTM7k!M4/8CxrEQF']wIg2E?eeY))Z!]tbP6j2F-XstGt!@Dk^$r>81",
       "name": "anj"
     },
     {
-      "domain": ".analytics.yahoo.com",
-      "cookie": "\"175w~2fxy:18z8~2fxy:18vk~2fxy:19e0~2fxy\"",
-      "name": "IDSYNC"
-    },
-    {
-      "domain": ".lijit.com",
-      "cookie": "H674UPZHpIG_P1ayQdibXAIj",
-      "name": "ljt_reader"
-    },
-    {
-      "domain": ".casalemedia.com",
-      "cookie": "ZZNBNgZpw93WBf2e7FWqtQAA",
-      "name": "CMID"
-    },
-    {
-      "domain": ".casalemedia.com",
-      "cookie": "4245",
-      "name": "CMPRO"
-    },
-    {
-      "domain": ".yahoo.com",
-      "cookie": "d=AQABBDZBk2UCELr97EGIySyzugioY9IloFYFEgEBAQGSlGWdZR6kxyMA_eMAAA&S=AQAAAsgChRJ3SZy79_LN6xmisnk",
-      "name": "A3"
-    },
-    {
       "domain": ".speedtest.net",
-      "cookie": "7d02t4kzpfjnsaxe6kzwkpikkpyqr1704149313|1704149313031|1704149313031|1704149313031",
+      "cookie": "lkye7xz6ibvxujaxrrkacibf2ekac1704163894|1704163894333|1704163894333|1704163894333",
       "name": "nol_fpid"
-    },
-    {
-      "domain": ".amazon-adsystem.com",
-      "cookie": "A8hCYtLvkE3KqcHGpKzPSCk",
-      "name": "ad-id"
-    },
-    {
-      "domain": ".amazon-adsystem.com",
-      "cookie": "0",
-      "name": "ad-privacy"
     },
     {
       "domain": ".mookie1.com",
@@ -846,19 +621,9 @@
       "name": "ov"
     },
     {
-      "domain": ".33across.com",
-      "cookie": "u%3D212404184437305%3As1%3D1704149303050%3Ats%3D1704149303050",
-      "name": "33x_ps"
-    },
-    {
       "domain": ".imrworldwide.com",
-      "cookie": "df866760-a8f7-11ee-9a54-c724f81c2635",
+      "cookie": "d28c4a30-a919-11ee-889f-9f57469d015b",
       "name": "IMRID"
-    },
-    {
-      "domain": ".rubiconproject.com",
-      "cookie": "LQVIHTWE-H-LXR3",
-      "name": "khaos"
     },
     {
       "domain": ".a-mx.com",
@@ -866,24 +631,9 @@
       "name": "amdt_t"
     },
     {
-      "domain": ".a-mx.com",
-      "cookie": "c50d4eeb-1d6c-4692-8044-f070c8df21ec",
-      "name": "amuid2"
-    },
-    {
       "domain": ".pubmatic.com",
       "cookie": "157577^https%3A%2F%2Fcookies.nextmillmedia.com%2Fsetuid%3Fbidder%3Dpubmatic%26nmuid%3D%26gdpr%3D0%26gdpr_consent%3D%26us_privacy%3D%7B%7BUS_PRIVACY%7D%7D%26uid%3D%23PMUID^2^0",
       "name": "ipc"
-    },
-    {
-      "domain": ".ipredictive.com",
-      "cookie": "f983106f-a887-41e8-a487-65162657c139|1704149304902",
-      "name": "cu"
-    },
-    {
-      "domain": ".adnxs.com",
-      "cookie": "373762103788395902",
-      "name": "uuid2"
     },
     {
       "domain": ".kargo.com",
@@ -911,33 +661,18 @@
       "name": "mc"
     },
     {
-      "domain": ".rubiconproject.com",
-      "cookie": "1|3amyYZZtoWvVR+hMcgWhQ0fJSxmaSveSHse86u7jCR1LmO55TDIVHEmGxJ74IWr9gsHIPbqgjQ1S8G+dhi1GhVEzNmZkqoUp",
-      "name": "audit"
-    },
-    {
       "domain": ".pubmatic.com",
-      "cookie": "5F3E8BD0-1FF1-481B-BF60-05DA302BF987",
+      "cookie": "DF6DFD77-B0EF-487A-94A6-DAB588B4C122",
       "name": "KADUSERCOOKIE"
     },
     {
       "domain": ".pubmatic.com",
-      "cookie": "5",
-      "name": "chkChromeAb67Sec"
-    },
-    {
-      "domain": ".pubmatic.com",
-      "cookie": "156498:4",
-      "name": "pi"
-    },
-    {
-      "domain": ".pubmatic.com",
-      "cookie": "1705276800%3A260_258_263_259_201_262_261_256%7C1704153600%3A248_255%7C1705104000%3A257%7C1704672000%3A265",
+      "cookie": "1705363200%3A201_263%7C1704240000%3A248%7C1704758400%3A265",
       "name": "DPSync3"
     },
     {
       "domain": ".pubmatic.com",
-      "cookie": "1705276800%3A8_104_55_220_22_3_13_54_21_233_46_5_240_231_71_166_165_48_264_250_178_176%7C1704931200%3A63%7C1705363200%3A35%7C1704672000%3A2_223_15",
+      "cookie": "1705363200%3A21_13_54_250_71_220",
       "name": "SyncRTB3"
     },
     {
@@ -946,18 +681,8 @@
       "name": "TXCSDMN_380"
     },
     {
-      "domain": ".bidr.io",
-      "cookie": "AADa_k7LJoIAABKVidQEwA",
-      "name": "bito"
-    },
-    {
       "domain": ".pubmatic.com",
-      "cookie": "1704149309",
-      "name": "PugT"
-    },
-    {
-      "domain": ".pubmatic.com",
-      "cookie": "1704111659",
+      "cookie": "1704163883",
       "name": "SPugT"
     },
     {
@@ -966,14 +691,389 @@
       "name": "__PPU___PPU_SESSION_URL"
     },
     {
-      "domain": "lby2kd27c.com",
-      "cookie": "2401011801ce892664d9824f84b69f352577",
-      "name": "UID"
-    },
-    {
       "domain": "lermanga.org",
       "cookie": "{\"impressions\":6,\"delayStarted\":0}",
       "name": "bnState_1991121"
+    },
+    {
+      "domain": ".speedtest.net",
+      "cookie": "writeable",
+      "name": "_rdc1704163877455"
+    },
+    {
+      "domain": ".speedtest.net",
+      "cookie": "0Cw6LNAs7Q%3D%3D",
+      "name": "_pubcid_cst"
+    },
+    {
+      "domain": "www.speedtest.net",
+      "cookie": "0Cw6LNAs7Q%3D%3D",
+      "name": "pbjs-unifiedid_cst"
+    },
+    {
+      "domain": ".speedtest.net",
+      "cookie": "ccff0232-2efa-42d1-ad5a-e89294b9334a",
+      "name": "_pubcid"
+    },
+    {
+      "domain": ".speedtest.net",
+      "cookie": "s%3At9my6OgLF6mlYwUrzgAmsAAqaQkXCCXj.CeaK5%2B03gPkoNjG8%2BiXCTQxmrX6HWDFx6D02FgSlubE",
+      "name": "st4-sid"
+    },
+    {
+      "domain": ".speedtest.net",
+      "cookie": "ID=a73bdf393d45dbac:T=1704163870:RT=1704163870:S=ALNI_MZF076_eTBQN6gGe2BLWYKGlYDYqQ",
+      "name": "__gads"
+    },
+    {
+      "domain": ".speedtest.net",
+      "cookie": "UID=00000a05ce5f6c6b:T=1704163870:RT=1704163870:S=ALNI_MZV54XSVPOPNpN31Zs6Hcf6WQmibg",
+      "name": "__gpi"
+    },
+    {
+      "domain": ".openx.net",
+      "cookie": "699b8fc9-40e9-01e6-2fcd-bde694072650|1704163871",
+      "name": "i"
+    },
+    {
+      "domain": ".tappx.com",
+      "cookie": "1704163871",
+      "name": "TXCD"
+    },
+    {
+      "domain": ".acuityplatform.com",
+      "cookie": "MTU0NzM1MXwwfDJ8M3wyMDg2MTgxMXwwfDF8MHwwfDd8Mnx8fHwwfDB8MHwwfHx8ZWYwMTZkZTAwNDQ3ZDAxMDc1ZjYzMjg2ZmM0NGQzNGVjMmU5MWRhMHw1fDB8ODcxNzU5OTE0Njg5fDczNTkwMDc3N3wwfDB8fHwxNzMzODgwMDY0fDk5fDExMDkzMjAwMDh8LTEwMzAyNzcwMzh8MHwwfDF8MHwxfHwwfHxVU0F8REV8V0lMTUlOR1RPTnwyMzV8dmEtYmRyLTAyNl8xNzA0MTYzODY5OTk3XzE3MDQyMDQ2ODYxODd8MjEyMDg4fHwxMjY4OHwxNTQ1OHwzODM0NHwxNzU1NjJ8OTgyNjB8MHw3MTQ2fDIxOTExfDB8MHwxMTU3Nnx4YXBpOjI1NjUyMDpsQzBjd0R1ZTRfNEF8MC4wfDIzLDI2LDEyLDE1fDB8MHwwfDB8MThjYzgxNTBjZGE",
+      "name": "bv-877628"
+    },
+    {
+      "domain": ".srv.stackadapt.com",
+      "cookie": "s%3A0-aa07b9f8-4aca-5b9a-72c0-ef433591fd4a.h3Ru7I9reYvQYP3sJ98gyLg9%2Fp%2F7QrqPFDRjc%2F9YHBo",
+      "name": "sa-user-id"
+    },
+    {
+      "domain": ".srv.stackadapt.com",
+      "cookie": "s%3Aqge5-ErKW5pywO9DNZH9SmdY6co.JRp8OGXB%2BfBd%2FVM02EycFCXz4XyalDnifnzc1Bme0aU",
+      "name": "sa-user-id-v2"
+    },
+    {
+      "domain": ".adx.opera.com",
+      "cookie": "OPUb53fc99dfd3a4226a18ac8d1f1d6271d",
+      "name": "UID"
+    },
+    {
+      "domain": ".speedtest.net",
+      "cookie": "isGpcEnabled=0&datestamp=Mon+Jan+01+2024+23%3A51%3A19+GMT-0300+(Hor%C3%A1rio+Padr%C3%A3o+de+Bras%C3%ADlia)&version=202312.1.0&browserGpcFlag=0&isIABGlobal=false&hosts=H225%3A1%2CH796%3A1%2CH845%3A1%2CH36%3A1%2CH71%3A1%2CH1%3A1%2CH2%3A1%2CH137%3A1%2Clie%3A1%2CH4%3A1%2CH205%3A1%2Clqf%3A1%2CH9%3A1%2CH908%3A1%2CH11%3A1%2CH12%3A1%2CH814%3A1%2CH283%3A1%2CH15%3A1%2CH16%3A1%2CH17%3A1%2CH196%3A1%2CH18%3A1%2CH23%3A1%2CH26%3A1%2CH32%3A1%2CH33%3A1%2CH1109%3A1%2CH190%3A1%2CH35%3A1%2CH159%3A1%2CH140%3A1%2CH38%3A1%2CH39%3A1%2CH171%3A1%2CH43%3A1%2CH44%3A1%2CH375%3A1%2CH45%3A1%2CH290%3A1%2CH132%3A1%2Cgoh%3A1%2CH49%3A1%2CH51%3A1%2CH52%3A1%2CH54%3A1%2Ckoq%3A1%2CH55%3A1%2CH57%3A1%2CH58%3A1%2CH894%3A1%2Ccpg%3A1%2CH67%3A1%2CH69%3A1%2CH70%3A1%2CH798%3A1%2CH73%3A1%2Cwjt%3A1%2CH76%3A1%2CH245%3A1%2Cfgs%3A1%2CH78%3A1%2CH184%3A1%2CH298%3A1%2CH79%3A1%2CH810%3A1%2CH85%3A1%2CH86%3A1%2CH87%3A1%2Cyyf%3A1%2CH89%3A1%2CH246%3A1%2CH191%3A1%2CH547%3A1%2CH93%3A1%2CH94%3A1%2CH95%3A1&consentId=fdb76c57-7f9a-49d4-a237-10f59c3a736d&interactionCount=1&landingPath=NotLandingPage&GPPCookiesCount=1&groups=C0001%3A1%2CC0003%3A1%2CC0002%3A1%2CC0004%3A1%2COSSTA_BG%3A1&genVendors=",
+      "name": "OptanonConsent"
+    },
+    {
+      "domain": ".speedtest.net",
+      "cookie": "DBABLA~BVQqAAAACWA.QA",
+      "name": "OTGPPConsent"
+    },
+    {
+      "domain": ".speedtest.net",
+      "cookie": "GA1.2.1513007405.1704163878",
+      "name": "_ga"
+    },
+    {
+      "domain": ".speedtest.net",
+      "cookie": "GA1.2.1653418641.1704163880",
+      "name": "_gid"
+    },
+    {
+      "domain": "www.speedtest.net",
+      "cookie": "1---",
+      "name": "usprivacy"
+    },
+    {
+      "domain": ".betweendigital.com",
+      "cookie": "sjc1",
+      "name": "dc"
+    },
+    {
+      "domain": "sync.srv.stackadapt.com",
+      "cookie": "s%3AAQAKIPbLTMDjxXY_hNjFlYwc4fydelDg7VP9BvkaZeWqVC5ZEOYBGAQgoPTNrAYwAToECLubaEIEwYGLdA.a7iUqCDGsdwW0XOaixJftsbF7vgQRNchHmMM0N%2BKKt4",
+      "name": "sa-user-id-v3"
+    },
+    {
+      "domain": ".betweendigital.com",
+      "cookie": "ZZN6IAAAbWBzqE-vt2E9WybLVsOmspqb21a-gw==",
+      "name": "ut"
+    },
+    {
+      "domain": ".33across.com",
+      "cookie": "u%3D212403058344945%3As1%3D1704163871900%3Ats%3D1704163871900",
+      "name": "33x_ps"
+    },
+    {
+      "domain": ".ipredictive.com",
+      "cookie": "9f38fcc0-5f5d-4d75-940a-682a91fad152|1704163873954",
+      "name": "cu"
+    },
+    {
+      "domain": ".csync.loopme.me",
+      "cookie": "f6ea8bf0-8d37-4c59-878f-35a13bdbd2a0",
+      "name": "viewer_token"
+    },
+    {
+      "domain": ".tappx.com",
+      "cookie": "f6ea8bf0-8d37-4c59-878f-35a13bdbd2a0",
+      "name": "TXCSDMN_109"
+    },
+    {
+      "domain": ".bidswitch.net",
+      "cookie": "1704163898",
+      "name": "tuuid_lu"
+    },
+    {
+      "domain": ".a-mo.net",
+      "cookie": "d6ee21c7-4948-4144-bcb6-5996b4e9e5ed",
+      "name": "amuid2"
+    },
+    {
+      "domain": ".prebid.a-mo.net",
+      "cookie": "d6ee21c7-4948-4144-bcb6-5996b4e9e5ed",
+      "name": "sd_amuid2"
+    },
+    {
+      "domain": ".casalemedia.com",
+      "cookie": "ZZN6H7YZ25NXFX0A14XVNQAA",
+      "name": "CMID"
+    },
+    {
+      "domain": ".casalemedia.com",
+      "cookie": "1721",
+      "name": "CMPRO"
+    },
+    {
+      "domain": ".rubiconproject.com",
+      "cookie": "LQVR61P9-N-IVN2",
+      "name": "khaos"
+    },
+    {
+      "domain": ".rubiconproject.com",
+      "cookie": "1|eU6lLiqxFsrmAlDNTd1kEusuctNIo1HWMzldqOZCQLJogcEUG9wh0cUZbQ0mMKlL9VilA+NqdjIizXmmrSrFbdFmRRNMd5/3N4UGW0w+VJ5QtBocFBFhRzzUN72XGlPASiHVyGH0U0M=",
+      "name": "audit"
+    },
+    {
+      "domain": ".hb.yahoo.net",
+      "cookie": "3471654808026691000V10",
+      "name": "visitor-id"
+    },
+    {
+      "domain": ".hb.yahoo.net",
+      "cookie": "LQVR61P9-N-IVN2~~63",
+      "name": "data-mag"
+    },
+    {
+      "domain": ".tappx.com",
+      "cookie": "8e484acb-684b-49ee-9004-3d3dcc58341c",
+      "name": "TXCSDMN_80"
+    },
+    {
+      "domain": ".sharethrough.com",
+      "cookie": "958c8499-811a-405e-adc3-d95b6fb88dc3",
+      "name": "stx_user_id"
+    },
+    {
+      "domain": ".3lift.com",
+      "cookie": "4686308800217851256492",
+      "name": "tluid"
+    },
+    {
+      "domain": ".amazon-adsystem.com",
+      "cookie": "A3s36sDHakmbpRiLxZI1fQQ",
+      "name": "ad-id"
+    },
+    {
+      "domain": ".turn.com",
+      "cookie": "2989352947983130015",
+      "name": "uid"
+    },
+    {
+      "domain": ".tapad.com",
+      "cookie": "1704163872218",
+      "name": "TapAd_TS"
+    },
+    {
+      "domain": ".tapad.com",
+      "cookie": "15fa5612-2a74-4764-a916-223f5e95f2ba",
+      "name": "TapAd_DID"
+    },
+    {
+      "domain": ".tapad.com",
+      "cookie": "1!50-2!50-3!50",
+      "name": "TapAd_3WAY_SYNCS"
+    },
+    {
+      "domain": ".go.sonobi.com",
+      "cookie": "s85132|ZZN6L",
+      "name": "HAPLB8G"
+    },
+    {
+      "domain": ".go.sonobi.com",
+      "cookie": "3c11f33d-e625-41ed-8b41-08d6b9cbc5a9",
+      "name": "__uis"
+    },
+    {
+      "domain": ".acuityplatform.com",
+      "cookie": "\"OikKAfqbdXNlck1hdGNoQnlVc2VyTWF0Y2hpbmdJZE1hcPqBNjT6jXVzZXJNYXRjaGluZ0lkJAKAkWxhc3REcm9wVGltZU1pbGxpcyUBRjICURW0mGxhc3RTdWNjZXNzZnVsTWF0Y2hNaWxsaXMlAUYyAlEVtI90aGlyZFBhcnR5VXNlcklkYzE1ZmE1NjEyLTJhNzQtNDc2NC1hOTE2LTIyM2Y1ZTk1ZjJiYfuBMTf6QiSiQyUBRjICUGa0RCFFIfuAMvpCxEMlAUYyAlBmtEQhRSH7gTQx+kIkAZJDJQFGMgJTSIJEJQFGMgJTSIJFZTY0ODI2Mjg5OTM4NTIzMjY4NTQxNTc0NTM3MzAyNDA1NjE5MTk2+4IxMDn6QiQDmkMlAUYyAlBmtEQhRSH7+4Z2ZXJzaW9uwvs=\"",
+      "name": "aum"
+    },
+    {
+      "domain": ".targeting.unrulymedia.com",
+      "cookie": "%7B%22rx_uuid%22%3A%22RX-7ba88b78-fa0b-4ada-ad65-122c2d242131-005%22%7D",
+      "name": "_rxuuid"
+    },
+    {
+      "domain": ".tappx.com",
+      "cookie": "RX-7ba88b78-fa0b-4ada-ad65-122c2d242131-005",
+      "name": "TXCSDMN_162"
+    },
+    {
+      "domain": ".speedtest.net",
+      "cookie": "eyJ6ZGJiIjoiIiwiZnBpZCI6bnVsbCwicHBpZCI6IjdkMTUwNTQzYjZiOTQxOWNiY2I0MDhkZWQ3MzFlYTZjIiwidWVfbTJzIjoiIiwibGNsX2lkIjoiIiwibG9jIjoiaHR0cHM6Ly93d3cuc3BlZWR0ZXN0Lm5ldC9wdCIsInB2X2lkIjoiM2Y4ZTc3NmUtYjNjMS00N2I5LTg2MWQtYmQ4MDMzNjBiOGQ0Iiwic2Vzc19pZCI6IjljZTMwMThkLTkzYzktNGJiOC04ZWVjLTQyMTAxMDEwYzkxNCJ9",
+      "name": "zpack"
+    },
+    {
+      "domain": ".speedtest.net",
+      "cookie": ".speedtest.net",
+      "name": "_li_dcdm_c"
+    },
+    {
+      "domain": ".speedtest.net",
+      "cookie": "3f68d4c253f3--01hk41apb19ctw70gtwt1e34zn",
+      "name": "_lc2_fpi"
+    },
+    {
+      "domain": ".speedtest.net",
+      "cookie": "7d150543b6b9419cbcb408ded731ea6c",
+      "name": "fpid"
+    },
+    {
+      "domain": ".bluekai.com",
+      "cookie": "phx",
+      "name": "bkdc"
+    },
+    {
+      "domain": ".zdbb.net",
+      "cookie": "7d150543b6b9419cbcb408ded731ea6c",
+      "name": "h_zdbb"
+    },
+    {
+      "domain": ".zdbb.net",
+      "cookie": "0",
+      "name": "csp"
+    },
+    {
+      "domain": ".agkn.com",
+      "cookie": "0001%3AGAhHf3Y4ASf4m3L2xz4idR1YJCNEByUZ",
+      "name": "ab"
+    },
+    {
+      "domain": ".adsrvr.org",
+      "cookie": "9010a42b-0e92-4ccc-bb98-e7d1e4cc2516",
+      "name": "TDID"
+    },
+    {
+      "domain": ".adsrvr.org",
+      "cookie": "CAESFQoGY2FzYWxlEgsI1OTm3_bRxTwQBRIUCgV0YXBhZBILCJyE_un20cU8EAUSFgoHcnViaWNvbhILCMrb2fP20cU8EAUSGwoMc2hhcmV0aHJvdWdoEgsIprCwuvfRxTwQBRIXCghwdWJtYXRpYxILCPKl_L_30cU8EAUYASABKAIyCwi8ldCPjtLFPBAFOAFaB3BleHU4N2VgAg..",
+      "name": "TDCPM"
+    },
+    {
+      "domain": ".bidr.io",
+      "cookie": "AADG_E7LJvQAABISbBQ-Hw",
+      "name": "bito"
+    },
+    {
+      "domain": ".pubmatic.com",
+      "cookie": "1704163885",
+      "name": "PugT"
+    },
+    {
+      "domain": ".demdex.net",
+      "cookie": "64826289938523268541574537302405619196",
+      "name": "demdex"
+    },
+    {
+      "domain": ".analytics.yahoo.com",
+      "cookie": "\"18vk~2fy2:19e0~2fy2:1766~2fy2\"",
+      "name": "IDSYNC"
+    },
+    {
+      "domain": ".yahoo.com",
+      "cookie": "d=AQABBB96k2UCEHVK68tQG0OYEofdZRFU1pUFEgEBAQHLlGWdZQAAAAAA_eMAAA&S=AQAAAvHTXVWkotTiK2kFpYupKyk",
+      "name": "A3"
+    },
+    {
+      "domain": ".lijit.com",
+      "cookie": "eJwVjTsOAjEMRO%2BSGku2cfzhBkhoBRTbx9lwCcTd8ZbzNDPv29jarQUSDuEEXMEgc07IDIdlB62K3EnbpTlW9%2FHa30rPgA3u%2B8aFgwsrGzp3Z%2BGrmnc2Oxfne6ZTThPQzxAQdYUxqDx4lHXYik9vvz8OIyFL",
+      "name": "ljtrtb"
+    },
+    {
+      "domain": ".lijit.com",
+      "cookie": "c:b5ddc1ffd2c182bdbf9478c260950fe5",
+      "name": "_ljtrtb_84"
+    },
+    {
+      "domain": ".lijit.com",
+      "cookie": "eJyrVrI0V7IyNDcwNTY3NjE30lGyMEHjo8kbQfgm5mYWZiC%2BpRGyfC0AndYQag%3D%3D",
+      "name": "ljtrtbexp"
+    },
+    {
+      "domain": ".lijit.com",
+      "cookie": "H6_rRPZH0vnboj2jQRuXfF3K",
+      "name": "ljt_reader"
+    },
+    {
+      "domain": ".eyeota.net",
+      "cookie": "18cc81547ed-44320000010a5b74",
+      "name": "mako_uid"
+    },
+    {
+      "domain": ".eyeota.net",
+      "cookie": "23412~DM",
+      "name": "SERVERID"
+    },
+    {
+      "domain": ".adnxs.com",
+      "cookie": "6270825824236785277",
+      "name": "uuid2"
+    },
+    {
+      "domain": ".zdbb.net",
+      "cookie": "1",
+      "name": "zd_cs_ady"
+    },
+    {
+      "domain": ".zdbb.net",
+      "cookie": "1",
+      "name": "zd_cs_ada"
+    },
+    {
+      "domain": ".liadm.com",
+      "cookie": "96394d01-4f81-4f12-922b-886dca051434",
+      "name": "lidid"
+    },
+    {
+      "domain": ".speedtest.net",
+      "cookie": "{}",
+      "name": "__li_idex_cache_eyJyZXNvbHZlIjoic2hhMiJ9"
+    },
+    {
+      "domain": ".360yield.com",
+      "cookie": "12dafca1-40f6-4ed6-9794-d5122e68af45",
+      "name": "tuuid"
+    },
+    {
+      "domain": ".speedtest.net",
+      "cookie": "GS1.1.1704163877.1.1.1704163906.60.0.0",
+      "name": "_ga_KKLSRK6J1Z"
+    },
+    {
+      "domain": "www.google.com",
+      "cookie": "I-A0jEXonT4tkMPdkvyzBNZpDU6BzFjzpAMFNxV0TAMAAAA",
+      "name": "DV"
     },
     {
       "domain": ".google.com",
@@ -982,12 +1082,12 @@
     },
     {
       "domain": ".google.com",
-      "cookie": "511=AJfUSLL1nPezMG_Uh5D8G5WFHF_ZU-h334Fn9_C_0evU9zZ4ov4aDcyVVZNZ0Mq-stU04kT1-mxcSMiLkf80lt9MnkVD6fnnHZBKouu3XbwvZYaf8iaVd3cGodWxuPJ80YUJhFiycghHjm7LA14UJg5FK4Hh46_8f48BGjAsm9eKS3w6yMY--Oo",
+      "cookie": "511=pl1kZtJ0A8s3Z1bH--i-xT88IOHGqZCwXcNORLTf9eBJci57_8vaRskWP8RIuw9mCqX68dDXLeeUio6Ohm21wFfRWhKlExHt6Zh_isSXuCpQM_kYY3321FHzUpF9HlFNY34_zxjj9fUPGiY_sqWdeu64RM4TMFZaRPpi0iPuLe2GECuovI55MK-RDpyd5Ayu",
       "name": "NID"
     },
     {
       "domain": ".google.com",
-      "cookie": "2024-01-02-01",
+      "cookie": "2024-01-02-03",
       "name": "1P_JAR"
     }
   ]

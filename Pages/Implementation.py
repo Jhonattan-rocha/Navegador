@@ -590,7 +590,7 @@ class Historic(QWidget):
         items_to_load = history['Sites'][self.loaded_items:self.loaded_items + self.items_per_load]
 
         for site in items_to_load:
-            Historic.add_historic_item(main_page=self.main_page, historic_data=site, historic_page=self)
+            self.add_historic_item(historic_data=site)
 
         self.loaded_items += self.items_per_load
 
@@ -614,25 +614,22 @@ class Historic(QWidget):
             cont = 0
             for site in history['Sites']:
                 if cont <= limit:
-                    Historic.add_historic_item(main_page=self.main_page, historic_data=site,
-                                               historic_page=self)
+                    self.add_historic_item(historic_data=site)
                     cont += 1
                 else:
                     break
 
-    @staticmethod
-    def open_historic_site(main_page, site):
-        default_page = Default(main_page, main_page=main_page).ui.page
-        main_page.ui.tabs.addTab(default_page, "Nova pagina")
-        last_page = main_page.ui.tabs.count() - 1
-        layout = main_page.ui.tabs.widget(last_page)
+    def open_historic_site(self, site):
+        default_page = Default(self.main_page, main_page=self.main_page).ui.page
+        self.main_page.ui.tabs.addTab(default_page, "Nova pagina")
+        last_page = self.main_page.ui.tabs.count() - 1
+        layout = self.main_page.ui.tabs.widget(last_page)
         webview = layout.findChildren(QWebEngineView)
         if webview:
             webview[0].load(site)
 
-    @staticmethod
-    def add_historic_item(main_page, historic_page, historic_data):
-        if main_page:
+    def add_historic_item(self, historic_data):
+        if self.main_page:
             historic_item = QGroupBox()
             historic_item.setObjectName(u"historic_item")
             sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -684,7 +681,7 @@ class Historic(QWidget):
             open_site.setObjectName(u"open_site")
             sizePolicy.setHeightForWidth(open_site.sizePolicy().hasHeightForWidth())
             open_site.setSizePolicy(sizePolicy)
-            open_site.clicked.connect(lambda: Historic.open_historic_site(main_page, historic_data['name']))
+            open_site.clicked.connect(lambda: self.open_historic_site(historic_data['name']))
             open_site.setMaximumSize(QSize(16777215, 16777215))
             open_site.setFont(font)
             open_site.setIcon(icon5)
@@ -703,7 +700,7 @@ class Historic(QWidget):
             del_item_historic.clicked.connect(
                 lambda: remove_historic_item(id=historic_data['id'],
                                              remove_view=True, widget=historic_item,
-                                             layout=historic_page.ui.container_historic_page))
+                                             layout=self.ui.container_historic_page))
             del_item_historic.setMaximumSize(QSize(40, 40))
             del_item_historic.setMinimumSize(QSize(40, 40))
             del_item_historic.setStyleSheet(u"QPushButton {\n"
@@ -723,4 +720,4 @@ class Historic(QWidget):
 
             horizontalLayout_7.addWidget(del_item_historic)
 
-            historic_page.ui.container_historic_page.addWidget(historic_item)
+            self.ui.container_historic_page.addWidget(historic_item)

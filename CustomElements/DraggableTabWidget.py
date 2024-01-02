@@ -30,7 +30,7 @@ class DraggableTabWidget(QTabWidget):
     def join_tabs(self):
 
         main_instances = self.__class__.main_instances
-
+        print(main_instances)
         # Verifica se há pelo menos duas instâncias
         if len(main_instances) >= 1:
             main_window_to_receive_tabs = self.main_page
@@ -41,30 +41,22 @@ class DraggableTabWidget(QTabWidget):
                     tabs_to_transfer = instance.ui.tabs
 
                     # Transfere as abas para a primeira main_window
-                    for index in range(tabs_to_transfer.count()):
+                    for index in range(tabs_to_transfer.count(), -1, -1):
                         widget = tabs_to_transfer.widget(index)
                         if widget:
                             tabs_to_transfer.removeTab(index)
 
                             widget.implementation.main_page = main_window_to_receive_tabs
-                            widget.setParent(main_window_to_receive_tabs.ui.tabs)
+                            widget.implementation.setParent(main_window_to_receive_tabs)
+                            widget.setParent(widget.implementation)
                             main_window_to_receive_tabs.ui.tabs.addTab(widget,
                                                                        widget.implementation.windowTitle() or widget.implementation.ui.webEngineView.title())
 
-                            # if 'page' in widget.objectName():
-                            #     new_tab = Default(self.main_page, self.main_page)
-                            #     new_tab.ui.webEngineView.load(widget.implementation.ui.webEngineView.url().toString())
-                            #     main_window_to_receive_tabs.ui.tabs.addTab(new_tab.ui.page,
-                            #                                                new_tab.ui.webEngineView.title())
-                            # elif 'download' in widget.objectName():
-                            #     new_tab = Download(self.main_page, self.main_page)
-                            #     main_window_to_receive_tabs.ui.tabs.addTab(new_tab.ui.downloads, "Downloads")
-                            # elif 'historic' in widget.objectName():
-                            #     new_tab = Historic(self.main_page, self.main_page)
-                            #     main_window_to_receive_tabs.ui.tabs.addTab(new_tab.ui.historic, "Downloads")
+
                     self.update()
                     self.__class__.main_instances.remove(instance)
                     instance.close()
+            main_window_to_receive_tabs.ui.tabs.setTabsClosable(True)
 
     def close_tab(self):
         current_index = self.currentIndex()
@@ -154,23 +146,9 @@ class DraggableTabWidget(QTabWidget):
 
             page = Main(new_tab=False)
 
-            # old_page = self.contentWidget.findChildren(QWebEngineView)
-            # if bool(old_page):
-            #     url = old_page[0].url().toString()
-            #     new_page = Default(parent=page, main_page=page)
-            #     new_page.ui.webEngineView.load(url)
-            #     page.ui.tabs.addTab(new_page.ui.page, name)
-            # elif 'download' in self.contentWidget.objectName():
-            #     new_page = Download(parent=page, main_page=page)
-            #     page.ui.tabs.addTab(new_page.ui.downloads, name)
-            # elif 'historic' in self.contentWidget.objectName():
-            #     new_page = Historic(parent=page, main_page=page)
-            #     page.ui.tabs.addTab(new_page.ui.historic, name)
-            # self.contentWidget.implementation.deleteLater()
-            # self.contentWidget.deleteLater()
-
             self.contentWidget.implementation.main_page = page
-            self.contentWidget.setParent(page.ui.tabs)
+            self.contentWidget.implementation.setParent(page)
+            self.contentWidget.setParent(self.contentWidget.implementation)
             page.ui.tabs.addTab(self.contentWidget,
                                 self.contentWidget.implementation.windowTitle() or self.contentWidget.implementation.ui.webEngineView.title())
             self.update()
@@ -192,7 +170,7 @@ class DraggableTabWidget(QTabWidget):
         onMoveTabSignal = Signal(int, int, name='onMoveTabSignal')
         onAttchTabSignal = Signal()
 
-        def __init__(self, parent=None):
+        def __init__(self, parent=None, main_page=None):
             super().__init__(parent)
 
             self.setAcceptDrops(True)
@@ -203,6 +181,7 @@ class DraggableTabWidget(QTabWidget):
             self.dragDropedPos = QPoint()
             self.mouseCursor = QCursor()
             self.dragInitiated = False
+            self.main_page = main_page
 
         def mouseDoubleClickEvent(self, event):
             event.accept()
