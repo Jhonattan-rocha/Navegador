@@ -229,10 +229,6 @@ class DraggableTabWidget(QTabWidget):
                 if dropAction == Qt.DropAction.IgnoreAction:
                     event.accept()
                     self.onDetachTabSignal.emit(self.tabAt(self.dragStartPos), self.mouseCursor.pos())
-                # elif dropAction == Qt.DropAction.MoveAction:
-                #     if not self.dragDropedPos.isNull():
-                #         event.accept()
-                #         self.onMoveTabSignal.emit(self.tabAt(self.dragDropedPos), self.tabAt(self.dragStartPos))
             else:
                 super().mouseMoveEvent(event)
 
