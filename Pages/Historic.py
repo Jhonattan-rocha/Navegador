@@ -19,6 +19,7 @@ class HistoricPage(QWidget):
         sizePolicy1 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         sizePolicy1.setHorizontalStretch(0)
         sizePolicy1.setVerticalStretch(0)
+        widget.setWindowTitle("Histórico")
         icon1 = QIcon()
         icon1.addFile(u"figs/l-arrow.png", QSize(), QIcon.Normal, QIcon.Off)
         icon4 = QIcon()

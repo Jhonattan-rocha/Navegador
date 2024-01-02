@@ -19,6 +19,7 @@ class DownloadsPage(QWidget):
         sizePolicyExpanding.setHorizontalStretch(0)
         sizePolicyExpanding.setVerticalStretch(0)
 
+        widget.setWindowTitle("Downloads")
         icon1 = QIcon()
         icon1.addFile(u"figs/l-arrow.png", QSize(), QIcon.Normal, QIcon.Off)
         icon4 = QIcon()

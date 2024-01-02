@@ -1,10 +1,11 @@
 # This Python file uses the following encoding: utf-8
 import sys
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QCoreApplication
 from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import (QApplication, QWidget)
 
+from Pages.FindInPage import FindInPage
 from Pages.Implementation import Default, Historic, Download
 from Pages.ShortCuts import ShortcutManager
 # Important:
@@ -23,7 +24,7 @@ class Main(QWidget):
         self.dialog_download = None
         self.site_atual: dict = {}
         if new_tab:
-            self.ui.tabs.addTab(Default(self, main_window=self).ui.page, "Nova Página")
+            self.ui.tabs.addTab(Default(self, main_page=self).ui.page, "Nova Página")
         self.ui.tabs.tabCloseRequested.connect(self.close_tab)
         self.short_cuts = ShortcutManager()
 
@@ -42,6 +43,14 @@ class Main(QWidget):
 
         self.short_cuts.register_shortcut(self, Qt.CTRL | Qt.Key.Key_D, lambda: (self.ui.tabs.addTab(
             Download(self, self).ui.downloads, "Downloads"), self.ui.tabs.setTabsClosable(True)))
+
+        self.short_cuts.register_shortcut(self, Qt.CTRL | Qt.Key.Key_F, lambda: self.find_in_page_short_cut())
+
+    def find_in_page_short_cut(self):
+        tab = self.ui.tabs.currentWidget()
+        if 'page' in tab.objectName():
+            find = FindInPage(webView=tab.implementation.ui.webEngineView)
+            find.show()
 
     def previous_page(self):
         tabs = self.ui.tabs.count() - 1
@@ -77,12 +86,24 @@ class Main(QWidget):
     def close_tab(self, index) -> None:
         tabs = self.ui.tabs.count()
         if tabs > 1:
+            tab = self.ui.tabs.widget(index)
             self.ui.tabs.removeTab(index)
+            tab.implementation.deleteLater()
             tabs = self.ui.tabs.count()
             if tabs == 1:
                 self.ui.tabs.setTabsClosable(False)
         else:
             self.ui.tabs.setTabsClosable(False)
+
+    def closeEvent(self, event):
+        count = self.ui.tabs.count()
+        for tab_index in range(count):
+            self.ui.tabs.widget(tab_index).implementation.ui.deleteLater()
+            self.ui.tabs.widget(tab_index).implementation.deleteLater()
+        self.ui.deleteLater()
+        self.deleteLater()
+        QCoreApplication.processEvents()
+        event.accept()
 
 
 if __name__ == "__main__":

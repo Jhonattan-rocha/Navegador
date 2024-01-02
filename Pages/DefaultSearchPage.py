@@ -2,10 +2,11 @@ import os
 
 from PySide6.QtCore import (QSize, QUrl, Qt)
 from PySide6.QtGui import (QCursor, QFont, QIcon)
-from PySide6.QtWebEngineCore import QWebEngineProfile, QWebEnginePage
 from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import (QGroupBox, QHBoxLayout, QLineEdit, QSizePolicy, QWidget)
 from PySide6.QtWidgets import (QPushButton, QLayout, QProgressBar, QVBoxLayout)
+
+from CustomElements.CustonPageWebEngine import CustomWebEnginePage
 
 
 class DefaultSearchPage(QWidget):
@@ -113,7 +114,7 @@ class DefaultSearchPage(QWidget):
 
         self.horizontalLayout.addWidget(self.arrow_right_historic)
 
-        self.url = QLineEdit(self.hot_bar)
+        self.url = QLineEdit()
         self.url.setObjectName(u"url")
         self.url.setSizePolicy(sizePolicyExpanding)
         self.url.setStyleSheet(u"QLineEdit {\n"
@@ -175,12 +176,10 @@ class DefaultSearchPage(QWidget):
 
         self.container_tab.addWidget(self.hot_bar)
 
-        self.webEngineView = QWebEngineView(self.page)
-        self.profile = self.webEngineView.page().profile().defaultProfile()
-        self.profile.setPersistentCookiesPolicy(QWebEngineProfile.PersistentCookiesPolicy.ForcePersistentCookies)
-        self.profile.setPersistentStoragePath(os.path.abspath("Cookies"))
-        self.profile.setCachePath(os.path.abspath("PersistedDatas"))
-        self.profile.setDownloadPath(os.path.abspath("PersistedDatas"))
+        self.page_web = CustomWebEnginePage(parent=widget)
+        self.page_web.setObjectName("page_web")
+        self.webEngineView = QWebEngineView(parent=self.page)
+        self.webEngineView.setPage(self.page_web)
         self.webEngineView.setObjectName(u"webEngineView")
         self.webEngineView.setSizePolicy(sizePolicyExpanding)
         self.webEngineView.setMinimumSize(QSize(0, 0))
@@ -190,3 +189,5 @@ class DefaultSearchPage(QWidget):
         self.webEngineView.load("https://www.google.com/")
 
         self.container_tab.addWidget(self.webEngineView)
+
+

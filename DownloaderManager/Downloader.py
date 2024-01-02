@@ -49,6 +49,7 @@ class Downloader(QObject):
     progress_update = Signal(float, QProgressBar)
     download_finished = Signal(str, str)
     download_failed = Signal(str, str)
+    downloads = []
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -56,10 +57,8 @@ class Downloader(QObject):
 
     @Slot(str, str, str)
     def download_file(self, url, folder_path, suggested_file_name, progress_bar: QProgressBar):
-        register_download_historic(suggested_file_name, folder_path, 'Baixando', datetime.datetime.now(),
-                                   'download_notifications.json')
-
         self.download_thread = DownloadThread(url, folder_path, suggested_file_name)
+        self.downloads.append(self.download_thread)
         self.download_thread.progress_update.connect(lambda percent: self.handle_progress(percent, progress_bar))
         self.download_thread.download_finished.connect(self.handle_download_finished)
         self.download_thread.download_failed.connect(self.handle_download_failed)

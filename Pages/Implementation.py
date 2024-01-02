@@ -2,13 +2,15 @@ import datetime
 import os.path
 import re
 import threading
+import uuid
 
-from PySide6.QtCore import (QFile, QStringListModel, QByteArray)
+from PySide6.QtCore import (QFile, QStringListModel, QByteArray, Slot)
 from PySide6.QtCore import (QSize, QUrl, Qt)
 from PySide6.QtGui import (QCursor, QDesktopServices,
                            QFont, QIcon, QPixmap)
 from PySide6.QtNetwork import QNetworkCookie
 from PySide6.QtUiTools import QUiLoader
+from PySide6.QtWebEngineCore import QWebEngineDownloadRequest
 from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import (QDialog, QCompleter)
 from PySide6.QtWidgets import (QFileDialog)
@@ -27,21 +29,32 @@ from DataOperations.register_recover import register_download_historic, register
 from DownloaderManager import Downloader
 from Pages.DefaultSearchPage import DefaultSearchPage
 from Pages.Download import DownloadsPage
+from Pages.FindInPage import FindInPage
 from Pages.Historic import HistoricPage
 
 
 class Default(QWidget):
+    downloads = []
 
-    def __init__(self, parent=None, main_window=None):
+    def __init__(self, parent=None, main_page=None):
         super().__init__(parent)
-        self.ui = DefaultSearchPage(parent=parent)
+        self.trie = None
+        self.cookie_store = None
+        self.profile = None
+        self.ui = DefaultSearchPage(self)
         self.ui.setup_ui(self)
-        self.main_window = main_window
-        if not self.main_window.dialog_download or not self.main_window.dialog_ops:
+        self.identification = str(uuid.uuid4())
+        self.main_page = main_page
+        if not self.main_page.dialog_download or not self.main_page.dialog_ops:
             self.open_dialog_ops(view=False)
-            Download(self.main_window, self.main_window).open_dialog_download(view=False)
+            Download(self.main_page, self.main_page).open_dialog_download(view=False)
         self.site_atual: dict = {}
         self.sites_visitados: list = []
+        self.connect_signals()
+
+    def connect_signals(self):
+        self.ui.page_web.profile().defaultProfile().downloadRequested.connect(self.download_file)
+
         self.ui.arrow_left_historic.clicked.connect(
             lambda: self.load_direction_specific_historic('ant'))
         self.ui.arrow_right_historic.clicked.connect(
@@ -49,13 +62,12 @@ class Default(QWidget):
         self.ui.url.returnPressed.connect(
             lambda: self.search(web_loader=self.ui.webEngineView,
                                 search_text=self.ui.url.text()))
-        self.ui.webEngineView.page().profile().downloadRequested.connect(self.download_file)
 
         self.ui.webEngineView.loadFinished.connect(self.update_url)
         self.ui.webEngineView.loadFinished.connect(self.update_title)
         self.ui.options.clicked.connect(lambda: self.open_dialog_ops())
         self.ui.download_buttton.clicked.connect(
-            lambda: Download(self.main_window, self.main_window).open_dialog_download())
+            lambda: Download(self.main_page, self.main_page).open_dialog_download())
 
         self.profile = self.ui.webEngineView.page().profile()
 
@@ -100,7 +112,7 @@ class Default(QWidget):
                 self.trie.insert(his['name'])
 
     def on_text_changed(self, text):
-        autocomplete_suggestions = self.trie.search(text.lower())  # Pesquisa na TRIE com o texto atual
+        autocomplete_suggestions = self.trie.search(text.lower())
         completer = self.ui.url.completer()
         model = QStringListModel()
         model.setStringList([""] if not autocomplete_suggestions else autocomplete_suggestions)
@@ -139,8 +151,8 @@ class Default(QWidget):
         self.update_navigation_buttons()
 
     def open_dialog_ops(self, view=True):
-        if not self.main_window.dialog_ops:
-            self.main_window.ui.tabs.setTabsClosable(True)
+        if not self.main_page.dialog_ops:
+            self.main_page.ui.tabs.setTabsClosable(True)
             loader = QUiLoader()
             ui_file = QFile(os.path.abspath(os.path.join("Pages", "dialog_ops.ui")))
             ui_file.open(QFile.ReadOnly)
@@ -149,21 +161,25 @@ class Default(QWidget):
 
             add_page = dialog_widget.findChild(QPushButton, 'add_page')
             add_page.clicked.connect(
-                lambda: self.main_window.ui.tabs.addTab(Default(self.main_window, self.main_window).ui.page,
-                                                        "Nova Página"))
+                lambda: self.main_page.ui.tabs.addTab(Default(self.main_page, self.main_page).ui.page,
+                                                      "Nova Página"))
 
             download_page = dialog_widget.findChild(QPushButton, 'donwloads_page')
             download_page.clicked.connect(
-                lambda: self.main_window.ui.tabs.addTab(Download(self.main_window, self.main_window).ui.downloads,
-                                                        "Downloads"))
+                lambda: self.main_page.ui.tabs.addTab(Download(self.main_page, self.main_page).ui.downloads,
+                                                      "Downloads"))
 
             historic_page = dialog_widget.findChild(QPushButton, 'historic_page')
             historic_page.clicked.connect(
-                lambda: self.main_window.ui.tabs.addTab(Historic(self.main_window, self.main_window).ui.historic,
-                                                        "Histórico"))
+                lambda: self.main_page.ui.tabs.addTab(Historic(self.main_page, self.main_page).ui.historic,
+                                                      "Histórico"))
+
+            find_page = dialog_widget.findChild(QPushButton, 'findpage')
+            find = FindInPage(webView=self.ui.webEngineView)
+            find_page.clicked.connect(lambda: find.show())
 
             # Criar o diálogo
-            dialog = QDialog(self.main_window)
+            dialog = QDialog(self.main_page)
             dialog.setWindowModality(Qt.WindowModality.NonModal)
             dialog.setWindowTitle("Opções")
             dialog.setModal(True)  # Permitir interação com a janela principal
@@ -171,12 +187,12 @@ class Default(QWidget):
             layout.addWidget(dialog_widget)
 
             # Exibir o diálogo modalmente
-            self.main_window.dialog_ops = {"fields": dialog_widget, "view": dialog}
+            self.main_page.dialog_ops = {"fields": dialog_widget, "view": dialog}
             if view:
                 dialog.exec()
         else:
-            self.main_window.ui.tabs.setTabsClosable(True)
-            self.main_window.dialog_ops['view'].exec()
+            self.main_page.ui.tabs.setTabsClosable(True)
+            self.main_page.dialog_ops['view'].exec()
 
     def update_url(self, success) -> None:
         if success:
@@ -200,9 +216,9 @@ class Default(QWidget):
 
     def update_title(self, sucess) -> None:
         if sucess:
-            index = self.main_window.ui.tabs.indexOf(self.ui.page)
+            index = self.main_page.ui.tabs.indexOf(self.ui.page)
             text = self.ui.webEngineView.title()
-            self.main_window.ui.tabs.setTabText(index, self.limit_string(text, 30))
+            self.main_page.ui.tabs.setTabText(index, self.limit_string(text, 30))
 
     @staticmethod
     def is_valid_url(url_string: str) -> bool:
@@ -218,7 +234,6 @@ class Default(QWidget):
         return bool(re.match(url_pattern, url_string))
 
     def search(self, web_loader: QWebEngineView, search_text: str) -> None:
-        print(self.profile.persistentCookiesPolicy())
         if self.is_valid_url(search_text):
             url = f"{search_text}"
 
@@ -231,40 +246,50 @@ class Default(QWidget):
 
         web_loader.load(QUrl(search_url))
 
+    @Slot(QWebEngineDownloadRequest)
     def download_file(self, download_item) -> None:
-        options = QFileDialog.Options()
-        options |= QFileDialog.ShowDirsOnly
-        folder_path = QFileDialog.getExistingDirectory(self, "Selecionar pasta de destino", options=options)
-        suggested_file_name = download_item.suggestedFileName()
+        print(self.identification, self.ui.webEngineView.url().toString())
+        if download_item.url().toString() not in self.downloads:
+            url_download = download_item.url().toString()
+            self.downloads.append(url_download)
 
-        downloader = Downloader.Downloader(self)
-        downloader.download_finished.connect(self.handle_download_finished,
-                                             Qt.ConnectionType.QueuedConnection)
-        downloader.download_failed.connect(self.handle_download_failed,
-                                           Qt.ConnectionType.QueuedConnection)
-        progress_bar = Download.add_download_notification(main_windows=self.main_window.dialog_download,
-                                                          download_data={'download_time': datetime.datetime.now(),
-                                                                         'name': suggested_file_name,
-                                                                         'path': os.path.join(folder_path,
-                                                                                              suggested_file_name)})
-        downloader.progress_update.connect(lambda percent: self.handle_progress(percent, progress_bar),
-                                           Qt.ConnectionType.QueuedConnection)
-        downloader.download_file(download_item.url().toString(), folder_path, suggested_file_name, progress_bar)
+            folder_path = QFileDialog.getExistingDirectory(self, "Selecionar pasta de destino",
+                                                           options=QFileDialog.Option.ShowDirsOnly)
+            suggested_file_name = download_item.suggestedFileName()
+            progress_bar = Download.add_download_notification(main_pages=self.main_page.dialog_download,
+                                                              download_data={'download_time': datetime.datetime.now(),
+                                                                             'name': suggested_file_name,
+                                                                             'path': os.path.join(folder_path,
+                                                                                                  suggested_file_name)})
+            downloader = Downloader.Downloader(self.main_page)
+            downloader.download_finished.connect(
+                lambda suggested_file_name_arg, folder_path_arg: self.handle_download_finished(suggested_file_name_arg,
+                                                                                               folder_path_arg,
+                                                                                               url_download),
+                Qt.ConnectionType.QueuedConnection)
+            downloader.download_failed.connect(self.handle_download_failed,
+                                               Qt.ConnectionType.QueuedConnection)
+            downloader.progress_update.connect(lambda percent: self.handle_progress(percent, progress_bar),
+                                               Qt.ConnectionType.QueuedConnection)
+            downloader.download_file(download_item.url().toString(), folder_path, suggested_file_name, progress_bar)
 
-    def handle_progress(self, percent: float, progress_bar):
+    @staticmethod
+    def handle_progress(percent: float, progress_bar):
         try:
             progress_bar.setValue(percent)
         except Exception as e:
             print(e)
 
-    def handle_download_finished(self, suggested_file_name, folder_path):
+    def handle_download_finished(self, suggested_file_name, folder_path, url):
+        self.downloads.remove(url)
         threading.Thread(target=register_download_historic,
                          args=(suggested_file_name, folder_path, 'Concluido',
-                               f'{datetime.datetime.now()}')).start()
+                               datetime.datetime.now())).start()
 
-    def handle_download_failed(self, suggested_file_name, folder_path):
+    @staticmethod
+    def handle_download_failed(suggested_file_name, folder_path):
         threading.Thread(target=register_download_historic,
-                         args=(suggested_file_name, folder_path, 'Erro', f'{datetime.datetime.now()}')).start()
+                         args=(suggested_file_name, folder_path, 'Erro', datetime.datetime.now())).start()
 
 
 class Download(QWidget):
@@ -287,7 +312,7 @@ class Download(QWidget):
         items_to_load = downloads['Files'][self.loaded_items:self.loaded_items + self.items_per_load]
 
         for download_data in items_to_load:
-            Download.add_download_history(main_window=self, download_data=download_data)
+            Download.add_download_history(main_page=self, download_data=download_data)
 
         self.loaded_items += self.items_per_load
 
@@ -336,12 +361,12 @@ class Download(QWidget):
             cont = 0
             for download in history['Files']:
                 if cont <= limit:
-                    Download.add_download_history(main_window=self, download_data=download)
+                    Download.add_download_history(main_page=self, download_data=download)
                     cont += 1
 
     @staticmethod
-    def load_download_notificatios(main_window):
-        layout = main_window['fields'].findChild(QLayout, 'container_download_notifications')
+    def load_download_notificatios(main_page):
+        layout = main_page['fields'].findChild(QLayout, 'container_download_notifications')
         while layout.count():
             child = layout.takeAt(0)
             if child.widget():
@@ -352,11 +377,11 @@ class Download(QWidget):
         history = recover_download_historic(file_saved='download_notifications.json')
         if bool(history):
             for download in history['Files']:
-                Download.add_download_notification(main_windows=main_window, download_data=download,
+                Download.add_download_notification(main_pages=main_page, download_data=download,
                                                    show_progress=False)
 
     @staticmethod
-    def add_download_history(main_window, download_data):
+    def add_download_history(main_page, download_data):
         sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -479,7 +504,7 @@ class Download(QWidget):
         del_item.setSizePolicy(sizePolicy)
         del_item.setCursor(QCursor(Qt.PointingHandCursor))
         del_item.clicked.connect(lambda: remove_download_historic_item(download_data, True, download_item,
-                                                                       main_window.ui.container_downloads_itens_page))
+                                                                       main_page.ui.container_downloads_itens_page))
         del_item.setMaximumSize(QSize(40, 40))
         del_item.setStyleSheet(u"QPushButton {\n"
                                "    border: none;\n"
@@ -500,11 +525,11 @@ class Download(QWidget):
 
         horizontalLayout_4.addWidget(del_item)
 
-        main_window.ui.container_downloads_itens_page.addWidget(download_item)
+        main_page.ui.container_downloads_itens_page.addWidget(download_item)
 
     @staticmethod
-    def add_download_notification(main_windows, download_data, show_progress=True) -> QProgressBar:
-        if main_windows:
+    def add_download_notification(main_pages, download_data, show_progress=True) -> QProgressBar:
+        if main_pages:
             download_item_list = QGroupBox()
             download_item_list.setObjectName(u"download_item_list")
             sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -539,7 +564,7 @@ class Download(QWidget):
 
             verticalLayout_3.addWidget(progressBar)
 
-            (main_windows['fields'].findChild(QLayout, 'container_download_notifications')
+            (main_pages['fields'].findChild(QLayout, 'container_download_notifications')
              .addWidget(download_item_list))
 
             return progressBar
@@ -549,11 +574,12 @@ class Historic(QWidget):
 
     def __init__(self, parent=None, main_page=None):
         super().__init__(parent)
-        self.ui = HistoricPage()
+        self.ui = HistoricPage(self)
         self.ui.setup_ui(self)
         self.ui.arrow_left_back_historic.hide()
         self.main_page = main_page
         self.load_historic(10)
+
         self.ui.scrollAreaHistoric.verticalScrollBar().valueChanged.connect(self.scroll_event)
 
         self.loaded_items = 0
@@ -564,7 +590,7 @@ class Historic(QWidget):
         items_to_load = history['Sites'][self.loaded_items:self.loaded_items + self.items_per_load]
 
         for site in items_to_load:
-            Historic.add_historic_item(main_window=self.main_page, historic_data=site, historic_page=self)
+            Historic.add_historic_item(main_page=self.main_page, historic_data=site, historic_page=self)
 
         self.loaded_items += self.items_per_load
 
@@ -588,25 +614,25 @@ class Historic(QWidget):
             cont = 0
             for site in history['Sites']:
                 if cont <= limit:
-                    Historic.add_historic_item(main_window=self.main_page, historic_data=site,
+                    Historic.add_historic_item(main_page=self.main_page, historic_data=site,
                                                historic_page=self)
                     cont += 1
                 else:
                     break
 
     @staticmethod
-    def open_historic_site(main_window, site):
-        default_page = Default(main_window, main_window=main_window).ui.page
-        main_window.ui.tabs.addTab(default_page, "Nova pagina")
-        last_page = main_window.ui.tabs.count() - 1
-        layout = main_window.ui.tabs.widget(last_page)
+    def open_historic_site(main_page, site):
+        default_page = Default(main_page, main_page=main_page).ui.page
+        main_page.ui.tabs.addTab(default_page, "Nova pagina")
+        last_page = main_page.ui.tabs.count() - 1
+        layout = main_page.ui.tabs.widget(last_page)
         webview = layout.findChildren(QWebEngineView)
         if webview:
             webview[0].load(site)
 
     @staticmethod
-    def add_historic_item(main_window, historic_page, historic_data):
-        if main_window:
+    def add_historic_item(main_page, historic_page, historic_data):
+        if main_page:
             historic_item = QGroupBox()
             historic_item.setObjectName(u"historic_item")
             sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -658,7 +684,7 @@ class Historic(QWidget):
             open_site.setObjectName(u"open_site")
             sizePolicy.setHeightForWidth(open_site.sizePolicy().hasHeightForWidth())
             open_site.setSizePolicy(sizePolicy)
-            open_site.clicked.connect(lambda: Historic.open_historic_site(main_window, historic_data['name']))
+            open_site.clicked.connect(lambda: Historic.open_historic_site(main_page, historic_data['name']))
             open_site.setMaximumSize(QSize(16777215, 16777215))
             open_site.setFont(font)
             open_site.setIcon(icon5)
