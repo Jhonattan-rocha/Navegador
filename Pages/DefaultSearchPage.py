@@ -1,9 +1,9 @@
 import os
 
 from PySide6.QtCore import (QSize, QUrl, Qt)
-from PySide6.QtGui import (QCursor, QFont, QIcon)
+from PySide6.QtGui import (QCursor, QFont, QIcon, QMovie)
 from PySide6.QtWebEngineWidgets import QWebEngineView
-from PySide6.QtWidgets import (QGroupBox, QHBoxLayout, QLineEdit, QSizePolicy, QWidget)
+from PySide6.QtWidgets import (QGroupBox, QHBoxLayout, QLineEdit, QSizePolicy, QWidget, QLabel)
 from PySide6.QtWidgets import (QPushButton, QLayout, QProgressBar, QVBoxLayout)
 
 from CustomElements.CustonPageWebEngine import CustomWebEnginePage
@@ -113,6 +113,40 @@ class DefaultSearchPage(QWidget):
         self.arrow_right_historic.setIcon(icon2)
 
         self.horizontalLayout.addWidget(self.arrow_right_historic)
+
+        self.movie = QMovie(os.path.abspath(os.path.join("figs", 'load.gif')))
+        self.movie.setScaledSize(QSize(30, 30))
+        self.label_movie = QLabel(self.hot_bar)
+        self.label_movie.setSizePolicy(sizePolicyExpanding)
+        self.label_movie.setMaximumSize(QSize(40, 40))
+        self.label_movie.setMovie(self.movie)
+        self.label_movie.hide()
+
+        iconPush = QIcon()
+        iconPush.addFile(os.path.abspath(os.path.join("figs", 'site.png')), QSize(25, 25), QIcon.Normal, QIcon.Off)
+        pixmap = iconPush.pixmap(QSize(20, 20))
+        self.label_icon_site = QLabel()
+        self.label_icon_site.setPixmap(pixmap)
+        self.label_icon_site.setMaximumSize(QSize(25, 25))
+        self.label_icon_site.setSizePolicy(sizePolicyExpanding)
+        self.label_icon_site.setStyleSheet(u"QPushButton {\n"
+                                                "    border: none;\n"
+                                                "	border-radius: 15px;\n"
+                                                "	background-color: none;\n"
+                                                "	text-align: center;\n"
+                                                "	color: white;\n"
+                                                "}\n"
+                                                "\n"
+                                                "QPushButton:hover {\n"
+                                                "	transition: 1s;\n"
+                                                "	transition-delay: 1s;\n"
+                                                "	background-color: lightgray;\n"
+                                                "}")
+        self.label_icon_site.hide()
+        self.horizontalLayout.addWidget(self.label_movie)
+        self.horizontalLayout.addWidget(self.label_icon_site)
+
+        # -----------
 
         self.url = QLineEdit()
         self.url.setObjectName(u"url")

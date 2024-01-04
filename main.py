@@ -26,6 +26,7 @@ class Main(QWidget):
         if new_tab:
             self.ui.tabs.addTab(Default(self, self).ui.page, "Nova Página")
         self.ui.tabs.tabCloseRequested.connect(self.close_tab)
+
         self.short_cuts = ShortcutManager()
 
         self.short_cuts.register_shortcut(self, Qt.Key.Key_F5, lambda: self.reload_page())

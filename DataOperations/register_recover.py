@@ -32,7 +32,7 @@ def recover_download_historic(file_saved: str = 'download_history.json', f: str 
             js = dict(js)
 
             if bool(f):
-                f_list = [his for his in js['Files'] if f in his['path'] or f in his['name']]
+                f_list = [his for his in js['Files'] if f.lower() in his['path'].lower() or f.lower() in his['name'].lower()]
                 return {"Files": f_list}
             return js
         return {}
@@ -89,7 +89,7 @@ def recover_historic(file_saved: str = 'historic.json', f: str = "") -> dict:
             js = json.loads(file_read.decode('utf8'))
             js = dict(js)
             if bool(f):
-                f_list = [his for his in js['Sites'] if f in his['name']]
+                f_list = [his for his in js['Sites'] if f.lower() in his['name'].lower()]
                 return {'Sites': f_list}
             return js
         return {}

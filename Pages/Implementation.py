@@ -53,6 +53,13 @@ class Default(QWidget):
         self.sites_visitados: list = []
         self.connect_signals()
 
+    def handle_icon_changed(self, iconUrl):
+        icon = self.ui.webEngineView.icon()
+        if not icon.isNull():
+            pixmap = icon.pixmap(25, 25)  # Tamanho do ícone desejado
+            self.ui.label_icon_site.setPixmap(pixmap)  # Exibir o ícone em um QLabel
+            self.main_page.ui.tabs.setTabIcon(self.main_page.ui.tabs.indexOf(self.ui.page), QIcon(pixmap))
+
     def connect_signals(self):
         self.ui.page_web.profile().defaultProfile().downloadRequested.connect(self.download_file)
 
@@ -67,6 +74,11 @@ class Default(QWidget):
         self.ui.webEngineView.urlChanged.connect(self.update_url)
         self.ui.webEngineView.urlChanged.connect(self.update_title)
 
+        self.ui.webEngineView.loadStarted.connect(
+            lambda: (self.ui.movie.start(), self.ui.label_movie.show(), self.ui.label_icon_site.hide()))
+        self.ui.webEngineView.loadFinished.connect(
+            lambda: (self.ui.movie.stop(), self.ui.label_movie.hide(), self.ui.label_icon_site.show()))
+        self.ui.webEngineView.iconChanged.connect(self.handle_icon_changed)
         self.ui.options.clicked.connect(lambda: self.open_dialog_ops())
         self.ui.download_buttton.clicked.connect(
             lambda: Download(self.main_page, self.main_page).open_dialog_download())
