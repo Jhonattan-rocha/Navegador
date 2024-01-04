@@ -24,7 +24,6 @@ class DraggableTabWidget(QTabWidget):
 
         menu.addAction(close_action)
         tabs = self.main_page.ui.tabs.count()
-        print(tabs)
         if tabs >= 2:
             menu.addAction(closes_action)
             menu.addAction(join_action)

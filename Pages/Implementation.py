@@ -7,10 +7,10 @@ import uuid
 from PySide6.QtCore import (QFile, QStringListModel, QByteArray, Slot)
 from PySide6.QtCore import (QSize, QUrl, Qt)
 from PySide6.QtGui import (QCursor, QDesktopServices,
-                           QFont, QIcon, QPixmap)
+                           QFont, QIcon, QPixmap, QTextCursor)
 from PySide6.QtNetwork import QNetworkCookie
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtWebEngineCore import QWebEngineDownloadRequest
+from PySide6.QtWebEngineCore import QWebEngineDownloadRequest, QWebEnginePage
 from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import (QDialog, QCompleter)
 from PySide6.QtWidgets import (QFileDialog)
@@ -20,6 +20,8 @@ from PySide6.QtWidgets import (QLabel)
 from PySide6.QtWidgets import (QPushButton,
                                QVBoxLayout)
 from PySide6.QtWidgets import (QWidget)
+from bs4 import BeautifulSoup
+from colorama import init
 
 from DataOperations.TRIEManager import Trie
 from DataOperations.cookies import save_cookies, recover_cookies, remove_cookie
@@ -27,11 +29,15 @@ from DataOperations.register_recover import recover_download_historic, recover_h
     remove_download_historic_item
 from DataOperations.register_recover import register_download_historic, register_historic, remove_historic_item
 from DownloaderManager import Downloader
+from Pages.ConsolePage import ConsolePage
 from Pages.DefaultSearchPage import DefaultSearchPage
 from Pages.Download import DownloadsPage
 from Pages.FindInPage import FindInPage
 from Pages.Historic import HistoricPage
 from Pages.LoadPage import LoadPage
+from Pages.ShortCuts import ShortcutManager
+
+init(autoreset=True)
 
 
 class Default(QWidget):
@@ -53,12 +59,27 @@ class Default(QWidget):
         self.sites_visitados: list = []
         self.connect_signals()
 
-    def handle_icon_changed(self, iconUrl):
-        icon = self.ui.webEngineView.icon()
-        if not icon.isNull():
-            pixmap = icon.pixmap(25, 25)  # Tamanho do ícone desejado
-            self.ui.label_icon_site.setPixmap(pixmap)  # Exibir o ícone em um QLabel
-            self.main_page.ui.tabs.setTabIcon(self.main_page.ui.tabs.indexOf(self.ui.page), QIcon(pixmap))
+        self.shurt_cuts = ShortcutManager()
+        self.shurt_cuts.register_shortcut(self, "Ctrl+Shift+i", self.console_page)
+
+    def console_page(self):
+        self.console = ConsolePageImplementation(None, self.main_page, self.ui.webEngineView)
+        self.console.show()
+
+    def showContextMenu(self, event):
+        menu = self.ui.webEngineView.createStandardContextMenu()
+        view_page_source_action = None
+
+        # Encontrar a ação 'View Page Source' no menu de contexto
+        for action in menu.actions():
+            if action.text() == "View page source":
+                view_page_source_action = action
+                break
+
+        if view_page_source_action:
+            view_page_source_action.triggered.connect(self.console_page)
+
+        menu.exec(self.ui.webEngineView.mapToGlobal(event))
 
     def connect_signals(self):
         self.ui.page_web.profile().defaultProfile().downloadRequested.connect(self.download_file)
@@ -100,6 +121,13 @@ class Default(QWidget):
 
         # self.load = LoadPage()
         # self.load.show()
+
+    def handle_icon_changed(self, iconUrl):
+        icon = self.ui.webEngineView.icon()
+        if not icon.isNull():
+            pixmap = icon.pixmap(25, 25)  # Tamanho do ícone desejado
+            self.ui.label_icon_site.setPixmap(pixmap)  # Exibir o ícone em um QLabel
+            self.main_page.ui.tabs.setTabIcon(self.main_page.ui.tabs.indexOf(self.ui.page), QIcon(pixmap))
 
     def inputs(self):
         js = """
@@ -761,3 +789,71 @@ class LoadPageImplementation(QWidget):
         self.html = html
         self.ui = LoadPage(parent=self, main_page=main_page, title=title, html=html)
         self.ui.setupUi(self)
+
+
+class ConsolePageImplementation(QWidget):
+
+    def __init__(self, parent=None, main_page=None, webEngine: QWebEngineView = None):
+        super().__init__(parent)
+        self.main_page = main_page
+        self.webEngine = webEngine
+        self.connect_signals()
+        self.ui = ConsolePage(self)
+        self.ui.setupUi(self)
+
+        # configurando
+
+        self.webEngine.urlChanged.connect(self.update_title)
+        self.webEngine.page().javaScriptConsoleMessage = self.javascriptConsoleMessage
+        self.ui.console_input.returnPressed.connect(self.exec_js_input)
+
+    def update_title(self, url):
+        self.ui.title = "Console - " + self.webEngine.title()
+        self.window().setWindowTitle(self.ui.title)
+
+    def exec_js_input(self):
+        self.webEngine.page().runJavaScript(self.ui.console_input.text())
+
+    def javascriptConsoleMessage(self, level, message, lineNumber, sourceID):
+        level_mes = ""
+        back_color = None
+        font_color = None
+
+        if level == QWebEnginePage.JavaScriptConsoleMessageLevel.InfoMessageLevel:
+            level_mes = "Info"
+            back_color = "white"
+            font_color = "black"
+        elif level == QWebEnginePage.JavaScriptConsoleMessageLevel.WarningMessageLevel:
+            level_mes = "Warning"
+            back_color = "yellow"
+            font_color = "black"
+        elif level == QWebEnginePage.JavaScriptConsoleMessageLevel.ErrorMessageLevel:
+            level_mes = "Error"
+            back_color = "red"
+            font_color = "white"
+        else:
+            level_mes = "Info"
+            back_color = "white"
+            font_color = "black"
+
+        new_txt = f'\n<span style="background-color: {back_color}; color:{font_color}">Console {level_mes} at {lineNumber}, SourceId: {sourceID}: {message}</span><br>'
+        cursor = self.ui.console_output.textCursor()
+        cursor.movePosition(QTextCursor.End)
+        cursor.insertHtml(new_txt)
+
+    def connect_signals(self):
+        self.webEngine.page().loadFinished.connect(self.update_html)
+        self.webEngine.page().contentsSizeChanged.connect(self.update_html)
+        self.update_html()
+
+    def update_html(self):
+        self.webEngine.page().toHtml(lambda html: self.format_txt_html(html))
+
+    def format_txt_html(self, html):
+        self.ui.script.setPlainText(html)
+        self.highlight_html(html)
+
+    def highlight_html(self, html):
+        soup = BeautifulSoup(html, 'html.parser')
+        formatted_html = soup.prettify()
+        self.ui.script.setPlainText(formatted_html)

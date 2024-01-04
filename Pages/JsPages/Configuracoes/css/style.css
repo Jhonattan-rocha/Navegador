@@ -54,3 +54,9 @@ main {
 .option:target {
     display: block;
 }
+
+
+p {
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
