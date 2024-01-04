@@ -80,17 +80,17 @@ class HistoricPage(QWidget):
 
         self.horizontalLayout_6.addWidget(self.arrow_left_back_historic)
 
-        self.lineEdit_2 = QLineEdit(self.hotbar_historic)
-        self.lineEdit_2.setObjectName(u"lineEdit_2")
-        self.lineEdit_2.setMinimumSize(QSize(0, 30))
-        self.lineEdit_2.setStyleSheet(u"QLineEdit {\n"
+        self.search_input = QLineEdit(self.hotbar_historic)
+        self.search_input.setObjectName(u"search_input")
+        self.search_input.setMinimumSize(QSize(0, 30))
+        self.search_input.setStyleSheet(u"QLineEdit {\n"
                                       "	border: none;\n"
                                       "	border-radius: 15px;\n"
                                       "	padding-left: 10px;\n"
                                       "	padding-right: 10px;\n"
                                       "}")
 
-        self.horizontalLayout_6.addWidget(self.lineEdit_2)
+        self.horizontalLayout_6.addWidget(self.search_input)
 
         self.options_historic_sites = QPushButton(self.hotbar_historic)
         self.options_historic_sites.setObjectName(u"options_historic_sites")

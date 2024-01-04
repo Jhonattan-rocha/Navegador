@@ -64,9 +64,9 @@ class Default(QWidget):
             lambda: self.search(web_loader=self.ui.webEngineView,
                                 search_text=self.ui.url.text()))
 
-        self.ui.webEngineView.loadFinished.connect(self.update_url)
-        self.ui.webEngineView.loadFinished.connect(self.update_title)
-        self.ui.webEngineView.loadFinished.connect(self.inputs)
+        self.ui.webEngineView.urlChanged.connect(self.update_url)
+        self.ui.webEngineView.urlChanged.connect(self.update_title)
+
         self.ui.options.clicked.connect(lambda: self.open_dialog_ops())
         self.ui.download_buttton.clicked.connect(
             lambda: Download(self.main_page, self.main_page).open_dialog_download())
@@ -151,16 +151,10 @@ class Default(QWidget):
             "color: rgba(255, 255, 255, 0.5);" if not can_go_forward else "")
 
     def load_direction_specific_historic(self, direc: str):
-        current_page = self.ui.webEngineView.url().toString()
-        current_index = self.sites_visitados.index(current_page) if current_page in self.sites_visitados else -1
-
-        if current_index != -1:
-            new_index = current_index - 1 if direc == 'ant' else current_index + 1
-            try:
-                new_page = self.sites_visitados[new_index]
-                self.ui.webEngineView.load(new_page)
-            except IndexError:
-                print("Index out of range")
+        if direc == 'ant':
+            self.ui.webEngineView.back()
+        elif direc == 'prox':
+            self.ui.webEngineView.forward()
         self.update_navigation_buttons()
 
     def open_dialog_ops(self, view=True):
@@ -214,31 +208,29 @@ class Default(QWidget):
             self.main_page.ui.tabs.setTabsClosable(True)
             self.main_page.dialog_ops['view'].exec()
 
-    def update_url(self, success) -> None:
-        if success:
-            url = self.ui.webEngineView.url().toString()
-            data = datetime.datetime.now()
-            id = register_historic(url, [], data) - 1
-            self.site_atual = {"id": id, "name": url, "cookies": [], "date_time": f"{data}"}
+    def update_url(self, url_c) -> None:
+        url = url_c.toString()
+        data = datetime.datetime.now()
+        id = register_historic(url, [], data) - 1
+        self.site_atual = {"id": id, "name": url, "cookies": [], "date_time": f"{data}"}
 
-            page = self.ui.webEngineView.url().toString()
-            if page not in self.sites_visitados:
-                self.sites_visitados.append(page)
+        page = self.ui.webEngineView.url().toString()
+        if page not in self.sites_visitados:
+            self.sites_visitados.append(page)
 
-            self.ui.url.setText(url)
-            self.ui.url.setCursorPosition(0)
-            self.update_navigation_buttons()
+        self.ui.url.setText(url)
+        self.ui.url.setCursorPosition(0)
+        self.update_navigation_buttons()
 
     def limit_string(self, text: str, limit: int) -> str:
         if len(text) > limit:
             return text[:limit - 3] + "..."  # Corta o texto e adiciona "..." no final
         return text
 
-    def update_title(self, sucess) -> None:
-        if sucess:
-            index = self.main_page.ui.tabs.indexOf(self.ui.page)
-            text = self.ui.webEngineView.title()
-            self.main_page.ui.tabs.setTabText(index, self.limit_string(text, 30))
+    def update_title(self, url_c: QUrl) -> None:
+        index = self.main_page.ui.tabs.indexOf(self.ui.page)
+        text = self.ui.webEngineView.title()
+        self.main_page.ui.tabs.setTabText(index, self.limit_string(text, 30))
 
     @staticmethod
     def is_valid_url(url_string: str) -> bool:
@@ -328,12 +320,12 @@ class Download(QWidget):
         self.load_download_historic(limit=10)
 
         self.ui.scrollAreaDownloads.verticalScrollBar().valueChanged.connect(self.scroll_event)
-
+        self.ui.search_input.textChanged.connect(lambda txt: self.load_download_historic(10, txt))
         self.loaded_items = 0
         self.items_per_load = 10  # Número de itens a serem carregados a cada vez
 
-    def load_more_items(self):
-        downloads = recover_download_historic()
+    def load_more_items(self, f: str = ""):
+        downloads = recover_download_historic(f=f)
         items_to_load = downloads['Files'][self.loaded_items:self.loaded_items + self.items_per_load]
 
         for download_data in items_to_load:
@@ -344,7 +336,7 @@ class Download(QWidget):
     def scroll_event(self):
         scrollbar = self.ui.scrollAreaDownloads.verticalScrollBar()
         if scrollbar.value() >= scrollbar.maximum() - 100:  # Verifica se o usuário está próximo do final
-            self.load_more_items()
+            self.load_more_items(f=self.ui.search_input.text())
 
     def open_dialog_download(self, view=True):
         if not self.main_page.dialog_download:
@@ -371,13 +363,13 @@ class Download(QWidget):
         else:
             self.main_page.dialog_download['view'].exec()
 
-    def load_download_historic(self, limit: int):
+    def load_download_historic(self, limit: int, f: str = ""):
         layout = self.ui.container_downloads_itens_page.layout()
         while layout.count():
             child = layout.takeAt(0)
             if child.widget():
                 child.widget().deleteLater()
-        history = recover_download_historic()
+        history = recover_download_historic(f=f)
 
         self.loaded_items = 0
         self.items_per_load = 10
@@ -606,12 +598,13 @@ class Historic(QWidget):
         self.load_historic(10)
 
         self.ui.scrollAreaHistoric.verticalScrollBar().valueChanged.connect(self.scroll_event)
+        self.ui.search_input.textChanged.connect(lambda txt: self.load_historic(10, txt))
 
         self.loaded_items = 0
         self.items_per_load = 10  # Número de itens a serem carregados a cada vez
 
-    def load_more_items(self):
-        history = recover_historic()
+    def load_more_items(self, f: str):
+        history = recover_historic(f=f)
         items_to_load = history['Sites'][self.loaded_items:self.loaded_items + self.items_per_load]
 
         for site in items_to_load:
@@ -622,15 +615,15 @@ class Historic(QWidget):
     def scroll_event(self):
         scrollbar = self.ui.scrollAreaHistoric.verticalScrollBar()
         if scrollbar.value() >= scrollbar.maximum() - 100:  # Verifica se o usuário está próximo do final
-            self.load_more_items()
+            self.load_more_items(f=self.ui.search_input.text())
 
-    def load_historic(self, limit: int):
+    def load_historic(self, limit: int, f: str = ''):
         layout = self.ui.container_historic_page.layout()
         while layout.count():
             child = layout.takeAt(0)
             if child.widget():
                 child.widget().deleteLater()
-        history = recover_historic()
+        history = recover_historic(f=f)
 
         self.loaded_items = 0
         self.items_per_load = 10

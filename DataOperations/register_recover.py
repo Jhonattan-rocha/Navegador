@@ -24,12 +24,16 @@ def register_download_historic(suggested_file_name: str, folder_path: str, statu
             file2.write(str(json_file).replace("'", '"').encode('utf8'))
 
 
-def recover_download_historic(file_saved: str = 'download_history.json') -> dict:
+def recover_download_historic(file_saved: str = 'download_history.json', f: str = "") -> dict:
     with open(os.path.join('configs', file_saved), 'rb') as file:
         file_read = file.read()
         if bool(file_read):
             js = json.loads(file_read.decode('utf8'))
             js = dict(js)
+
+            if bool(f):
+                f_list = [his for his in js['Files'] if f in his['path'] or f in his['name']]
+                return {"Files": f_list}
             return js
         return {}
 
@@ -78,12 +82,15 @@ def register_historic(site: str, cookies: list,
         return len(json_file["Sites"])
 
 
-def recover_historic(file_saved: str = 'historic.json') -> dict:
+def recover_historic(file_saved: str = 'historic.json', f: str = "") -> dict:
     with open(os.path.join('configs', file_saved), 'rb') as file:
         file_read = file.read()
         if bool(file_read):
             js = json.loads(file_read.decode('utf8'))
             js = dict(js)
+            if bool(f):
+                f_list = [his for his in js['Sites'] if f in his['name']]
+                return {'Sites': f_list}
             return js
         return {}
 

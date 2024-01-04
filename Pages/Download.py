@@ -75,17 +75,17 @@ class DownloadsPage(QWidget):
 
         self.horizontalLayout_2.addWidget(self.arrow_left_back)
 
-        self.lineEdit = QLineEdit(self.hotbar)
-        self.lineEdit.setObjectName(u"lineEdit")
-        self.lineEdit.setMinimumSize(QSize(0, 30))
-        self.lineEdit.setStyleSheet(u"QLineEdit {\n"
+        self.search_input = QLineEdit(self.hotbar)
+        self.search_input.setObjectName(u"search_input")
+        self.search_input.setMinimumSize(QSize(0, 30))
+        self.search_input.setStyleSheet(u"QLineEdit {\n"
                                     "	border: none;\n"
                                     "	border-radius: 15px;\n"
                                     "	padding-left: 10px;\n"
                                     "	padding-right: 10px;\n"
                                     "}")
 
-        self.horizontalLayout_2.addWidget(self.lineEdit)
+        self.horizontalLayout_2.addWidget(self.search_input)
 
         self.options_donwload = QPushButton(self.hotbar)
         self.options_donwload.setObjectName(u"options_donwload")
