@@ -23,14 +23,16 @@ class DraggableTabWidget(QTabWidget):
         closes_action.triggered.connect(self.close_tabs)
 
         menu.addAction(close_action)
-        menu.addAction(closes_action)
-        menu.addAction(join_action)
+        tabs = self.main_page.ui.tabs.count()
+        print(tabs)
+        if tabs >= 2:
+            menu.addAction(closes_action)
+            menu.addAction(join_action)
         menu.exec(self.mapToGlobal(event))
 
     def join_tabs(self):
 
         main_instances = self.__class__.main_instances
-        print(main_instances)
         # Verifica se há pelo menos duas instâncias
         if len(main_instances) >= 1:
             main_window_to_receive_tabs = self.main_page
@@ -51,7 +53,6 @@ class DraggableTabWidget(QTabWidget):
                             widget.setParent(widget.implementation)
                             main_window_to_receive_tabs.ui.tabs.addTab(widget,
                                                                        widget.implementation.windowTitle() or widget.implementation.ui.webEngineView.title())
-
 
                     self.update()
                     self.__class__.main_instances.remove(instance)

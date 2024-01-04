@@ -93,17 +93,23 @@
       </widget>
      </item>
      <item>
-      <spacer name="verticalSpacer">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
+      <widget class="QPushButton" name="configs">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
        </property>
-       <property name="sizeHint" stdset="0">
+       <property name="maximumSize">
         <size>
-         <width>20</width>
+         <width>16777215</width>
          <height>40</height>
         </size>
        </property>
-      </spacer>
+       <property name="text">
+        <string>Configurações</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

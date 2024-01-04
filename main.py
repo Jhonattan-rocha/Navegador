@@ -24,7 +24,7 @@ class Main(QWidget):
         self.dialog_download = None
         self.site_atual: dict = {}
         if new_tab:
-            self.ui.tabs.addTab(Default(self, main_page=self).ui.page, "Nova Página")
+            self.ui.tabs.addTab(Default(self, self).ui.page, "Nova Página")
         self.ui.tabs.tabCloseRequested.connect(self.close_tab)
         self.short_cuts = ShortcutManager()
 

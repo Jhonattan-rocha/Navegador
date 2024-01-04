@@ -31,6 +31,7 @@ from Pages.DefaultSearchPage import DefaultSearchPage
 from Pages.Download import DownloadsPage
 from Pages.FindInPage import FindInPage
 from Pages.Historic import HistoricPage
+from Pages.LoadPage import LoadPage
 
 
 class Default(QWidget):
@@ -65,6 +66,7 @@ class Default(QWidget):
 
         self.ui.webEngineView.loadFinished.connect(self.update_url)
         self.ui.webEngineView.loadFinished.connect(self.update_title)
+        self.ui.webEngineView.loadFinished.connect(self.inputs)
         self.ui.options.clicked.connect(lambda: self.open_dialog_ops())
         self.ui.download_buttton.clicked.connect(
             lambda: Download(self.main_page, self.main_page).open_dialog_download())
@@ -83,6 +85,17 @@ class Default(QWidget):
 
         threading.Thread(target=self.load_cookies, args=()).start()
         threading.Thread(target=self.load_historic_in_trie, args=()).start()
+
+        # self.load = LoadPage()
+        # self.load.show()
+
+    def inputs(self):
+        js = """
+        let qtd = document.getElementsByTagName("input").length
+
+        alert("inputs: " + qtd)
+        """
+        # self.ui.webEngineView.page().runJavaScript(js)
 
     def on_cookie_added(self, cookie):
         dados = {'name': cookie.name().data().decode(), 'cookie': cookie.value().data().decode(),
@@ -174,6 +187,13 @@ class Default(QWidget):
                 lambda: self.main_page.ui.tabs.addTab(Historic(self.main_page, self.main_page).ui.historic,
                                                       "Histórico"))
 
+            config_page = dialog_widget.findChild(QPushButton, "configs")
+            config_page.clicked.connect(
+                lambda: self.main_page.ui.tabs.addTab(
+                    LoadPageImplementation(self.main_page, self.main_page, title="Configurações",
+                                           html=os.path.abspath(
+                                               os.path.join("Pages", "JsPages", "Configuracoes",
+                                                            "index.html"))).ui.load_page, "Configurações"))
             find_page = dialog_widget.findChild(QPushButton, 'findpage')
             find = FindInPage(webView=self.ui.webEngineView)
             find_page.clicked.connect(lambda: find.show())
@@ -242,6 +262,11 @@ class Default(QWidget):
 
             web_loader.load(QUrl(url))
             return
+
+        if 'file:///' in search_text:
+            web_loader.load(QUrl(search_text))
+            return
+
         search_url = "https://www.google.com/search?q=" + search_text.replace(" ", "+")
 
         web_loader.load(QUrl(search_url))
@@ -721,3 +746,13 @@ class Historic(QWidget):
             horizontalLayout_7.addWidget(del_item_historic)
 
             self.ui.container_historic_page.addWidget(historic_item)
+
+
+class LoadPageImplementation(QWidget):
+    def __init__(self, parent=None, main_page=None, title="SurfEase", html=""):
+        super().__init__(parent)
+        self.main_page = main_page
+        self.title = title
+        self.html = html
+        self.ui = LoadPage(parent=self, main_page=main_page, title=title, html=html)
+        self.ui.setupUi(self)
