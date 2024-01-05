@@ -2,11 +2,12 @@ import os
 
 from PySide6.QtCore import (QSize, QUrl, Qt)
 from PySide6.QtGui import (QCursor, QFont, QIcon, QMovie)
+from PySide6.QtWebEngineCore import QWebEnginePage
 from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import (QGroupBox, QHBoxLayout, QLineEdit, QSizePolicy, QWidget, QLabel)
 from PySide6.QtWidgets import (QPushButton, QLayout, QProgressBar, QVBoxLayout)
 
-from CustomElements.CustonPageWebEngine import CustomWebEnginePage
+from CustomElements.CustonProfile import CustomWebEngineProfile
 
 
 class DefaultSearchPage(QWidget):
@@ -130,18 +131,18 @@ class DefaultSearchPage(QWidget):
         self.label_icon_site.setMaximumSize(QSize(25, 25))
         self.label_icon_site.setSizePolicy(sizePolicyExpanding)
         self.label_icon_site.setStyleSheet(u"QPushButton {\n"
-                                                "    border: none;\n"
-                                                "	border-radius: 15px;\n"
-                                                "	background-color: none;\n"
-                                                "	text-align: center;\n"
-                                                "	color: white;\n"
-                                                "}\n"
-                                                "\n"
-                                                "QPushButton:hover {\n"
-                                                "	transition: 1s;\n"
-                                                "	transition-delay: 1s;\n"
-                                                "	background-color: lightgray;\n"
-                                                "}")
+                                           "    border: none;\n"
+                                           "	border-radius: 15px;\n"
+                                           "	background-color: none;\n"
+                                           "	text-align: center;\n"
+                                           "	color: white;\n"
+                                           "}\n"
+                                           "\n"
+                                           "QPushButton:hover {\n"
+                                           "	transition: 1s;\n"
+                                           "	transition-delay: 1s;\n"
+                                           "	background-color: lightgray;\n"
+                                           "}")
         self.label_icon_site.hide()
         self.horizontalLayout.addWidget(self.label_movie)
         self.horizontalLayout.addWidget(self.label_icon_site)
@@ -210,9 +211,10 @@ class DefaultSearchPage(QWidget):
 
         self.container_tab.addWidget(self.hot_bar)
 
-        self.page_web = CustomWebEnginePage(parent=widget)
+        self.profile = CustomWebEngineProfile(self)
+        self.page_web = QWebEnginePage(self.profile, widget)
         self.page_web.setObjectName("page_web")
-        self.webEngineView = QWebEngineView(parent=self.page)
+        self.webEngineView = QWebEngineView(self.page)
         self.webEngineView.setPage(self.page_web)
         self.webEngineView.setObjectName(u"webEngineView")
         self.webEngineView.setSizePolicy(sizePolicyExpanding)
@@ -221,7 +223,4 @@ class DefaultSearchPage(QWidget):
         self.webEngineView.setUrl(QUrl(u"about:blank"))
         self.webEngineView.loadProgress.connect(self.update_progress)
         self.webEngineView.load("https://www.google.com/")
-
         self.container_tab.addWidget(self.webEngineView)
-
-

@@ -42,6 +42,7 @@ init(autoreset=True)
 
 class Default(QWidget):
     downloads = []
+    consoles = []
 
     def __init__(self, parent=None, main_page=None):
         super().__init__(parent)
@@ -60,11 +61,23 @@ class Default(QWidget):
         self.connect_signals()
 
         self.shurt_cuts = ShortcutManager()
-        self.shurt_cuts.register_shortcut(self, "Ctrl+Shift+i", self.console_page)
+        self.shurt_cuts.register_shortcut(self, "Ctrl+Shift+i", lambda: self.console_page())
 
     def console_page(self):
-        self.console = ConsolePageImplementation(None, self.main_page, self.ui.webEngineView)
-        self.console.show()
+        main = self.main_page
+        tab = main.ui.tabs.currentWidget()
+        imp = tab.implementation
+        console = ConsolePageImplementation(None, main, imp.ui.webEngineView)
+        console.show()
+        self.consoles.append(console)
+
+    def closeEvent(self, event):
+        for c in self.consoles:
+            try:
+                c.close()
+            except Exception as e:
+                self.consoles.remove(c)
+        event.accept()
 
     def showContextMenu(self, event):
         menu = self.ui.webEngineView.createStandardContextMenu()
@@ -840,6 +853,7 @@ class ConsolePageImplementation(QWidget):
         cursor = self.ui.console_output.textCursor()
         cursor.movePosition(QTextCursor.End)
         cursor.insertHtml(new_txt)
+        cursor.movePosition(QTextCursor.End)
 
     def connect_signals(self):
         self.webEngine.page().loadFinished.connect(self.update_html)
