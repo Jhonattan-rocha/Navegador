@@ -826,6 +826,7 @@ class ConsolePageImplementation(QWidget):
 
     def exec_js_input(self):
         self.webEngine.page().runJavaScript(self.ui.console_input.text())
+        self.ui.console_input.setText("")
 
     def javascriptConsoleMessage(self, level, message, lineNumber, sourceID):
         level_mes = ""

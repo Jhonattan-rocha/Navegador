@@ -2,7 +2,7 @@ from PySide6.QtCore import (QSize)
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (QGroupBox, QLineEdit, QPlainTextEdit,
                                QSizePolicy, QVBoxLayout, QWidget)
-
+from CustomElements.CustomLineEdit import CustomLineEdit
 
 class ConsolePage(QWidget):
 
@@ -80,7 +80,7 @@ class ConsolePage(QWidget):
 
         self.verticalLayout_3.addWidget(self.console_output)
 
-        self.console_input = QLineEdit(self.container_console)
+        self.console_input = CustomLineEdit(self.container_console)
         self.console_input.setObjectName(u"console_input")
         self.console_input.setMinimumSize(QSize(0, 30))
         self.console_input.setMaximumSize(QSize(10000, 40))

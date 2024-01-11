@@ -7,7 +7,7 @@ from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import (QGroupBox, QHBoxLayout, QLineEdit, QSizePolicy, QWidget, QLabel)
 from PySide6.QtWidgets import (QPushButton, QLayout, QProgressBar, QVBoxLayout)
 
-from CustomElements.CustonProfile import CustomWebEngineProfile
+from CustomElements.CustomProfile import CustomWebEngineProfile
 
 
 class DefaultSearchPage(QWidget):

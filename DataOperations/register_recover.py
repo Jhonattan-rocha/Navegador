@@ -32,7 +32,8 @@ def recover_download_historic(file_saved: str = 'download_history.json', f: str 
             js = dict(js)
 
             if bool(f):
-                f_list = [his for his in js['Files'] if f.lower() in his['path'].lower() or f.lower() in his['name'].lower()]
+                f_list = [his for his in js['Files'] if
+                          f.lower() in his['path'].lower() or f.lower() in his['name'].lower()]
                 return {"Files": f_list}
             return js
         return {}
@@ -121,3 +122,43 @@ def remove_historic_item(id: int,
     return True
 
 
+# ------------------------------------------------------------------------------------------
+
+def register_console_historic(command: str, file_saved_main: str = 'console_historic.json'):
+    with open(os.path.abspath(os.path.join('configs', file_saved_main)), 'rb') as file:
+        file_read = file.read()
+        json_file = {}
+        if not file_read:
+            json_file = {"Commands": [command,]}
+        else:
+            json_file = json.loads(file_read)
+            json_file = dict(json_file)
+            json_file["Commands"].insert(0, command)
+
+        with open(os.path.abspath(os.path.join('configs', file_saved_main)), 'wb') as file2:
+            file2.write(str(json_file).replace("'", '"').encode('utf8'))
+
+
+def recover_console_historic(file_saved: str = 'console_historic.json') -> dict:
+    with open(os.path.join('configs', file_saved), 'rb') as file:
+        file_read = file.read()
+        if bool(file_read):
+            js = json.loads(file_read.decode('utf8'))
+            js = dict(js)
+            return js
+        return {}
+
+
+def remove_console_historic(command: str, file_saved_main: str = 'console_historic.json') -> bool:
+    with open(os.path.join('configs', file_saved_main), 'rb') as file:
+        file_read = file.read()
+        if bool(file_read):
+            js = json.loads(file_read.decode('utf8'))
+            js = dict(js)
+            if command in js['Commands']:
+                js['Commands'].remove(command)
+            with open(os.path.abspath(os.path.join('configs', file_saved_main)), 'wb') as file2:
+                file2.write(str(js).replace("'", '"').encode('utf8'))
+        else:
+            return False
+    return True
