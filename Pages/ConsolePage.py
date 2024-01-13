@@ -1,8 +1,10 @@
 from PySide6.QtCore import (QSize)
 from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import (QGroupBox, QLineEdit, QPlainTextEdit,
+from PySide6.QtWidgets import (QGroupBox, QPlainTextEdit,
                                QSizePolicy, QVBoxLayout, QWidget)
+
 from CustomElements.CustomLineEdit import CustomLineEdit
+
 
 class ConsolePage(QWidget):
 

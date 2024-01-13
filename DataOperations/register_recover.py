@@ -133,20 +133,34 @@ def register_console_historic(command: str, file_saved_main: str = 'console_hist
         else:
             json_file = json.loads(file_read)
             json_file = dict(json_file)
-            json_file["Commands"].insert(0, command)
+            json_file["Commands"].append(command)
 
-        with open(os.path.abspath(os.path.join('configs', file_saved_main)), 'wb') as file2:
-            file2.write(str(json_file).replace("'", '"').encode('utf8'))
+        with open(os.path.abspath(os.path.join('configs', file_saved_main)), 'w') as file2:
+            json.dump(json_file, file2, ensure_ascii=False, indent=2)
 
 
-def recover_console_historic(file_saved: str = 'console_historic.json') -> dict:
+def recover_console_historic(command: str, prev_next: str, file_saved: str = 'console_historic.json') -> str:
     with open(os.path.join('configs', file_saved), 'rb') as file:
         file_read = file.read()
         if bool(file_read):
             js = json.loads(file_read.decode('utf8'))
             js = dict(js)
-            return js
-        return {}
+
+            if not bool(command):
+                return js['Commands'][-1]
+
+            for co in js['Commands']:
+                if command == co and prev_next == "prev":
+                    index = list(js['Commands']).index(command)
+                    if index == 0:
+                        return command
+                    return js['Commands'][index-1]
+                elif command == co and prev_next == "next":
+                    index = js['Commands'].index(command)
+                    if index == len(js['Commands']) - 1:
+                        return command
+                    return js['Commands'][index+1]
+        return ""
 
 
 def remove_console_historic(command: str, file_saved_main: str = 'console_historic.json') -> bool:

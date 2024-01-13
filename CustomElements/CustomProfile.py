@@ -11,7 +11,7 @@ class CustomWebEngineProfile(QWebEngineProfile):
         self.setPersistentCookiesPolicy(self.PersistentCookiesPolicy.ForcePersistentCookies)
         self.setHttpCacheType(self.HttpCacheType.DiskHttpCache)
         self.setPersistentStoragePath(os.path.abspath("Cookies"))
-        self.setCachePath(os.path.abspath("PersistedDatas"))
+        self.setCachePath(os.path.abspath("SessionStorage"))
         self.setDownloadPath(os.path.abspath("PersistedDatas"))
         self.setHttpUserAgent(
             ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "

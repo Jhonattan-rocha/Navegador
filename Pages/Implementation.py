@@ -26,7 +26,7 @@ from colorama import init
 from DataOperations.TRIEManager import Trie
 from DataOperations.cookies import save_cookies, recover_cookies, remove_cookie
 from DataOperations.register_recover import recover_download_historic, recover_historic, \
-    remove_download_historic_item
+    remove_download_historic_item, register_console_historic
 from DataOperations.register_recover import register_download_historic, register_historic, remove_historic_item
 from DownloaderManager import Downloader
 from Pages.ConsolePage import ConsolePage
@@ -825,7 +825,9 @@ class ConsolePageImplementation(QWidget):
         self.window().setWindowTitle(self.ui.title)
 
     def exec_js_input(self):
-        self.webEngine.page().runJavaScript(self.ui.console_input.text())
+        command = self.ui.console_input.text()
+        threading.Thread(target=register_console_historic, args=(command,)).start()
+        self.webEngine.page().runJavaScript(command)
         self.ui.console_input.setText("")
 
     def javascriptConsoleMessage(self, level, message, lineNumber, sourceID):
