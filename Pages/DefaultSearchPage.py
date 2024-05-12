@@ -1,8 +1,8 @@
 import os
 
-from PySide6.QtCore import (QSize, QUrl, Qt)
+from PySide6.QtCore import (QSize, QUrl, Qt, QRect)
 from PySide6.QtGui import (QCursor, QFont, QIcon, QMovie)
-from PySide6.QtWebEngineCore import QWebEnginePage
+from PySide6.QtWebEngineCore import QWebEnginePage, QWebEngineProfile
 from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import (QGroupBox, QHBoxLayout, QLineEdit, QSizePolicy, QWidget, QLabel)
 from PySide6.QtWidgets import (QPushButton, QLayout, QProgressBar, QVBoxLayout)
@@ -20,10 +20,12 @@ class DefaultSearchPage(QWidget):
         # Atualizar o valor da barra de progresso com base no progresso do carregamento da página
         self.progress_bar.setValue(progress)
 
-    def setup_ui(self, widget):
+    def setup_ui(self, widget: QWidget):
         sizePolicyExpanding = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        sizePolicyExpanding.setHorizontalStretch(1)
-        sizePolicyExpanding.setVerticalStretch(1)
+        sizePolicyExpanding.setHorizontalStretch(0)
+        sizePolicyExpanding.setVerticalStretch(0)
+        widget.setSizePolicy(sizePolicyExpanding)
+        widget.setContentsMargins(0, 0, 0, 0)
         icon1 = QIcon()
         icon1.addFile(u"figs/l-arrow.png", QSize(), QIcon.Normal, QIcon.Off)
         icon4 = QIcon()
@@ -36,24 +38,29 @@ class DefaultSearchPage(QWidget):
         font.setFamilies([u"Segoe UI"])
         font.setBold(True)
         font.setUnderline(True)
-        self.page = QWidget(parent=widget)
+        self.container = QVBoxLayout(widget)
+        self.container.setObjectName(u"container")
+        self.container.setContentsMargins(0, 0, 0, 0)
+        self.container.setSizeConstraint(QVBoxLayout.SizeConstraint.SetDefaultConstraint)
+        self.page = QWidget()
         self.page.implementation = widget
         self.page.setObjectName(u"page")
-        self.setSizePolicy(sizePolicyExpanding)
         self.page.setSizePolicy(sizePolicyExpanding)
         self.page.setMaximumSize(QSize(16777215, 16777215))
+        self.page.setGeometry(QRect(0, 0, 778, 538))
         self.progress_bar = QProgressBar()
         self.progress_bar.setMaximum(100)
         self.progress_bar.setMinimumHeight(5)
         self.progress_bar.setMaximumHeight(10)
         self.progress_bar.setTextVisible(False)
         self.progress_bar.setSizePolicy(sizePolicyExpanding)
-        self.container_tab = QVBoxLayout(self.page)
+        self.container_tab = QVBoxLayout()
         self.container_tab.setObjectName(u"container_tab")
         self.container_tab.setContentsMargins(0, 0, 0, 0)
         self.container_tab.setSizeConstraint(QVBoxLayout.SizeConstraint.SetDefaultConstraint)
         self.container_tab.addWidget(self.progress_bar)
-        self.hot_bar = QGroupBox(self.page)
+        self.page.setLayout(self.container_tab)
+        self.hot_bar = QGroupBox()
         self.hot_bar.setObjectName(u"hot_bar")
         self.hot_bar.setMinimumSize(QSize(300, 40))
         self.hot_bar.setMaximumSize(QSize(16777215, 40))
@@ -64,12 +71,13 @@ class DefaultSearchPage(QWidget):
                                    "	padding: 0;\n"
                                    "	width: 100%;\n"
                                    "}")
-        self.horizontalLayout = QHBoxLayout(self.hot_bar)
+        self.horizontalLayout = QHBoxLayout()
+        self.hot_bar.setLayout(self.horizontalLayout)
         self.horizontalLayout.setSpacing(0)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.horizontalLayout.setContentsMargins(0, 5, 0, 0)
         self.horizontalLayout.setSizeConstraint(QLayout.SizeConstraint.SetDefaultConstraint)
-        self.arrow_left_historic = QPushButton(self.hot_bar)
+        self.arrow_left_historic = QPushButton()
         self.arrow_left_historic.setObjectName(u"arrow_left_historic")
         self.arrow_left_historic.setSizePolicy(sizePolicyExpanding)
         self.arrow_left_historic.setMaximumSize(QSize(30, 30))
@@ -82,8 +90,6 @@ class DefaultSearchPage(QWidget):
                                                "}\n"
                                                "\n"
                                                "QPushButton:hover {\n"
-                                               "	transition: 1s;\n"
-                                               "	transition-delay: 1s;\n"
                                                "	background-color: lightgray;\n"
                                                "}")
         icon1 = QIcon()
@@ -92,7 +98,7 @@ class DefaultSearchPage(QWidget):
 
         self.horizontalLayout.addWidget(self.arrow_left_historic)
 
-        self.arrow_right_historic = QPushButton(self.hot_bar)
+        self.arrow_right_historic = QPushButton()
         self.arrow_right_historic.setObjectName(u"arrow_right_historic")
         self.arrow_right_historic.setSizePolicy(sizePolicyExpanding)
         self.arrow_right_historic.setMaximumSize(QSize(30, 30))
@@ -105,8 +111,6 @@ class DefaultSearchPage(QWidget):
                                                 "}\n"
                                                 "\n"
                                                 "QPushButton:hover {\n"
-                                                "	transition: 1s;\n"
-                                                "	transition-delay: 1s;\n"
                                                 "	background-color: lightgray;\n"
                                                 "}")
         icon2 = QIcon()
@@ -117,7 +121,7 @@ class DefaultSearchPage(QWidget):
 
         self.movie = QMovie(os.path.abspath(os.path.join("figs", 'load.gif')))
         self.movie.setScaledSize(QSize(30, 30))
-        self.label_movie = QLabel(self.hot_bar)
+        self.label_movie = QLabel()
         self.label_movie.setSizePolicy(sizePolicyExpanding)
         self.label_movie.setMaximumSize(QSize(40, 40))
         self.label_movie.setMovie(self.movie)
@@ -139,8 +143,6 @@ class DefaultSearchPage(QWidget):
                                            "}\n"
                                            "\n"
                                            "QPushButton:hover {\n"
-                                           "	transition: 1s;\n"
-                                           "	transition-delay: 1s;\n"
                                            "	background-color: lightgray;\n"
                                            "}")
         self.label_icon_site.hide()
@@ -161,7 +163,7 @@ class DefaultSearchPage(QWidget):
 
         self.horizontalLayout.addWidget(self.url)
 
-        self.download_buttton = QPushButton(self.hot_bar)
+        self.download_buttton = QPushButton()
         self.download_buttton.setObjectName(u"download_buttton")
         self.download_buttton.setSizePolicy(sizePolicyExpanding)
         self.download_buttton.setMaximumSize(QSize(30, 30))
@@ -175,8 +177,6 @@ class DefaultSearchPage(QWidget):
                                             "}\n"
                                             "\n"
                                             "QPushButton:hover {\n"
-                                            "	transition: 1s;\n"
-                                            "	transition-delay: 1s;\n"
                                             "	background-color: lightgray;\n"
                                             "}")
         icon3 = QIcon()
@@ -185,7 +185,7 @@ class DefaultSearchPage(QWidget):
 
         self.horizontalLayout.addWidget(self.download_buttton)
 
-        self.options = QPushButton(self.hot_bar)
+        self.options = QPushButton()
         self.options.setObjectName(u"options")
         self.options.setSizePolicy(sizePolicyExpanding)
         self.options.setMaximumSize(QSize(30, 30))
@@ -199,8 +199,6 @@ class DefaultSearchPage(QWidget):
                                    "}\n"
                                    "\n"
                                    "QPushButton:hover {\n"
-                                   "	transition: 1s;\n"
-                                   "	transition-delay: 1s;\n"
                                    "	background-color: lightgray;\n"
                                    "}")
         icon4 = QIcon()
@@ -211,16 +209,16 @@ class DefaultSearchPage(QWidget):
 
         self.container_tab.addWidget(self.hot_bar)
 
-        self.profile = CustomWebEngineProfile(self)
-        self.page_web = QWebEnginePage(self.profile, widget)
+        self.profile = CustomWebEngineProfile("profile_web", parent=self, cache_path=widget.identification)
+        self.page_web = QWebEnginePage(self.profile, self)
         self.page_web.setObjectName("page_web")
-        self.webEngineView = QWebEngineView(self.page)
+        self.webEngineView = QWebEngineView()
         self.webEngineView.setPage(self.page_web)
         self.webEngineView.setObjectName(u"webEngineView")
         self.webEngineView.setSizePolicy(sizePolicyExpanding)
         self.webEngineView.setMinimumSize(QSize(0, 0))
         self.webEngineView.setMaximumSize(QSize(16777215, 16777215))
-        self.webEngineView.setUrl(QUrl(u"about:blank"))
         self.webEngineView.loadProgress.connect(self.update_progress)
         self.webEngineView.load("https://www.google.com/")
         self.container_tab.addWidget(self.webEngineView)
+        self.container.addWidget(self.page)

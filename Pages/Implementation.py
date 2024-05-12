@@ -4,27 +4,21 @@ import re
 import threading
 import uuid
 
-from PySide6.QtCore import (QFile, QStringListModel, QByteArray, Slot)
-from PySide6.QtCore import (QSize, QUrl, Qt)
-from PySide6.QtGui import (QCursor, QDesktopServices,
-                           QFont, QIcon, QPixmap, QTextCursor)
-from PySide6.QtNetwork import QNetworkCookie
+from PySide6.QtCore import (QFile, QStringListModel, Slot, QSize, QUrl, Qt, QPoint, QTimer)
+from PySide6.QtGui import (QCursor, QDesktopServices, QPainter, QRegion, QPageSize, QPageRanges, 
+                           QFont, QIcon, QPixmap, QTextCursor, QAction, QPageLayout)
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWebEngineCore import QWebEngineDownloadRequest, QWebEnginePage
 from PySide6.QtWebEngineWidgets import QWebEngineView
-from PySide6.QtWidgets import (QDialog, QCompleter)
-from PySide6.QtWidgets import (QFileDialog)
-from PySide6.QtWidgets import (QGroupBox, QHBoxLayout, QCommandLinkButton,
-                               QSizePolicy, QLayout, QProgressBar)
-from PySide6.QtWidgets import (QLabel)
-from PySide6.QtWidgets import (QPushButton,
-                               QVBoxLayout)
-from PySide6.QtWidgets import (QWidget)
+from PySide6.QtWidgets import (QDialog, QCompleter, QMenu, QFileDialog, QGroupBox, QHBoxLayout, QCommandLinkButton,
+                               QSizePolicy, QLayout, QProgressBar, QLabel, QWidget, QPushButton, QVBoxLayout, QLabel)
+from PySide6.QtWebEngineCore import QWebEngineCertificateError
+from PySide6.QtPrintSupport import QPrinter, QPrintPreviewDialog
+
 from bs4 import BeautifulSoup
 from colorama import init
-
+from uuid import uuid4
 from DataOperations.TRIEManager import Trie
-from DataOperations.cookies import save_cookies, recover_cookies, remove_cookie
 from DataOperations.register_recover import recover_download_historic, recover_historic, \
     remove_download_historic_item, register_console_historic
 from DataOperations.register_recover import register_download_historic, register_historic, remove_historic_item
@@ -33,70 +27,84 @@ from Pages.ConsolePage import ConsolePage
 from Pages.DefaultSearchPage import DefaultSearchPage
 from Pages.Download import DownloadsPage
 from Pages.FindInPage import FindInPage
-from Pages.Historic import HistoricPage
+from Pages.Historico import HistoricoPage
 from Pages.LoadPage import LoadPage
-from Pages.ShortCuts import ShortcutManager
 
 init(autoreset=True)
 
-
-class Default(QWidget):
+class DefaultSearchPageImplementation(QWidget):
     downloads = []
-    consoles = []
 
     def __init__(self, parent=None, main_page=None):
         super().__init__(parent)
         self.trie = None
-        self.cookie_store = None
-        self.profile = None
-        self.ui = DefaultSearchPage(self)
-        self.ui.setup_ui(self)
         self.identification = str(uuid.uuid4())
+        self.ui = DefaultSearchPage()
+        self.ui.setup_ui(self)
         self.main_page = main_page
+        self.ui.webEngineView.contextMenuEvent = self.handle_context_menu
         if not self.main_page.dialog_download or not self.main_page.dialog_ops:
             self.open_dialog_ops(view=False)
-            Download(self.main_page, self.main_page).open_dialog_download(view=False)
+            self.open_dialog_download(view=False)
         self.site_atual: dict = {}
         self.sites_visitados: list = []
         self.connect_signals()
+            
+    def print_page(self):
+        if self.ui.label_movie.isHidden():
+            filename = str(uuid4())
+            printer = QPrinter(QPrinter.PrinterMode.HighResolution)
+            printer.setPageSize(QPageSize.PageSizeId.A4)
+            printer.setCopyCount(1)
+            printer.setPrintRange(QPrinter.PrintRange.AllPages)
+            printer.setPaperSource(QPrinter.PaperSource.MaxPageSource)
+            printer.setPageOrientation(QPageLayout.Orientation.Portrait)
+            printer.setOutputFormat(QPrinter.OutputFormat.PdfFormat)
+            printer.setDocName(f"temp_{filename}.pdf")
+            printer.setFullPage(True)
+            printer.setOutputFileName(os.path.join(".", "cache_aux", f"temp_{filename}.pdf"))
+            printer.setFontEmbeddingEnabled(True)
+            printer.setResolution(max(printer.supportedResolutions()))
 
-        self.shurt_cuts = ShortcutManager()
-        self.shurt_cuts.register_shortcut(self, "Ctrl+Shift+i", lambda: self.console_page())
+            painter = QPainter(printer)
+            painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+            rg = QRegion()
+            self.ui.webEngineView.render(painter, QPoint(), rg)
+            painter.end()
 
-    def console_page(self):
-        main = self.main_page
-        tab = main.ui.tabs.currentWidget()
-        imp = tab.implementation
-        console = ConsolePageImplementation(None, main, imp.ui.webEngineView)
-        console.show()
-        self.consoles.append(console)
+    def handle_context_menu(self, event):
+        # Obtendo o menu de contexto padrão
+        default_menu = self.ui.webEngineView.createStandardContextMenu()
+
+        # Criando uma ação personalizada
+        custom_action = default_menu.addAction("Print page...")
+        custom_action.triggered.connect(lambda args: self.print_page())
+
+        # Exibindo o menu de contexto modificado
+        default_menu.exec_(event.globalPos())
+    
+    def showContextMenu(self, pos):
+        menu = QMenu(self)
+
+        history = self.ui.webEngineView.history()
+        for i in range(min(history.count(), 10)):  # Obter os últimos 10 itens do histórico
+            action = QAction(history.itemAt(i).title(), self)
+            action.setData(history.itemAt(i).url())  # Armazenar a URL como dados da ação
+            action.triggered.connect(lambda event: self.search(self.ui.webEngineView, history.itemAt(i).url().toString()))
+            menu.addAction(action)
+            
+        menu.exec_(self.ui.arrow_left_historic.mapToGlobal(pos))
 
     def closeEvent(self, event):
-        for c in self.consoles:
-            try:
-                c.close()
-            except Exception as e:
-                self.consoles.remove(c)
-        event.accept()
-
-    def showContextMenu(self, event):
-        menu = self.ui.webEngineView.createStandardContextMenu()
-        view_page_source_action = None
-
-        # Encontrar a ação 'View Page Source' no menu de contexto
-        for action in menu.actions():
-            if action.text() == "View page source":
-                view_page_source_action = action
-                break
-
-        if view_page_source_action:
-            view_page_source_action.triggered.connect(self.console_page)
-
-        menu.exec(self.ui.webEngineView.mapToGlobal(event))
+        super().closeEvent(event)
 
     def connect_signals(self):
-        self.ui.page_web.profile().defaultProfile().downloadRequested.connect(self.download_file)
-
+        self.ui.arrow_left_historic.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.arrow_right_historic.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.arrow_left_historic.customContextMenuRequested.connect(self.showContextMenu)
+        self.ui.arrow_right_historic.customContextMenuRequested.connect(self.showContextMenu)
+        self.ui.page_web.profile().downloadRequested.connect(self.download_file)
+        self.ui.page_web.certificateError.connect(self.handle_certificate_error)
         self.ui.arrow_left_historic.clicked.connect(
             lambda: self.load_direction_specific_historic('ant'))
         self.ui.arrow_right_historic.clicked.connect(
@@ -115,13 +123,7 @@ class Default(QWidget):
         self.ui.webEngineView.iconChanged.connect(self.handle_icon_changed)
         self.ui.options.clicked.connect(lambda: self.open_dialog_ops())
         self.ui.download_buttton.clicked.connect(
-            lambda: Download(self.main_page, self.main_page).open_dialog_download())
-
-        self.profile = self.ui.webEngineView.page().profile()
-
-        self.cookie_store = self.profile.cookieStore()
-        self.cookie_store.cookieAdded.connect(self.on_cookie_added)
-        self.cookie_store.cookieRemoved.connect(self.on_cookie_removed)
+            lambda: self.open_dialog_download())
 
         self.trie = Trie()
 
@@ -129,11 +131,22 @@ class Default(QWidget):
         self.ui.url.setCompleter(completer)
         self.ui.url.textChanged.connect(self.on_text_changed)
 
-        threading.Thread(target=self.load_cookies, args=()).start()
-        threading.Thread(target=self.load_historic_in_trie, args=()).start()
-
-        # self.load = LoadPage()
-        # self.load.show()
+    def disconnect_signals(self):
+        self.ui.arrow_left_historic.customContextMenuRequested.disconnect()
+        self.ui.arrow_right_historic.customContextMenuRequested.disconnect()
+        self.ui.page_web.profile().downloadRequested.disconnect()
+        self.ui.page_web.certificateError.disconnect()
+        self.ui.arrow_left_historic.clicked.disconnect()
+        self.ui.arrow_right_historic.clicked.disconnect()
+        self.ui.url.returnPressed.disconnect()
+        self.ui.webEngineView.urlChanged.disconnect()
+        self.ui.webEngineView.loadStarted.disconnect()
+        self.ui.webEngineView.loadFinished.disconnect()
+        self.ui.webEngineView.iconChanged.disconnect()
+        self.ui.options.clicked.disconnect()
+        self.ui.download_buttton.clicked.disconnect()
+        self.trie.root = None
+        self.ui.url.textChanged.disconnect()
 
     def handle_icon_changed(self, iconUrl):
         icon = self.ui.webEngineView.icon()
@@ -149,26 +162,6 @@ class Default(QWidget):
         alert("inputs: " + qtd)
         """
         # self.ui.webEngineView.page().runJavaScript(js)
-
-    def on_cookie_added(self, cookie):
-        dados = {'name': cookie.name().data().decode(), 'cookie': cookie.value().data().decode(),
-                 'domain': cookie.domain()}
-        threading.Thread(target=save_cookies, args=(dados,)).start()
-
-    def on_cookie_removed(self, cookie):
-        threading.Thread(target=remove_cookie,
-                         args=(cookie.name().data().decode(), cookie.value().data().decode())).start()
-
-    def load_cookies(self):
-        cookies = recover_cookies()
-        if bool(cookies):
-            for cook in cookies['Cookies']:
-                cookie = QNetworkCookie(
-                    name=QByteArray(cook['name'].encode()),
-                    value=QByteArray(cook['cookie'].encode())
-                )
-                cookie.setDomain(cook['domain'])
-                self.cookie_store.setCookie(cookie, cook['domain'])
 
     def load_historic_in_trie(self):
         historic = recover_historic()
@@ -209,6 +202,29 @@ class Default(QWidget):
         elif direc == 'prox':
             self.ui.webEngineView.forward()
         self.update_navigation_buttons()
+    
+    def open_dialog_download(self, view=True):
+        if not self.main_page.dialog_download:
+            loader = QUiLoader()
+            ui_file = QFile(os.path.abspath(os.path.join("Pages", "dialog_downloads.ui")))
+            ui_file.open(QFile.ReadOnly)
+            dialog_widget = loader.load(ui_file)
+            ui_file.close()
+
+            # Criar o diálogo
+            dialog = QDialog(self.main_page)
+            dialog.setWindowModality(Qt.WindowModality.NonModal)
+            dialog.setWindowTitle("Downloads")
+            dialog.setModal(True)  # Permitir interação com a janela principal
+            layout = QVBoxLayout(dialog)
+            layout.addWidget(dialog_widget)
+
+            self.main_page.dialog_download = dialog
+
+            if view:
+                dialog.exec()
+        else:
+            self.main_page.dialog_download.exec()
 
     def open_dialog_ops(self, view=True):
         if not self.main_page.dialog_ops:
@@ -221,26 +237,24 @@ class Default(QWidget):
 
             add_page = dialog_widget.findChild(QPushButton, 'add_page')
             add_page.clicked.connect(
-                lambda: self.main_page.ui.tabs.addTab(Default(self.main_page, self.main_page).ui.page,
+                lambda: self.main_page.ui.tabs.addTab(DefaultSearchPageImplementation(self.main_page.ui.tabs, self.main_page).ui.page,
                                                       "Nova Página"))
 
             download_page = dialog_widget.findChild(QPushButton, 'donwloads_page')
             download_page.clicked.connect(
-                lambda: self.main_page.ui.tabs.addTab(Download(self.main_page, self.main_page).ui.downloads,
+                lambda: self.main_page.ui.tabs.addTab(DownloadImplementation(self.main_page, self.main_page).ui.downloads,
                                                       "Downloads"))
 
             historic_page = dialog_widget.findChild(QPushButton, 'historic_page')
             historic_page.clicked.connect(
-                lambda: self.main_page.ui.tabs.addTab(Historic(self.main_page, self.main_page).ui.historic,
+                lambda: self.main_page.ui.tabs.addTab(HistoricoImplementation(self.main_page, self.main_page).ui.historic,
                                                       "Histórico"))
 
             config_page = dialog_widget.findChild(QPushButton, "configs")
             config_page.clicked.connect(
                 lambda: self.main_page.ui.tabs.addTab(
                     LoadPageImplementation(self.main_page, self.main_page, title="Configurações",
-                                           html=os.path.abspath(
-                                               os.path.join("Pages", "JsPages", "Configuracoes",
-                                                            "index.html"))).ui.load_page, "Configurações"))
+                                           html="http://localhost:3000/config/").ui.load_page, "Configurações"))
             find_page = dialog_widget.findChild(QPushButton, 'findpage')
             find = FindInPage(webView=self.ui.webEngineView)
             find_page.clicked.connect(lambda: find.show())
@@ -254,12 +268,12 @@ class Default(QWidget):
             layout.addWidget(dialog_widget)
 
             # Exibir o diálogo modalmente
-            self.main_page.dialog_ops = {"fields": dialog_widget, "view": dialog}
+            self.main_page.dialog_ops = dialog
             if view:
                 dialog.exec()
         else:
             self.main_page.ui.tabs.setTabsClosable(True)
-            self.main_page.dialog_ops['view'].exec()
+            self.main_page.dialog_ops.exec()
 
     def update_url(self, url_c) -> None:
         url = url_c.toString()
@@ -288,20 +302,36 @@ class Default(QWidget):
     @staticmethod
     def is_valid_url(url_string: str) -> bool:
         url_pattern = re.compile(
-            r'^(https?://)?' +  # validar protocolo
-            r'((([a-z\d]([a-z\d-]*[a-z\d])*)\.)+[a-z]{2,}|' +  # validar nome de domínio
-            r'((\d{1,3}\.){3}\d{1,3}))' +  # validar OU endereço IP (v4)
-            r'(:\d+)?(/[-a-z\d%_.~+]*)*' +  # validar porta e caminho
+            r'^(https?://)?' +  # validar protocolo opcional
+            r'(?:(?:([a-z\d]([a-z\d-]*[a-z\d])*)\.)+[a-z]{2,}|' +  # validar nome de domínio
+            r'(?:\d{1,3}\.){3}\d{1,3})' +  # validar endereço IP (v4)
+            r'(:\d+)?' +  # validar porta opcional
+            r'(/[-a-z\d%_.~+]*)*' +  # validar caminho
             r'(\?[;&a-z\d%_.~+=-]*)?' +  # validar string de consulta
             r'(#[-a-z\d_]*)?$',  # validar fragmento
             re.IGNORECASE  # ignora case sensitivity
         )
         return bool(re.match(url_pattern, url_string))
+    
+    @Slot(QWebEngineCertificateError)
+    def handle_certificate_error(self, error):
+        url = error.url()
+        # Verifica se a URL é HTTPS e tenta carregar usando HTTP
+        if url.scheme() == 'https':
+            new_url = QUrl(url.toString().replace('https://', 'http://'))
+            self.ui.webEngineView.load(new_url)
+            return True  # Ignora o erro de certificado original
+        return False  # Não ignora outros erros de certificado
+
 
     def search(self, web_loader: QWebEngineView, search_text: str) -> None:
         if self.is_valid_url(search_text):
             url = f"{search_text}"
-
+            
+            if 'localhost:' in search_text:
+                web_loader.load(QUrl(url))
+                return
+            
             if 'https://' not in search_text:
                 url = f"https://{search_text}"
 
@@ -309,7 +339,7 @@ class Default(QWidget):
             return
 
         if 'file:///' in search_text:
-            web_loader.load(QUrl(search_text))
+            web_loader.load(QUrl.fromLocalFile(search_text.replace('file:///', "")))
             return
 
         search_url = "https://www.google.com/search?q=" + search_text.replace(" ", "+")
@@ -317,8 +347,7 @@ class Default(QWidget):
         web_loader.load(QUrl(search_url))
 
     @Slot(QWebEngineDownloadRequest)
-    def download_file(self, download_item) -> None:
-        print(self.identification, self.ui.webEngineView.url().toString())
+    def download_file(self, download_item: QWebEngineDownloadRequest) -> None:
         if download_item.url().toString() not in self.downloads:
             url_download = download_item.url().toString()
             self.downloads.append(url_download)
@@ -326,7 +355,7 @@ class Default(QWidget):
             folder_path = QFileDialog.getExistingDirectory(self, "Selecionar pasta de destino",
                                                            options=QFileDialog.Option.ShowDirsOnly)
             suggested_file_name = download_item.suggestedFileName()
-            progress_bar = Download.add_download_notification(main_pages=self.main_page.dialog_download,
+            progress_bar = DownloadImplementation.add_download_notification(main_pages=self.main_page.dialog_download,
                                                               download_data={'download_time': datetime.datetime.now(),
                                                                              'name': suggested_file_name,
                                                                              'path': os.path.join(folder_path,
@@ -336,15 +365,15 @@ class Default(QWidget):
                 lambda suggested_file_name_arg, folder_path_arg: self.handle_download_finished(suggested_file_name_arg,
                                                                                                folder_path_arg,
                                                                                                url_download),
-                Qt.ConnectionType.QueuedConnection)
+                                                Qt.ConnectionType.QueuedConnection)
             downloader.download_failed.connect(self.handle_download_failed,
-                                               Qt.ConnectionType.QueuedConnection)
-            downloader.progress_update.connect(lambda percent: self.handle_progress(percent, progress_bar),
-                                               Qt.ConnectionType.QueuedConnection)
-            downloader.download_file(download_item.url().toString(), folder_path, suggested_file_name, progress_bar)
+                                                Qt.ConnectionType.QueuedConnection)
+            downloader.progress_update.connect(lambda percent, progress=progress_bar: self.handle_progress(percent, progress),
+                                                Qt.ConnectionType.QueuedConnection)
+            downloader.download_file(download_item.url().toString(), folder_path, suggested_file_name)
 
     @staticmethod
-    def handle_progress(percent: float, progress_bar):
+    def handle_progress(percent: float, progress_bar: QProgressBar):
         try:
             progress_bar.setValue(percent)
         except Exception as e:
@@ -362,27 +391,34 @@ class Default(QWidget):
                          args=(suggested_file_name, folder_path, 'Erro', datetime.datetime.now())).start()
 
 
-class Download(QWidget):
+class DownloadImplementation(QWidget):
 
     def __init__(self, parent=None, main_page=None):
         super().__init__(parent)
-        self.ui = DownloadsPage(self)
+        self.identification = str(uuid.uuid4())
+        self.ui = DownloadsPage()
         self.ui.setup_ui(self)
         self.ui.arrow_left_back.hide()
         self.main_page = main_page
         self.load_download_historic(limit=10)
-
-        self.ui.scrollAreaDownloads.verticalScrollBar().valueChanged.connect(self.scroll_event)
-        self.ui.search_input.textChanged.connect(lambda txt: self.load_download_historic(10, txt))
         self.loaded_items = 0
         self.items_per_load = 10  # Número de itens a serem carregados a cada vez
+        self.connect_signals()
+        
+    def connect_signals(self):
+        self.ui.scrollAreaDownloads.verticalScrollBar().valueChanged.connect(self.scroll_event)
+        self.ui.search_input.textChanged.connect(lambda txt: self.load_download_historic(10, txt))
 
+    def disconnect_signals(self):
+        self.ui.scrollAreaDownloads.verticalScrollBar().valueChanged.disconnect()
+        self.ui.search_input.textChanged.disconnect()
+    
     def load_more_items(self, f: str = ""):
         downloads = recover_download_historic(f=f)
         items_to_load = downloads['Files'][self.loaded_items:self.loaded_items + self.items_per_load]
 
         for download_data in items_to_load:
-            Download.add_download_history(main_page=self, download_data=download_data)
+            DownloadImplementation.add_download_history(main_page=self, download_data=download_data)
 
         self.loaded_items += self.items_per_load
 
@@ -390,31 +426,6 @@ class Download(QWidget):
         scrollbar = self.ui.scrollAreaDownloads.verticalScrollBar()
         if scrollbar.value() >= scrollbar.maximum() - 100:  # Verifica se o usuário está próximo do final
             self.load_more_items(f=self.ui.search_input.text())
-
-    def open_dialog_download(self, view=True):
-        if not self.main_page.dialog_download:
-            loader = QUiLoader()
-            ui_file = QFile(os.path.abspath(os.path.join("Pages", "dialog_downloads.ui")))
-            ui_file.open(QFile.ReadOnly)
-            dialog_widget = loader.load(ui_file)
-            ui_file.close()
-
-            # Criar o diálogo
-            dialog = QDialog(self.main_page)
-            dialog.setWindowModality(Qt.WindowModality.NonModal)
-            dialog.setWindowTitle("Downloads")
-            dialog.setModal(True)  # Permitir interação com a janela principal
-            layout = QVBoxLayout(dialog)
-            layout.addWidget(dialog_widget)
-
-            # Exibir o diálogo modalmente
-            self.main_page.dialog_download = {"fields": dialog_widget, "view": dialog}
-            # Download.load_download_notificatios(self.main_page.dialog_download)
-
-            if view:
-                dialog.exec()
-        else:
-            self.main_page.dialog_download['view'].exec()
 
     def load_download_historic(self, limit: int, f: str = ""):
         layout = self.ui.container_downloads_itens_page.layout()
@@ -431,7 +442,7 @@ class Download(QWidget):
             cont = 0
             for download in history['Files']:
                 if cont <= limit:
-                    Download.add_download_history(main_page=self, download_data=download)
+                    DownloadImplementation.add_download_history(main_page=self, download_data=download)
                     cont += 1
 
     @staticmethod
@@ -447,7 +458,7 @@ class Download(QWidget):
         history = recover_download_historic(file_saved='download_notifications.json')
         if bool(history):
             for download in history['Files']:
-                Download.add_download_notification(main_pages=main_page, download_data=download,
+                DownloadImplementation.add_download_notification(main_pages=main_page, download_data=download,
                                                    show_progress=False)
 
     @staticmethod
@@ -585,8 +596,6 @@ class Download(QWidget):
                                "}\n"
                                "\n"
                                "QPushButton:hover {\n"
-                               "	transition: 1s;\n"
-                               "	transition-delay: 1s;\n"
                                "	background-color: lightgray;\n"
                                "}")
         icon5 = QIcon()
@@ -634,28 +643,35 @@ class Download(QWidget):
 
             verticalLayout_3.addWidget(progressBar)
 
-            (main_pages['fields'].findChild(QLayout, 'container_download_notifications')
+            (main_pages.findChild(QLayout, 'container_download_notifications')
              .addWidget(download_item_list))
 
             return progressBar
 
 
-class Historic(QWidget):
+class HistoricoImplementation(QWidget):
 
     def __init__(self, parent=None, main_page=None):
         super().__init__(parent)
-        self.ui = HistoricPage(self)
+        self.identification = str(uuid.uuid4())
+        self.ui = HistoricoPage()
         self.ui.setup_ui(self)
         self.ui.arrow_left_back_historic.hide()
         self.main_page = main_page
         self.load_historic(10)
-
-        self.ui.scrollAreaHistoric.verticalScrollBar().valueChanged.connect(self.scroll_event)
-        self.ui.search_input.textChanged.connect(lambda txt: self.load_historic(10, txt))
-
+        self.connect_signals()
         self.loaded_items = 0
         self.items_per_load = 10  # Número de itens a serem carregados a cada vez
 
+        
+    def connect_signals(self):
+        self.ui.scrollAreaHistoric.verticalScrollBar().valueChanged.connect(self.scroll_event)
+        self.ui.search_input.textChanged.connect(lambda txt: self.load_historic(10, txt))
+
+    def disconnect_signals(self):
+        self.ui.scrollAreaHistoric.verticalScrollBar().valueChanged.disconnect()
+        self.ui.search_input.textChanged.disconnect()
+    
     def load_more_items(self, f: str):
         history = recover_historic(f=f)
         items_to_load = history['Sites'][self.loaded_items:self.loaded_items + self.items_per_load]
@@ -691,7 +707,7 @@ class Historic(QWidget):
                     break
 
     def open_historic_site(self, site):
-        default_page = Default(self.main_page, main_page=self.main_page).ui.page
+        default_page = DefaultSearchPageImplementation(self.main_page.ui.tabs, main_page=self.main_page).ui.page
         self.main_page.ui.tabs.addTab(default_page, "Nova pagina")
         last_page = self.main_page.ui.tabs.count() - 1
         layout = self.main_page.ui.tabs.widget(last_page)
@@ -783,8 +799,6 @@ class Historic(QWidget):
                                             "}\n"
                                             "\n"
                                             "QPushButton:hover {\n"
-                                            "	transition: 1s;\n"
-                                            "	transition-delay: 1s;\n"
                                             "	background-color: lightgray;\n"
                                             "}")
             del_item_historic.setIcon(icon6)
@@ -800,8 +814,12 @@ class LoadPageImplementation(QWidget):
         self.main_page = main_page
         self.title = title
         self.html = html
-        self.ui = LoadPage(parent=self, main_page=main_page, title=title, html=html)
+        self.identification = str(uuid.uuid4())
+        self.ui = LoadPage(parent=None, main_page=main_page, title=title, html=html, cache_path=self.identification)
         self.ui.setupUi(self)
+    
+    def disconnect_signals(self):
+        pass
 
 
 class ConsolePageImplementation(QWidget):
@@ -810,9 +828,10 @@ class ConsolePageImplementation(QWidget):
         super().__init__(parent)
         self.main_page = main_page
         self.webEngine = webEngine
-        self.connect_signals()
-        self.ui = ConsolePage(self)
+        self.identification = str(uuid.uuid4())
+        self.ui = ConsolePage()
         self.ui.setupUi(self)
+        self.connect_signals()
 
         # configurando
 
@@ -862,6 +881,10 @@ class ConsolePageImplementation(QWidget):
         self.webEngine.page().loadFinished.connect(self.update_html)
         self.webEngine.page().contentsSizeChanged.connect(self.update_html)
         self.update_html()
+    
+    def disconnect_signals(self):
+        self.webEngine.page().loadFinished.disconnect(self.update_html)
+        self.webEngine.page().contentsSizeChanged.disconnect(self.update_html)
 
     def update_html(self):
         self.webEngine.page().toHtml(lambda html: self.format_txt_html(html))

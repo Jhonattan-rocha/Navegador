@@ -1,7 +1,7 @@
 from PySide6.QtCore import (QCoreApplication, QMetaObject, QSize, Qt)
 from PySide6.QtGui import (QIcon)
 from PySide6.QtWidgets import (QStackedWidget, QTabWidget, QVBoxLayout, QWidget, QSizePolicy)
-
+import os
 from CustomElements.DraggableTabWidget import DraggableTabWidget
 
 
@@ -17,7 +17,7 @@ class Main_page(QWidget):
         Widget.resize(800, 600)
         Widget.setContentsMargins(0, 0, 0, 0)
         icon = QIcon()
-        icon.addFile(u"figs/icon.png", QSize(), QIcon.Normal, QIcon.Off)
+        icon.addFile("./figs/icon.png", QSize(), QIcon.Normal, QIcon.Off)
         Widget.setWindowIcon(icon)
         Widget.setSizePolicy(sizePolicyExpanding)
         self.verticalLayout_2 = QVBoxLayout(Widget)
@@ -41,7 +41,7 @@ class Main_page(QWidget):
         self.tabs.setObjectName(u"tabs")
         self.tabs.setMovable(True)
         self.tabs.setEnabled(True)
-        self.tabs.setTabPosition(QTabWidget.TabPosition.South)
+        self.tabs.setTabPosition(QTabWidget.TabPosition.North)
         self.tabs.setElideMode(Qt.TextElideMode.ElideMiddle)
         self.tabs.setTabsClosable(False)
 
@@ -52,10 +52,7 @@ class Main_page(QWidget):
             border: 1px solid black;
         }
         QTabBar::tab:selected {
-            background-color: lightgray; /* Cor de fundo da aba selecionada */
-            border-top-left-radius: 0px;
-            border-top-right-radius: 0px;
-            border-top-color: none;
+            background-color: rgba(0,0,0,0.3); /* Cor de fundo da aba selecionada */
         }
 
         QTabBar {

@@ -82,8 +82,6 @@ class FindInPage(QWidget):
                                 "}\n"
                                 "\n"
                                 "QPushButton:hover {\n"
-                                "	transition: 1s;\n"
-                                "	transition-delay: 1s;\n"
                                 "	background-color: lightgray;\n"
                                 "}")
 
@@ -107,8 +105,6 @@ class FindInPage(QWidget):
                                     "}\n"
                                     "\n"
                                     "QPushButton:hover {\n"
-                                    "	transition: 1s;\n"
-                                    "	transition-delay: 1s;\n"
                                     "	background-color: lightgray;\n"
                                     "}")
 
@@ -133,8 +129,6 @@ class FindInPage(QWidget):
                                         "}\n"
                                         "\n"
                                         "QPushButton:hover {\n"
-                                        "	transition: 1s;\n"
-                                        "	transition-delay: 1s;\n"
                                         "	background-color: lightgray;\n"
                                         "}")
 

@@ -1,0 +1,29 @@
+.login-page {
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    align-self: center;
+    justify-content: center;
+    width: fit-content;
+    height: 50vh;
+    min-height: 50vh;
+    border: 3px solid white;
+    padding: 20px;
+    border-radius: 10px;
+
+    box-shadow: 3px 3px 3px 3px rgba(0, 0, 0, 0.7);
+  }
+  
+  .login-page button {
+    color: white;
+    background-color: blue;
+  }
+
+  .login-page span{
+    font-size: 30px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: start;
+    width: 100%;
+  }

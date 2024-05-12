@@ -1,32 +1,36 @@
 # This Python file uses the following encoding: utf-8
+import os
+import shutil
 import sys
 
-from PySide6.QtCore import Qt, QCoreApplication
+from PySide6.QtCore import Qt, QCoreApplication, QTimer
 from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import (QApplication, QWidget)
 
 from Pages.FindInPage import FindInPage
-from Pages.Implementation import Default, Historic, Download
+from Pages.Implementation import ConsolePageImplementation, DefaultSearchPageImplementation, HistoricoImplementation, DownloadImplementation
 from Pages.ShortCuts import ShortcutManager
-# Important:
-# You need to run the following command to generate the main_page.py file
-#     pyside6-uic form.ui -o main_page.py, or
-#     pyside2-uic form.ui -o main_page.py
 from Pages.main_page import Main_page
+from PySide6.QtQuick import QQuickWindow, QSGRendererInterface
+import ctypes
 
+QQuickWindow.setGraphicsApi(QSGRendererInterface.GraphicsApi.Direct3D11Rhi)
+QQuickWindow.setSceneGraphBackend("rhi")
+myappid = u'mycompany.myproduct.subproduct.version.1' # arbitrary string
+ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
 class Main(QWidget):
+    
+    consoles = []
+    
     def __init__(self, parent=None, new_tab=True):
         super().__init__(parent)
         self.ui = Main_page()
         self.ui.setupUi(self)
         self.dialog_ops = None
         self.dialog_download = None
-        self.site_atual: dict = {}
-        if new_tab:
-            self.ui.tabs.addTab(Default(self, self).ui.page, "Nova Página")
         self.ui.tabs.tabCloseRequested.connect(self.close_tab)
-
+        
         self.short_cuts = ShortcutManager()
 
         self.short_cuts.register_shortcut(self, Qt.Key.Key_F5, lambda: self.reload_page())
@@ -34,19 +38,28 @@ class Main(QWidget):
         self.short_cuts.register_shortcut(self, Qt.Key.Key_Tab | Qt.CTRL, lambda: self.next_page())
 
         self.short_cuts.register_shortcut(self, "Ctrl+Shift+tab",
-                                          lambda: self.previous_page())
+                                          lambda: self.previous_page()) 
 
         self.short_cuts.register_shortcut(self, Qt.CTRL | Qt.Key.Key_N, lambda: (self.ui.tabs.addTab(
-            Default(self, self).ui.page, 'Nova Página'), self.ui.tabs.setTabsClosable(True)))
+            DefaultSearchPageImplementation(self.ui.tabs, self).ui.page, 'Nova Página'), self.ui.tabs.setTabsClosable(True)))
 
         self.short_cuts.register_shortcut(self, Qt.CTRL | Qt.Key.Key_H, lambda: (self.ui.tabs.addTab(
-            Historic(self, self).ui.historic, "Histórico"), self.ui.tabs.setTabsClosable(True)))
+            HistoricoImplementation(self.ui.tabs, self).ui.historic, "Histórico"), self.ui.tabs.setTabsClosable(True)))
 
         self.short_cuts.register_shortcut(self, Qt.CTRL | Qt.Key.Key_D, lambda: (self.ui.tabs.addTab(
-            Download(self, self).ui.downloads, "Downloads"), self.ui.tabs.setTabsClosable(True)))
+            DownloadImplementation(self.ui.tabs, self).ui.downloads, "Downloads"), self.ui.tabs.setTabsClosable(True)))
 
         self.short_cuts.register_shortcut(self, Qt.CTRL | Qt.Key.Key_F, lambda: self.find_in_page_short_cut())
-
+    
+        self.short_cuts.register_shortcut(self, "Ctrl+Shift+i", lambda: self.console_page())
+    
+    def console_page(self):
+        tab = self.ui.tabs.currentWidget()
+        imp = tab.implementation
+        console = ConsolePageImplementation(None, self, imp.ui.webEngineView)
+        console.show()
+        self.consoles.append(console)    
+        
     def find_in_page_short_cut(self):
         tab = self.ui.tabs.currentWidget()
         if 'page' in tab.objectName():
@@ -85,30 +98,55 @@ class Main(QWidget):
             page.implementation.load_download_historic(10)
 
     def close_tab(self, index) -> None:
+        print('close tab')
         tabs = self.ui.tabs.count()
+        tab = self.ui.tabs.widget(index)
         if tabs > 1:
-            tab = self.ui.tabs.widget(index)
             self.ui.tabs.removeTab(index)
+            tab.implementation.disconnect_signals()
             tab.implementation.deleteLater()
+            tab.implementation.ui.deleteLater()
+            tab.deleteLater()
             tabs = self.ui.tabs.count()
             if tabs == 1:
                 self.ui.tabs.setTabsClosable(False)
+            if "page" in tab.objectName().lower():
+                QTimer.singleShot(1000, lambda: shutil.rmtree(".\\cache\\"+tab.implementation.identification+"\\", ignore_errors=False))
         else:
             self.ui.tabs.setTabsClosable(False)
+        QCoreApplication.processEvents()
+
 
     def closeEvent(self, event):
+        print('main close')
         count = self.ui.tabs.count()
         for tab_index in range(count):
-            self.ui.tabs.widget(tab_index).implementation.ui.deleteLater()
-            self.ui.tabs.widget(tab_index).implementation.deleteLater()
+            tab = self.ui.tabs.widget(tab_index)
+            tab.implementation.disconnect_signals()
+            tab.implementation.deleteLater()
+            tab.implementation.ui.deleteLater()
+            tab.deleteLater()
+        for console in self.consoles:
+            try:
+                console.close()
+            except Exception as e:
+                pass
         self.ui.deleteLater()
         self.deleteLater()
         QCoreApplication.processEvents()
+        self.clear_cache()
+        self.consoles.clear()
         event.accept()
+    
+    def clear_cache(self):
+        pastas = os.listdir("./cache")
+        for pasta in pastas:
+            shutil.rmtree(".\\cache\\"+pasta, ignore_errors=True)
 
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     widget = Main()
+    ShortcutManager().shortcuts[Qt.CTRL | Qt.Key.Key_N].activated.emit()
     widget.show()
     sys.exit(app.exec())

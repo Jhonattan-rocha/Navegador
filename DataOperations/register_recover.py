@@ -4,7 +4,6 @@ import os
 
 from PySide6.QtWidgets import QWidget, QLayout
 
-
 def register_download_historic(suggested_file_name: str, folder_path: str, status: str,
                                download_time: datetime.datetime, file_saved_main: str = 'download_history.json'):
     with open(os.path.abspath(os.path.join('configs', file_saved_main)), 'rb') as file:

@@ -1,15 +1,31 @@
+import sys
 from PySide6.QtCore import Qt, Signal, Slot, QPoint, QEvent, QMimeData
-from PySide6.QtGui import QAction, QIcon, QMouseEvent, QDrag, QPainter, QPixmap, QCursor, QColor
-from PySide6.QtWidgets import QWidget, QTabWidget, QMenu, QTabBar, QApplication
+from PySide6.QtGui import QAction, QEnterEvent, QIcon, QMouseEvent, QDrag, QPainter, QPixmap, QCursor, QDropEvent
+from PySide6.QtWidgets import QWidget, QTabWidget, QMenu, QTabBar, QApplication, QToolTip
 
 
 class DraggableTabWidget(QTabWidget):
     tabMovedToAnotherMainPage = Signal(QWidget, str, QIcon, name='tabMovedToAnotherMainPage')
     main_instances = []
+    
+    def __init__(self, parent=None, main_page=None):
+        super().__init__(parent)
+
+        self.tabBar = self.TabBar(self)
+        self.tabBar.setMovable(True)
+        self.tabBar.onDetachTabSignal.connect(self.detachTab)
+        self.tabBar.onMoveTabSignal.connect(self.moveTab)
+        self.tabBar.onAttchTabSignal.connect(self.join_tab)
+        self.setTabBar(self.tabBar)
+        self.__class__.main_instances.append(self.parent().implementation)
+        self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.show_context_menu)
+        self.main_page = main_page
 
     def __del__(self):
         try:
-            self.__class__.main_instances.remove(self.main_page)
+            if self.__class__.main_instances.index(self.main_page):
+                self.__class__.main_instances.remove(self.main_page)
         except Exception as e:
             print(e)
 
@@ -26,8 +42,30 @@ class DraggableTabWidget(QTabWidget):
         tabs = self.main_page.ui.tabs.count()
         if tabs >= 2:
             menu.addAction(closes_action)
+        if len(self.__class__.main_instances) > 1:
             menu.addAction(join_action)
         menu.exec(self.mapToGlobal(event))
+    
+    def join_tab(self, event: QDropEvent):
+        main_instances = self.__class__.main_instances
+        mime = event.mimeData()
+        if len(main_instances) >= 1:
+            for instance in main_instances:
+                if instance != self.main_page:
+                    transfer_tab = int(instance.ui.tabs.tabBar.tabAt(QPoint(xpos=event.posF().x, ypos=event.posF().y))) == 0 and type(instance.ui.tabs.widget(int(mime.data('index')))) != type(None)
+                    if transfer_tab and instance.ui.tabs.count() > 0:
+                        index = int(mime.data('index'))
+                        widget = instance.ui.tabs.widget(index)
+                        if widget:
+                            instance.ui.tabs.removeTab(index)
+                            widget.implementation.main_page = self.main_page
+                            widget.implementation.setParent(self.main_page)
+                            widget.setParent(widget.implementation)
+                            self.main_page.ui.tabs.addTab(widget, widget.implementation.windowTitle() or widget.implementation.ui.webEngineView.title())
+                            self.main_page.ui.tabs.setTabsClosable(True)
+                            widget.update()
+                            self.update()
+                            event.accept()
 
     def join_tabs(self):
 
@@ -52,6 +90,7 @@ class DraggableTabWidget(QTabWidget):
                             widget.setParent(widget.implementation)
                             main_window_to_receive_tabs.ui.tabs.addTab(widget,
                                                                        widget.implementation.windowTitle() or widget.implementation.ui.webEngineView.title())
+                            widget.update()
 
                     self.update()
                     self.__class__.main_instances.remove(instance)
@@ -62,7 +101,9 @@ class DraggableTabWidget(QTabWidget):
         current_index = self.currentIndex()
         tab = self.widget(current_index)
         self.removeTab(current_index)
+        tab.implementation.disconnect_signals()
         tab.implementation.deleteLater()
+        tab.implementation.ui.deleteLater()
         tab.deleteLater()
 
     def close_tabs(self):
@@ -70,27 +111,10 @@ class DraggableTabWidget(QTabWidget):
         for i in range(cont):
             self.removeTab(i)
             tab = self.widget(i)
+            tab.implementation.disconnect_signals()
             tab.implementation.deleteLater()
+            tab.implementation.ui.deleteLater()
             tab.deleteLater()
-
-    def __init__(self, parent=None, main_page=None):
-        super().__init__(parent)
-
-        self.tabBar = self.TabBar(self)
-        self.tabBar.setMovable(True)
-        self.tabBar.onDetachTabSignal.connect(self.detachTab)
-        self.tabBar.onMoveTabSignal.connect(self.moveTab)
-        self.tabBar.onAttchTabSignal.connect(self.join_tabs)
-        self.setTabBar(self.tabBar)
-        self.__class__.main_instances.append(self.parent().implementation)
-        self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.customContextMenuRequested.connect(self.show_context_menu)
-        self.main_page = main_page
-
-    @Slot(QWidget, str, QIcon, name='attachTabToMainPage')
-    def attachTabToMainPage(self, contentWidget, name, icon):
-        # Emitir o sinal para indicar que a guia está sendo movida para outra tela principal
-        self.tabMovedToAnotherMainPage.emit(contentWidget, name, icon)
 
     @Slot(int, int, name='moveTab')
     def moveTab(self, fromIndex, toIndex):
@@ -114,25 +138,9 @@ class DraggableTabWidget(QTabWidget):
         detachedTab.setWindowModality(Qt.WindowModality.NonModal)
         detachedTab.setWindowTitle(name)
         detachedTab.setWindowIcon(icon)
-        detachedTab.onCloseSignal.connect(self.attachTab)
         detachedTab.setObjectName(name)
         detachedTab.move(point)
         detachedTab.show()
-
-    @Slot(QWidget, str, QIcon, name='attachTab')
-    def attachTab(self, contentWidget, name, icon):
-        # Setando a guia como filha do QTabWidget atual
-        contentWidget.setParent(self)
-
-        # Obtendo o índice onde a guia será inserida
-        index = self.count()
-
-        # Inserindo a guia no QTabWidget atual
-        index = self.insertTab(index, contentWidget, icon, name)
-
-        # Definindo a guia recém-inserida como a guia atual, se inserida com sucesso
-        if index > -1:
-            self.setCurrentIndex(index)
 
     class DetachedTab(QWidget):
 
@@ -150,7 +158,7 @@ class DraggableTabWidget(QTabWidget):
             self.contentWidget.implementation.setParent(page)
             self.contentWidget.setParent(self.contentWidget.implementation)
             page.ui.tabs.addTab(self.contentWidget,
-                                self.contentWidget.implementation.windowTitle() or self.contentWidget.implementation.ui.webEngineView.title())
+                                self.contentWidget.implementation.windowTitle() or self.contentWidget.implementation.ui.webEngineView.title() or name)
             self.update()
             page.show()
 
@@ -164,12 +172,13 @@ class DraggableTabWidget(QTabWidget):
         def closeEvent(self, event):
             self.onCloseSignal.emit(self.contentWidget, self.objectName(), self.windowIcon())
             event.accept()
+    
 
     class TabBar(QTabBar):
         onDetachTabSignal = Signal(int, QPoint, name='onDetachTabSignal')
         onMoveTabSignal = Signal(int, int, name='onMoveTabSignal')
-        onAttchTabSignal = Signal()
-
+        onAttchTabSignal = Signal(QDropEvent)
+        
         def __init__(self, parent=None, main_page=None):
             super().__init__(parent)
 
@@ -182,6 +191,7 @@ class DraggableTabWidget(QTabWidget):
             self.mouseCursor = QCursor()
             self.dragInitiated = False
             self.main_page = main_page
+            self.dialog = None
 
         def mouseDoubleClickEvent(self, event):
             event.accept()
@@ -209,22 +219,26 @@ class DraggableTabWidget(QTabWidget):
                 )
 
                 super().mouseMoveEvent(finishMoveEvent)
+                index = self.tabAt(self.dragStartPos)
+                if index == -1:
+                    return
+                
+                pixmap = self.parentWidget().grab()
+                targetPixmap = QPixmap(pixmap.size())  # Garantir que o pixmap é criado com um tamanho adequado
+                painter = QPainter(targetPixmap)
+                painter.setOpacity(0.85)
+                painter.drawPixmap(0, 0, pixmap)
+                painter.end()
 
                 drag = QDrag(self)
                 mimeData = QMimeData()
                 mimeData.setData('action', b'application/tab-detach')
+                mimeData.setData('index', str(index).encode())
                 drag.setMimeData(mimeData)
-
-                pixmap = self.parentWidget().grab()
-                targetPixmap = QPixmap()
-                targetPixmap.fill(QColor().black())
-                painter = QPainter()
-                painter.setOpacity(0.85)
-                painter.drawPixmap(0, 0, pixmap)
-                painter.end()
                 drag.setPixmap(targetPixmap)
-
-                dropAction = drag.exec(Qt.DropAction.MoveAction, Qt.DropAction.CopyAction)
+                drag.setHotSpot(event.pos() - self.rect().topLeft())  # Ajustar o ponto de clique
+                dropAction = drag.exec(Qt.DropAction.MoveAction)
+                # dropAction = drag.exec(Qt.DropAction.MoveAction, Qt.DropAction.CopyAction)
 
                 if dropAction == Qt.DropAction.IgnoreAction:
                     event.accept()
@@ -253,7 +267,18 @@ class DraggableTabWidget(QTabWidget):
                 return
 
             if fromIndex == -1 or fromIndex == toIndex:
-                self.onAttchTabSignal.emit()
+                self.onAttchTabSignal.emit(event)
                 return
 
             super().dropEvent(event)
+        
+        # def dragEnterEvent(self, event):
+        #     if event.mimeData().hasText():
+        #         event.acceptProposedAction()
+        
+        # def dropEvent(self, event):
+        #     sourceIndex = int(event.mimeData().text())
+        #     widget = QApplication.instance().widgetAt(event.pos())
+        #     if isinstance(widget, DraggableTabWidget):
+        #         widget.addTab(self.widget(sourceIndex), self.tabText(sourceIndex))
+        #         event.acceptProposedAction()

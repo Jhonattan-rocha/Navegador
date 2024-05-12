@@ -25,7 +25,11 @@ class DownloadsPage(QWidget):
         icon4 = QIcon()
         icon4.addFile(u"figs/dotdotdot.png", QSize(), QIcon.Normal, QIcon.Off)
 
-        self.downloads = QWidget(widget)
+        self.container = QVBoxLayout(widget)
+        self.container.setObjectName(u"container")
+        self.container.setContentsMargins(0, 0, 0, 0)
+        self.container.setSizeConstraint(QVBoxLayout.SizeConstraint.SetDefaultConstraint)
+        self.downloads = QWidget()
         self.downloads.implementation = widget
         self.setSizePolicy(sizePolicyExpanding)
         self.downloads.setObjectName(u"downloads")
@@ -34,16 +38,16 @@ class DownloadsPage(QWidget):
         self.container_principal_donwload.setSpacing(0)
         self.container_principal_donwload.setSizeConstraint(QVBoxLayout.SizeConstraint.SetDefaultConstraint)
         self.container_principal_donwload.setObjectName(u"container_principal_donwload")
-        self.hotbar = QGroupBox(self.downloads)
-        self.hotbar.setObjectName(u"hotbar")
-        self.hotbar.setMinimumSize(QSize(0, 40))
-        self.hotbar.setMaximumSize(QSize(16777215, 120))
-        self.hotbar.setStyleSheet(u"QGroupBox {\n"
+        self.hot_bar_download = QGroupBox(self.downloads)
+        self.hot_bar_download.setObjectName(u"hot_bar_download")
+        self.hot_bar_download.setMinimumSize(QSize(0, 40))
+        self.hot_bar_download.setMaximumSize(QSize(16777215, 120))
+        self.hot_bar_download.setStyleSheet(u"QGroupBox {\n"
                                   "	border: none;\n"
                                   "	margin: 0;\n"
                                   "	padding: 0;\n"
                                   "}")
-        self.horizontalLayout_3 = QHBoxLayout(self.hotbar)
+        self.horizontalLayout_3 = QHBoxLayout(self.hot_bar_download)
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
         self.horizontalLayout_3.setSizeConstraint(QHBoxLayout.SizeConstraint.SetDefaultConstraint)
         self.horizontalLayout_3.setContentsMargins(0, 0, 0, 0)
@@ -51,7 +55,7 @@ class DownloadsPage(QWidget):
         self.horizontalLayout_2.setSpacing(0)
         self.horizontalLayout_2.setSizeConstraint(QHBoxLayout.SizeConstraint.SetDefaultConstraint)
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.arrow_left_back = QPushButton(self.hotbar)
+        self.arrow_left_back = QPushButton()
         self.arrow_left_back.setObjectName(u"arrow_left_back")
         sizePolicy1 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         sizePolicy1.setHorizontalStretch(0)
@@ -67,15 +71,13 @@ class DownloadsPage(QWidget):
                                            "}\n"
                                            "\n"
                                            "QPushButton:hover {\n"
-                                           "	transition: 1s;\n"
-                                           "	transition-delay: 1s;\n"
                                            "	background-color: lightgray;\n"
                                            "}")
         self.arrow_left_back.setIcon(icon1)
 
         self.horizontalLayout_2.addWidget(self.arrow_left_back)
 
-        self.search_input = QLineEdit(self.hotbar)
+        self.search_input = QLineEdit()
         self.search_input.setObjectName(u"search_input")
         self.search_input.setMinimumSize(QSize(0, 30))
         self.search_input.setStyleSheet(u"QLineEdit {\n"
@@ -87,7 +89,7 @@ class DownloadsPage(QWidget):
 
         self.horizontalLayout_2.addWidget(self.search_input)
 
-        self.options_donwload = QPushButton(self.hotbar)
+        self.options_donwload = QPushButton()
         self.options_donwload.setObjectName(u"options_donwload")
         self.options_donwload.setSizePolicy(sizePolicy1)
         self.options_donwload.setMaximumSize(QSize(33, 30))
@@ -101,8 +103,6 @@ class DownloadsPage(QWidget):
                                             "}\n"
                                             "\n"
                                             "QPushButton:hover {\n"
-                                            "	transition: 1s;\n"
-                                            "	transition-delay: 1s;\n"
                                             "	background-color: lightgray;\n"
                                             "}")
         self.options_donwload.setIcon(icon4)
@@ -111,7 +111,7 @@ class DownloadsPage(QWidget):
 
         self.horizontalLayout_3.addLayout(self.horizontalLayout_2)
 
-        self.container_principal_donwload.addWidget(self.hotbar)
+        self.container_principal_donwload.addWidget(self.hot_bar_download)
 
         self.scrollAreaDownloads = QScrollArea(self.downloads)
         self.scrollAreaDownloads.setObjectName(u"scrollAreaDownloads")
@@ -228,8 +228,6 @@ class DownloadsPage(QWidget):
                                     "}\n"
                                     "\n"
                                     "QPushButton:hover {\n"
-                                    "	transition: 1s;\n"
-                                    "	transition-delay: 1s;\n"
                                     "	background-color: lightgray;\n"
                                     "}")
         icon6 = QIcon()
@@ -243,3 +241,4 @@ class DownloadsPage(QWidget):
         self.scrollAreaDownloads.setWidget(self.scrollAreaDownloadContents)
 
         self.container_principal_donwload.addWidget(self.scrollAreaDownloads)
+        self.container.addWidget(self.downloads)
