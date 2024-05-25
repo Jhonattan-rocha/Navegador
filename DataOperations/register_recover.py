@@ -1,177 +1,110 @@
 import datetime
-import json
-import os
+from sqlalchemy import create_engine, Column, Integer, String, DateTime, Boolean
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
-from PySide6.QtWidgets import QWidget, QLayout
+Base = declarative_base()
+
+class DownloadHistoric(Base):
+    __tablename__ = 'download_historic'
+    id = Column(Integer, primary_key=True)
+    suggested_file_name = Column(String)
+    folder_path = Column(String)
+    status = Column(String)
+    download_time = Column(DateTime)
+
+class Historic(Base):
+    __tablename__ = 'historic'
+    id = Column(Integer, primary_key=True)
+    site = Column(String)
+    name = Column(String)
+    download_time = Column(DateTime)
+    fav = Column(Boolean, default=False)
+    folder = Column(String, default="default")
+
+class ConsoleHistoric(Base):
+    __tablename__ = 'console_historic'
+    id = Column(Integer, primary_key=True)
+    command = Column(String)
+
+def init_db(db_path='sqlite:///configs/app.db'):
+    engine = create_engine(db_path)
+    Base.metadata.create_all(engine)
+    Session = sessionmaker(bind=engine)
+    return Session()
+
+session = init_db()
 
 def register_download_historic(suggested_file_name: str, folder_path: str, status: str,
-                               download_time: datetime.datetime, file_saved_main: str = 'download_history.json'):
-    with open(os.path.abspath(os.path.join('configs', file_saved_main)), 'rb') as file:
-        file_read = file.read()
-        json_file = {}
-        if not file_read:
-            json_file = {"Files": [{"name": f"{suggested_file_name}", "path": f"{folder_path}",
-                                    "download_time": f"{download_time}", "status": f"{status}"}]}
-        else:
-            json_file = json.loads(file_read)
-            json_file = dict(json_file)
-            json_file["Files"].insert(0,
-                                      {"name": f"{suggested_file_name}", "path": f"{folder_path}",
-                                       "download_time": f"{download_time}", "status": f"{status}"})
+                               download_time: datetime.datetime) -> DownloadHistoric:
+    download_historic = DownloadHistoric(suggested_file_name=suggested_file_name, 
+                                         folder_path=folder_path, 
+                                         status=status, 
+                                         download_time=download_time)
+    session.add(download_historic)
+    session.commit()
+    return download_historic
 
-        with open(os.path.abspath(os.path.join('configs', file_saved_main)), 'wb') as file2:
-            file2.write(str(json_file).replace("'", '"').encode('utf8'))
+def recover_download_historic(f: str = "", limit: int=20, order_desc=False):
+    if f:
+        return session.query(DownloadHistoric).filter(DownloadHistoric.folder_path.like(f'%{f}%') | 
+                                                      DownloadHistoric.suggested_file_name.like(f'%{f}%')).order_by(DownloadHistoric.folder_path.desc() if order_desc else DownloadHistoric.folder_path.asc()).limit(limit)
+    return session.query(DownloadHistoric).all()
 
-
-def recover_download_historic(file_saved: str = 'download_history.json', f: str = "") -> dict:
-    with open(os.path.join('configs', file_saved), 'rb') as file:
-        file_read = file.read()
-        if bool(file_read):
-            js = json.loads(file_read.decode('utf8'))
-            js = dict(js)
-
-            if bool(f):
-                f_list = [his for his in js['Files'] if
-                          f.lower() in his['path'].lower() or f.lower() in his['name'].lower()]
-                return {"Files": f_list}
-            return js
-        return {}
-
-
-def remove_download_historic_item(download_data: dict, remove_view: bool = False, widget: QWidget = None,
-                                  layout: QLayout = None, file_saved_main: str = 'download_history.json') -> bool:
-    with open(os.path.join('configs', file_saved_main), 'rb') as file:
-        file_read = file.read()
-        if bool(file_read):
-            js = json.loads(file_read.decode('utf8'))
-            js = dict(js)
-            js_copy = {'Files': []}
-            for file_saved in js['Files']:
-                if file_saved['name'] != download_data['name']:
-                    js_copy['Files'].insert(0, file_saved)
-
-            with open(os.path.abspath(os.path.join('configs', file_saved_main)), 'wb') as file2:
-                file2.write(str(js_copy).replace("'", '"').encode('utf8'))
-        else:
-            return False
+def remove_download_historic_item(download_data: DownloadHistoric, remove_view: bool = False, widget=None, layout=None):
+    session.query(DownloadHistoric).filter_by(id=download_data.id).delete()
+    session.commit()
     if remove_view:
         layout.removeWidget(widget)
         widget.deleteLater()
         layout.update()
-    return True
 
+def update_historic(site: str, id: int, fav: bool, folder: str="default"):
+    historic = session.query(Historic).filter_by(id=id, site=site).first() 
+    if historic:
+        historic.fav = fav
+        historic.folder = folder
+        session.commit()
+        return True
+    return False
 
-# ------------------
+def register_historic(site: str, name: str, download_time: datetime.datetime, fav: bool=False, folder: str="default"):
+    historic = Historic(site=site, name=name, fav=fav, download_time=download_time, folder=folder)
+    session.add(historic)
+    session.commit()
 
-def register_historic(site: str, cookies: list,
-                      download_time: datetime.datetime, file_saved_main: str = 'historic.json'):
-    with open(os.path.abspath(os.path.join('configs', file_saved_main)), 'rb+') as file:
-        file_read = file.read()
-        json_file = {}
-        if not file_read:
-            json_file = {"Sites": [{"id": 0, "name": f"{site}", "cookies": cookies, "date_time": f"{download_time}"}]}
-        else:
-            json_file = json.loads(file_read)
-            json_file = dict(json_file)
-            json_file["Sites"].insert(0, {"id": len(json_file["Sites"]), "name": f"{site}", "cookies": cookies,
-                                          "date_time": f"{download_time}"})
+def recover_historic(f: str = "", limit: int=20, order_desc=False):
+    if f:
+        return session.query(Historic).filter(Historic.site.like(f'%{f}%')).order_by(Historic.site.desc() if order_desc else Historic.site.asc()).limit(limit)
+    return session.query(Historic).all()
 
-        with open(os.path.abspath(os.path.join('configs', file_saved_main)), 'wb') as file2:
-            file2.write(str(json_file).replace("'", '"').encode('utf8'))
+def recover_favorities(limit: int=20, order_desc=False):
+    return session.query(Historic).filter(Historic.fav == True).order_by(Historic.site.desc() if order_desc else Historic.site.asc()).limit(limit)
 
-        return len(json_file["Sites"])
-
-
-def recover_historic(file_saved: str = 'historic.json', f: str = "") -> dict:
-    with open(os.path.join('configs', file_saved), 'rb') as file:
-        file_read = file.read()
-        if bool(file_read):
-            js = json.loads(file_read.decode('utf8'))
-            js = dict(js)
-            if bool(f):
-                f_list = [his for his in js['Sites'] if f.lower() in his['name'].lower()]
-                return {'Sites': f_list}
-            return js
-        return {}
-
-
-def remove_historic_item(id: int,
-                         file_saved_main: str = 'historic.json',
-                         widget: QWidget = None,
-                         layout: QLayout = None,
-                         remove_view=True) -> bool:
-    with open(os.path.join('configs', file_saved_main), 'rb') as file:
-        file_read = file.read()
-        if bool(file_read):
-            js = json.loads(file_read.decode('utf8'))
-            js = dict(js)
-            js_copy = {'Sites': []}
-            for file_saved in js['Sites']:
-                if file_saved['id'] != id:
-                    js_copy['Sites'].insert(0, file_saved)
-
-            with open(os.path.abspath(os.path.join('configs', file_saved_main)), 'wb') as file2:
-                file2.write(str(js_copy).replace("'", '"').encode('utf8'))
-        else:
-            return False
+def remove_historic_item(id: int, widget=None, layout=None, remove_view=True):
+    session.query(Historic).filter_by(id=id).delete()
+    session.commit()
     if remove_view:
         layout.removeWidget(widget)
         widget.deleteLater()
         layout.update()
-    return True
 
+def register_console_historic(command: str):
+    console_historic = ConsoleHistoric(command=command)
+    session.add(console_historic)
+    session.commit()
 
-# ------------------------------------------------------------------------------------------
+def recover_console_historic(command: str, prev_next: str):
+    if not command:
+        return session.query(ConsoleHistoric).order_by(ConsoleHistoric.id.desc()).first().command
+    query = session.query(ConsoleHistoric)
+    if prev_next == "prev":
+        return query.filter(ConsoleHistoric.command < command).order_by(ConsoleHistoric.command.desc()).first().command
+    elif prev_next == "next":
+        return query.filter(ConsoleHistoric.command > command).order_by(ConsoleHistoric.command.asc()).first().command
+    return ""
 
-def register_console_historic(command: str, file_saved_main: str = 'console_historic.json'):
-    with open(os.path.abspath(os.path.join('configs', file_saved_main)), 'rb') as file:
-        file_read = file.read()
-        json_file = {}
-        if not file_read:
-            json_file = {"Commands": [command,]}
-        else:
-            json_file = json.loads(file_read)
-            json_file = dict(json_file)
-            json_file["Commands"].append(command)
+def remove_console_historic(command: str):
+    session.query(ConsoleHistoric).filter_by(command=command).delete()
+    session.commit()
 
-        with open(os.path.abspath(os.path.join('configs', file_saved_main)), 'w') as file2:
-            json.dump(json_file, file2, ensure_ascii=False, indent=2)
-
-
-def recover_console_historic(command: str, prev_next: str, file_saved: str = 'console_historic.json') -> str:
-    with open(os.path.join('configs', file_saved), 'rb') as file:
-        file_read = file.read()
-        if bool(file_read):
-            js = json.loads(file_read.decode('utf8'))
-            js = dict(js)
-
-            if not bool(command):
-                return js['Commands'][-1]
-
-            for co in js['Commands']:
-                if command == co and prev_next == "prev":
-                    index = list(js['Commands']).index(command)
-                    if index == 0:
-                        return command
-                    return js['Commands'][index-1]
-                elif command == co and prev_next == "next":
-                    index = js['Commands'].index(command)
-                    if index == len(js['Commands']) - 1:
-                        return command
-                    return js['Commands'][index+1]
-        return ""
-
-
-def remove_console_historic(command: str, file_saved_main: str = 'console_historic.json') -> bool:
-    with open(os.path.join('configs', file_saved_main), 'rb') as file:
-        file_read = file.read()
-        if bool(file_read):
-            js = json.loads(file_read.decode('utf8'))
-            js = dict(js)
-            if command in js['Commands']:
-                js['Commands'].remove(command)
-            with open(os.path.abspath(os.path.join('configs', file_saved_main)), 'wb') as file2:
-                file2.write(str(js).replace("'", '"').encode('utf8'))
-        else:
-            return False
-    return True

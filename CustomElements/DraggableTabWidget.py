@@ -1,5 +1,5 @@
 import sys
-from PySide6.QtCore import Qt, Signal, Slot, QPoint, QEvent, QMimeData
+from PySide6.QtCore import Qt, Signal, Slot, QPoint, QEvent, QMimeData, QCoreApplication
 from PySide6.QtGui import QAction, QEnterEvent, QIcon, QMouseEvent, QDrag, QPainter, QPixmap, QCursor, QDropEvent
 from PySide6.QtWidgets import QWidget, QTabWidget, QMenu, QTabBar, QApplication, QToolTip
 
@@ -103,8 +103,9 @@ class DraggableTabWidget(QTabWidget):
         self.removeTab(current_index)
         tab.implementation.disconnect_signals()
         tab.implementation.deleteLater()
-        tab.implementation.ui.deleteLater()
-        tab.deleteLater()
+        # tab.implementation.ui.deleteLater()
+        # tab.deleteLater()
+        QCoreApplication.processEvents()
 
     def close_tabs(self):
         cont = self.count()
@@ -113,8 +114,10 @@ class DraggableTabWidget(QTabWidget):
             tab = self.widget(i)
             tab.implementation.disconnect_signals()
             tab.implementation.deleteLater()
-            tab.implementation.ui.deleteLater()
-            tab.deleteLater()
+            # tab.implementation.ui.deleteLater()
+            # tab.deleteLater()
+            QCoreApplication.processEvents()
+
 
     @Slot(int, int, name='moveTab')
     def moveTab(self, fromIndex, toIndex):

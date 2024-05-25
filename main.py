@@ -2,16 +2,17 @@
 import os
 import shutil
 import sys
+import threading
 
 from PySide6.QtCore import Qt, QCoreApplication, QTimer
 from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import (QApplication, QWidget)
-
+from PySide6.QtQuick import QQuickWindow, QSGRendererInterface
+from Pages.ConfigPage import Configuracoes
 from Pages.FindInPage import FindInPage
 from Pages.Implementation import ConsolePageImplementation, DefaultSearchPageImplementation, HistoricoImplementation, DownloadImplementation
 from Pages.ShortCuts import ShortcutManager
 from Pages.main_page import Main_page
-from PySide6.QtQuick import QQuickWindow, QSGRendererInterface
 import ctypes
 
 QQuickWindow.setGraphicsApi(QSGRendererInterface.GraphicsApi.Direct3D11Rhi)
@@ -22,6 +23,7 @@ ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 class Main(QWidget):
     
     consoles = []
+    configuracao = None
     
     def __init__(self, parent=None, new_tab=True):
         super().__init__(parent)
@@ -30,6 +32,7 @@ class Main(QWidget):
         self.dialog_ops = None
         self.dialog_download = None
         self.ui.tabs.tabCloseRequested.connect(self.close_tab)
+
         
         self.short_cuts = ShortcutManager()
 
@@ -52,6 +55,17 @@ class Main(QWidget):
         self.short_cuts.register_shortcut(self, Qt.CTRL | Qt.Key.Key_F, lambda: self.find_in_page_short_cut())
     
         self.short_cuts.register_shortcut(self, "Ctrl+Shift+i", lambda: self.console_page())
+        
+        self.short_cuts.register_shortcut(self, "Ctrl+Shift+c", lambda: self.config_page())
+        
+    def config_page(self):
+        if not self.configuracao:
+            self.configuracao = Configuracoes()
+            self.configuracao.load_ini_file(self.configuracao.default_path)
+            self.configuracao.show()
+        else:
+            self.configuracao.show()
+            
     
     def console_page(self):
         tab = self.ui.tabs.currentWidget()
@@ -98,50 +112,58 @@ class Main(QWidget):
             page.implementation.load_download_historic(10)
 
     def close_tab(self, index) -> None:
-        print('close tab')
         tabs = self.ui.tabs.count()
         tab = self.ui.tabs.widget(index)
         if tabs > 1:
             self.ui.tabs.removeTab(index)
             tab.implementation.disconnect_signals()
             tab.implementation.deleteLater()
-            tab.implementation.ui.deleteLater()
-            tab.deleteLater()
+            # tab.implementation.ui.deleteLater()
+            # tab.deleteLater()
+            QCoreApplication.processEvents()
             tabs = self.ui.tabs.count()
             if tabs == 1:
                 self.ui.tabs.setTabsClosable(False)
             if "page" in tab.objectName().lower():
-                QTimer.singleShot(1000, lambda: shutil.rmtree(".\\cache\\"+tab.implementation.identification+"\\", ignore_errors=False))
+                QTimer.singleShot(1000, lambda: shutil.rmtree(".\\cache\\"+tab.implementation.identification+"\\", ignore_errors=True))
         else:
             self.ui.tabs.setTabsClosable(False)
-        QCoreApplication.processEvents()
 
 
     def closeEvent(self, event):
-        print('main close')
+        tabs_caches = []
+        count = self.ui.tabs.count()
+        for i in range(count):
+            tabs_caches.append(self.ui.tabs.widget(i).implementation.identification)
+            
+        threading.Thread(target=self.clear_cache, args=(tabs_caches,)).start()
+        
         count = self.ui.tabs.count()
         for tab_index in range(count):
             tab = self.ui.tabs.widget(tab_index)
-            tab.implementation.disconnect_signals()
-            tab.implementation.deleteLater()
-            tab.implementation.ui.deleteLater()
-            tab.deleteLater()
+            if tab:
+                self.ui.tabs.removeTab(tab_index)
+                tab.implementation.disconnect_signals()
+                tab.implementation.deleteLater()
+                # tab.implementation.ui.deleteLater()
+                # tab.deleteLater()
+                QCoreApplication.processEvents()
         for console in self.consoles:
             try:
                 console.close()
             except Exception as e:
                 pass
-        self.ui.deleteLater()
-        self.deleteLater()
-        QCoreApplication.processEvents()
-        self.clear_cache()
         self.consoles.clear()
-        event.accept()
+        # self.ui.deleteLater()
+        # self.deleteLater()
+        QCoreApplication.processEvents()
+        super().closeEvent(event)
     
-    def clear_cache(self):
+    def clear_cache(self, caches: list):
         pastas = os.listdir("./cache")
         for pasta in pastas:
-            shutil.rmtree(".\\cache\\"+pasta, ignore_errors=True)
+            if pasta in caches:
+                shutil.rmtree(".\\cache\\"+pasta, ignore_errors=True)
 
 
 if __name__ == "__main__":

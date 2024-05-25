@@ -5,9 +5,10 @@ from PySide6.QtGui import (QCursor, QFont, QIcon, QMovie)
 from PySide6.QtWebEngineCore import QWebEnginePage, QWebEngineProfile
 from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import (QGroupBox, QHBoxLayout, QLineEdit, QSizePolicy, QWidget, QLabel)
-from PySide6.QtWidgets import (QPushButton, QLayout, QProgressBar, QVBoxLayout)
+from PySide6.QtWidgets import (QPushButton, QLayout, QProgressBar, QVBoxLayout, QToolBar)
 
 from CustomElements.CustomProfile import CustomWebEngineProfile
+from CustomElements.DraggableToolBar import DraggableToolBar
 
 
 class DefaultSearchPage(QWidget):
@@ -162,6 +163,31 @@ class DefaultSearchPage(QWidget):
                                "}")
 
         self.horizontalLayout.addWidget(self.url)
+        
+        # ---
+        
+        self.favoritos_button = QPushButton()
+        self.favoritos_button.setObjectName(u"favoritos_button")
+        self.favoritos_button.setSizePolicy(sizePolicyExpanding)
+        self.favoritos_button.setMaximumSize(QSize(30, 30))
+        self.favoritos_button.setCursor(QCursor(Qt.PointingHandCursor))
+        self.favoritos_button.setStyleSheet(u"QPushButton {\n"
+                                            "    border: none;\n"
+                                            "	border-radius: 15px;\n"
+                                            "	background-color: none;\n"
+                                            "	text-align: center;\n"
+                                            "	color: white;\n"
+                                            "}\n"
+                                            "\n"
+                                            "QPushButton:hover {\n"
+                                            "	background-color: lightgray;\n"
+                                            "}")
+        icon3 = QIcon()
+        icon3.addFile(u"figs/star_out.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.favoritos_button.setIcon(icon3)
+        
+        self.horizontalLayout.addWidget(self.favoritos_button)
+        # ---
 
         self.download_buttton = QPushButton()
         self.download_buttton.setObjectName(u"download_buttton")
@@ -208,12 +234,18 @@ class DefaultSearchPage(QWidget):
         self.horizontalLayout.addWidget(self.options)
 
         self.container_tab.addWidget(self.hot_bar)
+        
+        self.favoritos = DraggableToolBar(title="Favoritos")
 
-        self.profile = CustomWebEngineProfile("profile_web", parent=self, cache_path=widget.identification)
-        self.page_web = QWebEnginePage(self.profile, self)
-        self.page_web.setObjectName("page_web")
+        self.container_tab.addWidget(self.favoritos)
+    
         self.webEngineView = QWebEngineView()
-        self.webEngineView.setPage(self.page_web)
+        
+        self.favoritos.webEngineView = self.webEngineView
+        profile = CustomWebEngineProfile("profile_web", parent=self.webEngineView, cache_path=widget.identification)
+        page_web = QWebEnginePage(profile, self.webEngineView)
+        page_web.setObjectName("page_web")
+        self.webEngineView.setPage(page_web)
         self.webEngineView.setObjectName(u"webEngineView")
         self.webEngineView.setSizePolicy(sizePolicyExpanding)
         self.webEngineView.setMinimumSize(QSize(0, 0))

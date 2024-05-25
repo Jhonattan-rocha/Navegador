@@ -8,7 +8,7 @@ from CustomElements.DraggableTabWidget import DraggableTabWidget
 class Main_page(QWidget):
 
     def setupUi(self, Widget):
-        sizePolicyExpanding = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicyExpanding = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         sizePolicyExpanding.setHorizontalStretch(0)
         sizePolicyExpanding.setVerticalStretch(0)
 
@@ -41,7 +41,7 @@ class Main_page(QWidget):
         self.tabs.setObjectName(u"tabs")
         self.tabs.setMovable(True)
         self.tabs.setEnabled(True)
-        self.tabs.setTabPosition(QTabWidget.TabPosition.North)
+        self.tabs.setTabPosition(QTabWidget.TabPosition.South)
         self.tabs.setElideMode(Qt.TextElideMode.ElideMiddle)
         self.tabs.setTabsClosable(False)
 
@@ -50,7 +50,10 @@ class Main_page(QWidget):
             border-radius: 10px;
             padding: 5px;
             border: 1px solid black;
+            max-width: 130px;
+            min-height: 20px;
         }
+        
         QTabBar::tab:selected {
             background-color: rgba(0,0,0,0.3); /* Cor de fundo da aba selecionada */
         }
