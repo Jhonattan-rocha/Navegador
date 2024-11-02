@@ -22,14 +22,14 @@ from DataOperations.register_recover import recover_download_historic, recover_h
     remove_download_historic_item, register_console_historic, update_historic
 from DataOperations.register_recover import register_download_historic, register_historic, remove_historic_item
 from DownloaderManager import Downloader
-from Pages.ConsolePage import ConsolePage
+from Pages.Dialogs.ConsolePage import ConsolePage
 from Pages.DefaultSearchPage import DefaultSearchPage
 from Pages.Download import DownloadsPage
-from Pages.FindInPage import FindInPage
+from Pages.Dialogs.FindInPage import FindInPage
 from Pages.Historico import HistoricoPage
 from Pages.ShortCuts import ShortcutManager
 from configs.Config import settings_app
-from Pages.NewWindowDialog import NewWindowDialog
+from Pages.Dialogs.NewWindowDialog import NewWindowDialog
 
 init(autoreset=True)
 
@@ -281,7 +281,7 @@ class DefaultSearchPageImplementation(QWidget):
     def open_dialog_download(self, view=True):
         if not self.main_page.dialog_download:
             loader = QUiLoader()
-            ui_file = QFile(os.path.abspath(os.path.join("Pages", "dialog_downloads.ui")))
+            ui_file = QFile(os.path.abspath(os.path.join("Pages", "Dialogs", "dialog_downloads.ui")))
             ui_file.open(QFile.ReadOnly)
             dialog_widget = loader.load(ui_file)
             ui_file.close()
@@ -305,7 +305,7 @@ class DefaultSearchPageImplementation(QWidget):
         if not self.main_page.dialog_ops:
             self.main_page.ui.tabs.setTabsClosable(True)
             loader = QUiLoader()
-            ui_file = QFile(os.path.abspath(os.path.join("Pages", "dialog_ops.ui")))
+            ui_file = QFile(os.path.abspath(os.path.join("Pages", "Dialogs", "dialog_ops.ui")))
             ui_file.open(QFile.ReadOnly)
             dialog_widget = loader.load(ui_file)
             ui_file.close()

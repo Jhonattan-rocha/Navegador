@@ -7,7 +7,7 @@ class ShortcutManager:
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super(ShortcutManager, cls).__new__(cls)
-            cls._instance.shortcuts = {}  # Dicionário para manter os atalhos
+            cls._instance.shortcuts = {}
         return cls._instance
 
     def register_shortcut(self, widget, key_sequence, callback):

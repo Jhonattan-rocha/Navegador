@@ -1,4 +1,4 @@
-2024/05/15-17:42:50.417 34e4 Log #3: 3 ops saved to Table #4 OK
-2024/05/15-17:42:51.428 34e4 Archiving C:\Users\Jhonattan\Documents\vscode\python\Navegador\cookies\File System\Origins/000003.log: IO error: C:\Users\Jhonattan\Documents\vscode\python\Navegador\cookies\File System\Origins/000003.log: Could not rename file: File currently in use. (ChromeMethodBFE: 14::RenameFile::2)
-2024/05/15-17:42:51.428 34e4 Table #4: 3 entries OK
-2024/05/15-17:42:52.441 34e4 Archiving C:\Users\Jhonattan\Documents\vscode\python\Navegador\cookies\File System\Origins/MANIFEST-000001: IO error: C:\Users\Jhonattan\Documents\vscode\python\Navegador\cookies\File System\Origins/MANIFEST-000001: Could not rename file: File currently in use. (ChromeMethodBFE: 14::RenameFile::2)
+2024/11/01-16:57:46.959 498c Log #3: 3 ops saved to Table #4 OK
+2024/11/01-16:57:47.965 498c Archiving C:\Users\Jhonattan\Documents\GitHub\Navegador\cookies\File System\Origins/000003.log: IO error: C:\Users\Jhonattan\Documents\GitHub\Navegador\cookies\File System\Origins/000003.log: Could not rename file: File currently in use. (ChromeMethodBFE: 14::RenameFile::2)
+2024/11/01-16:57:47.965 498c Table #4: 3 entries OK
+2024/11/01-16:57:48.983 498c Archiving C:\Users\Jhonattan\Documents\GitHub\Navegador\cookies\File System\Origins/MANIFEST-000001: IO error: C:\Users\Jhonattan\Documents\GitHub\Navegador\cookies\File System\Origins/MANIFEST-000001: Could not rename file: File currently in use. (ChromeMethodBFE: 14::RenameFile::2)

@@ -8,8 +8,8 @@ from PySide6.QtCore import Qt, QCoreApplication, QTimer
 from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import (QApplication, QWidget)
 from PySide6.QtQuick import QQuickWindow, QSGRendererInterface
-from Pages.ConfigPage import Configuracoes
-from Pages.FindInPage import FindInPage
+from Pages.Dialogs.ConfigPage import Configuracoes
+from Pages.Dialogs.FindInPage import FindInPage
 from Pages.Implementation import ConsolePageImplementation, DefaultSearchPageImplementation, HistoricoImplementation, DownloadImplementation
 from Pages.ShortCuts import ShortcutManager
 from Pages.main_page import Main_page
