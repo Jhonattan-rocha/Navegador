@@ -1,3 +1,8 @@
-2024/11/02-14:24:54.291 1e1c Reusing MANIFEST C:\Users\Jhonattan\Documents\GitHub\Navegador\cookies\Local Storage\leveldb/MANIFEST-000001
-2024/11/02-14:24:54.307 1e1c Recovering log #7
-2024/11/02-14:24:54.307 1e1c Reusing old log C:\Users\Jhonattan\Documents\GitHub\Navegador\cookies\Local Storage\leveldb/000007.log 
+2024/11/02-14:55:03.793 1874 Reusing MANIFEST C:\Users\Jhonattan\Documents\GitHub\Navegador\cookies\Local Storage\leveldb/MANIFEST-000001
+2024/11/02-14:55:03.800 1874 Recovering log #14
+2024/11/02-14:55:03.800 1874 Level-0 table #16: started
+2024/11/02-14:55:03.804 1874 Level-0 table #16: 54109 bytes OK
+2024/11/02-14:55:03.810 1874 Recovering log #16
+2024/11/02-14:55:03.810 1874 Reusing old log C:\Users\Jhonattan\Documents\GitHub\Navegador\cookies\Local Storage\leveldb/000016.log 
+2024/11/02-14:55:03.812 1874 Delete type=0 #14
+2024/11/02-14:55:03.812 1874 Delete type=2 #17

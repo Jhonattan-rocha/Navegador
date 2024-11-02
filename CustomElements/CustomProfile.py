@@ -28,6 +28,7 @@ class CustomWebEngineProfile(QWebEngineProfile):
         self.settings().setAttribute(self.settings().WebAttribute.JavascriptCanAccessClipboard, settings_app.value("GeneralSettings/JavascriptCanAccessClipboard", defaultValue=True, type=bool))
         self.settings().setAttribute(self.settings().WebAttribute.PlaybackRequiresUserGesture, settings_app.value("GeneralSettings/PlaybackRequiresUserGesture", defaultValue=True, type=bool))
         self.settings().setAttribute(self.settings().WebAttribute.ForceDarkMode, settings_app.value("GeneralSettings/ForceDarkMode", defaultValue=True, type=bool))
+        self.settings().setAttribute(self.settings().WebAttribute.PlaybackRequiresUserGesture, False)
 
         self.settings().setDefaultTextEncoding("utf8")
         # format = QSurfaceFormat()
