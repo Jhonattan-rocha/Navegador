@@ -2,8 +2,6 @@ import os
 
 from PySide6.QtWebEngineCore import QWebEngineProfile
 from configs.Config import settings_app
-# from PySide6.QtWidgets import QApplication
-# from PySide6.QtGui import QSurfaceFormat
 
 class CustomWebEngineProfile(QWebEngineProfile):
 
@@ -28,10 +26,6 @@ class CustomWebEngineProfile(QWebEngineProfile):
         self.settings().setAttribute(self.settings().WebAttribute.JavascriptCanAccessClipboard, settings_app.value("GeneralSettings/JavascriptCanAccessClipboard", defaultValue=True, type=bool))
         self.settings().setAttribute(self.settings().WebAttribute.PlaybackRequiresUserGesture, settings_app.value("GeneralSettings/PlaybackRequiresUserGesture", defaultValue=True, type=bool))
         self.settings().setAttribute(self.settings().WebAttribute.ForceDarkMode, settings_app.value("GeneralSettings/ForceDarkMode", defaultValue=True, type=bool))
-        self.settings().setAttribute(self.settings().WebAttribute.PlaybackRequiresUserGesture, False)
 
         self.settings().setDefaultTextEncoding("utf8")
-        # format = QSurfaceFormat()
-        # format.setVersion(3, 2)  # Versão do OpenGL
-        # format.setProfile(format.OpenGLContextProfile.CompatibilityProfile)
-        # format.setOption(format.FormatOption.ProtectedContent)
+        
