@@ -1,4 +1,0 @@
-2024/11/02-15:04:20.051 1480 Log #3: 3 ops saved to Table #4 OK
-2024/11/02-15:04:21.062 1480 Archiving C:\Users\Jhonattan\Documents\GitHub\Navegador\cookies\File System\Origins/000003.log: IO error: C:\Users\Jhonattan\Documents\GitHub\Navegador\cookies\File System\Origins/000003.log: Could not rename file: File currently in use. (ChromeMethodBFE: 14::RenameFile::2)
-2024/11/02-15:04:21.062 1480 Table #4: 3 entries OK
-2024/11/02-15:04:22.075 1480 Archiving C:\Users\Jhonattan\Documents\GitHub\Navegador\cookies\File System\Origins/MANIFEST-000001: IO error: C:\Users\Jhonattan\Documents\GitHub\Navegador\cookies\File System\Origins/MANIFEST-000001: Could not rename file: File currently in use. (ChromeMethodBFE: 14::RenameFile::2)
