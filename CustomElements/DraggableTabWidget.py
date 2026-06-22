@@ -99,24 +99,32 @@ class DraggableTabWidget(QTabWidget):
 
     def close_tab(self):
         current_index = self.currentIndex()
+        if current_index < 0:
+            return
         tab = self.widget(current_index)
         self.removeTab(current_index)
-        tab.implementation.disconnect_signals()
-        tab.implementation.deleteLater()
-        # tab.implementation.ui.deleteLater()
-        # tab.deleteLater()
+        self._dispose_tab(tab)
         QCoreApplication.processEvents()
 
     def close_tabs(self):
-        cont = self.count()
-        for i in range(cont):
-            self.removeTab(i)
+        # De trás para frente: remover por índice crescente pula widgets.
+        for i in reversed(range(self.count())):
             tab = self.widget(i)
-            tab.implementation.disconnect_signals()
-            tab.implementation.deleteLater()
-            # tab.implementation.ui.deleteLater()
-            # tab.deleteLater()
-            QCoreApplication.processEvents()
+            self.removeTab(i)
+            self._dispose_tab(tab)
+        QCoreApplication.processEvents()
+
+    @staticmethod
+    def _dispose_tab(tab):
+        if not tab:
+            return
+        impl = getattr(tab, "implementation", None)
+        if impl is not None:
+            try:
+                impl.disconnect_signals()
+            except Exception:
+                pass
+            impl.deleteLater()
 
 
     @Slot(int, int, name='moveTab')

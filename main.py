@@ -1,10 +1,7 @@
 # This Python file uses the following encoding: utf-8
-import os
-import shutil
 import sys
-import threading
 
-from PySide6.QtCore import Qt, QCoreApplication, QTimer
+from PySide6.QtCore import Qt, QCoreApplication
 from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import (QApplication, QWidget)
 from PySide6.QtQuick import QQuickWindow, QSGRendererInterface
@@ -21,12 +18,11 @@ myappid = u'mycompany.myproduct.subproduct.version.1' # arbitrary string
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
 class Main(QWidget):
-    
-    consoles = []
-    configuracao = None
-    
+
     def __init__(self, parent=None, new_tab=True):
         super().__init__(parent)
+        self.consoles = []
+        self.configuracao = None
         self.ui = Main_page()
         self.ui.setupUi(self)
         self.dialog_ops = None
@@ -116,54 +112,41 @@ class Main(QWidget):
         tab = self.ui.tabs.widget(index)
         if tabs > 1:
             self.ui.tabs.removeTab(index)
-            tab.implementation.disconnect_signals()
-            tab.implementation.deleteLater()
-            # tab.implementation.ui.deleteLater()
-            # tab.deleteLater()
+            self._dispose_tab(tab)
             QCoreApplication.processEvents()
-            tabs = self.ui.tabs.count()
-            if tabs == 1:
+            if self.ui.tabs.count() == 1:
                 self.ui.tabs.setTabsClosable(False)
-            if "page" in tab.objectName().lower():
-                QTimer.singleShot(1000, lambda: shutil.rmtree(".\\cache\\"+tab.implementation.identification+"\\", ignore_errors=True))
         else:
             self.ui.tabs.setTabsClosable(False)
 
+    @staticmethod
+    def _dispose_tab(tab) -> None:
+        """Desconecta sinais e agenda a remoção de uma aba com segurança."""
+        if not tab:
+            return
+        impl = getattr(tab, "implementation", None)
+        if impl is not None:
+            try:
+                impl.disconnect_signals()
+            except Exception:
+                pass
+            impl.deleteLater()
 
     def closeEvent(self, event):
-        tabs_caches = []
-        count = self.ui.tabs.count()
-        for i in range(count):
-            tabs_caches.append(self.ui.tabs.widget(i).implementation.identification)
-            
-        threading.Thread(target=self.clear_cache, args=(tabs_caches,)).start()
-        
-        count = self.ui.tabs.count()
-        for tab_index in range(count):
-            tab = self.ui.tabs.widget(tab_index)
-            if tab:
-                self.ui.tabs.removeTab(tab_index)
-                tab.implementation.disconnect_signals()
-                tab.implementation.deleteLater()
-                # tab.implementation.ui.deleteLater()
-                # tab.deleteLater()
-                QCoreApplication.processEvents()
+        # Itera de trás para frente: remover por índice crescente pula widgets.
+        for i in reversed(range(self.ui.tabs.count())):
+            tab = self.ui.tabs.widget(i)
+            self.ui.tabs.removeTab(i)
+            self._dispose_tab(tab)
+        QCoreApplication.processEvents()
         for console in self.consoles:
             try:
                 console.close()
-            except Exception as e:
+            except Exception:
                 pass
         self.consoles.clear()
-        # self.ui.deleteLater()
-        # self.deleteLater()
         QCoreApplication.processEvents()
         super().closeEvent(event)
-    
-    def clear_cache(self, caches: list):
-        pastas = os.listdir("./cache")
-        for pasta in pastas:
-            if pasta in caches:
-                shutil.rmtree(".\\cache\\"+pasta, ignore_errors=True)
 
 
 if __name__ == "__main__":

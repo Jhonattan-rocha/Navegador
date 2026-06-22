@@ -1,7 +1,7 @@
 import datetime
 from sqlalchemy import create_engine, Column, Integer, String, DateTime, Boolean
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, scoped_session
 
 Base = declarative_base()
 
@@ -28,11 +28,15 @@ class ConsoleHistoric(Base):
     command = Column(String)
 
 def init_db(db_path='sqlite:///configs/app.db'):
-    engine = create_engine(db_path)
+    # check_same_thread=False + scoped_session: cada thread recebe sua própria
+    # Session (thread-local). Antes era UMA Session global compartilhada entre
+    # threads — origem de travamentos/corrupção intermitentes no SQLite.
+    engine = create_engine(db_path, connect_args={"check_same_thread": False})
     Base.metadata.create_all(engine)
-    Session = sessionmaker(bind=engine)
-    return Session()
+    return scoped_session(sessionmaker(bind=engine))
 
+# `session` é um scoped_session: encaminha .query/.add/.commit/... para a Session
+# da thread atual, então todos os call sites existentes continuam funcionando.
 session = init_db()
 
 def register_download_historic(suggested_file_name: str, folder_path: str, status: str,
@@ -58,6 +62,14 @@ def remove_download_historic_item(download_data: DownloadHistoric, remove_view: 
         layout.removeWidget(widget)
         widget.deleteLater()
         layout.update()
+
+def update_download_status(download_id: int, status: str) -> bool:
+    item = session.query(DownloadHistoric).filter_by(id=download_id).first()
+    if item:
+        item.status = status
+        session.commit()
+        return True
+    return False
 
 def update_historic(site: str, id: int, fav: bool, folder: str="default"):
     historic = session.query(Historic).filter_by(id=id, site=site).first() 

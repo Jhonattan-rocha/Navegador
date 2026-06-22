@@ -66,9 +66,24 @@ CMakeLists.txt.user*
 
 # Python byte code
 *.pyc
+__pycache__/
+
+# Ambientes virtuais
+.venv/
+venv/
+env/
 
 # Binaries
 # --------
 *.dll
 *.exe
+
+# Dados de runtime do navegador (perfil/cache do Chromium) — não versionar
+cache/
+cache_aux/
+cookies/
+
+# Banco de dados local (histórico/downloads/favoritos do usuário)
+*.db
+*.db-journal
 

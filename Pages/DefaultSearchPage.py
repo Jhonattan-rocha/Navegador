@@ -7,7 +7,7 @@ from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import (QGroupBox, QHBoxLayout, QLineEdit, QSizePolicy, QWidget, QLabel)
 from PySide6.QtWidgets import (QPushButton, QLayout, QProgressBar, QVBoxLayout, QToolBar)
 
-from CustomElements.CustomProfile import CustomWebEngineProfile
+from CustomElements.CustomProfile import shared_web_profile
 from CustomElements.DraggableToolBar import DraggableToolBar
 
 
@@ -240,9 +240,11 @@ class DefaultSearchPage(QWidget):
         self.container_tab.addWidget(self.favoritos)
     
         self.webEngineView = QWebEngineView()
-        
+
         self.favoritos.webEngineView = self.webEngineView
-        profile = CustomWebEngineProfile("profile_web", parent=self.webEngineView, cache_path=widget.identification)
+        # Perfil ÚNICO compartilhado por todas as abas/janelas (login/sessão valem
+        # entre abas; sem mais um perfil por aba).
+        profile = shared_web_profile()
         page_web = QWebEnginePage(profile, self.webEngineView)
         page_web.setObjectName("page_web")
         self.webEngineView.setPage(page_web)
