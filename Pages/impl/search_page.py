@@ -45,6 +45,9 @@ class DefaultSearchPageImplementation(QWidget):
         self.identification = str(uuid.uuid4())
         self.ui = DefaultSearchPage()
         self.ui.setup_ui(self)
+        # A navegação agora vive na toolbar da janela; esconde a barra por-aba
+        # para não duplicar URL/botões.
+        self.ui.hot_bar.hide()
         self.main_page = main_page
         self.ui.webEngineView.contextMenuEvent = self.handle_context_menu
         if not self.main_page.dialog_download or not self.main_page.dialog_ops:
@@ -169,17 +172,17 @@ class DefaultSearchPageImplementation(QWidget):
     
     def addfavoritie(self):
         historico = recover_historic(f=self.ui.url.text())
-
+        if not historico:
+            return
         icon_full = historico[0].fav
-        if historico.count() > 0:
-            for site in historico:
-                update_historic(site=site.site, id=site.id, fav=not site.fav)
-            
-            icon_star = QIcon()
-            icon_star.addFile(f"figs/star_{"full" if icon_full else "out"}.png", QSize(), QIcon.Normal, QIcon.Off)
-            
-            self.ui.favoritos_button.setIcon(icon_star)
-            self.ui.favoritos.load_favorities()
+        for site in historico:
+            update_historic(site=site.site, id=site.id, fav=not site.fav)
+
+        icon_star = QIcon()
+        icon_star.addFile(f"figs/star_{'full' if icon_full else 'out'}.png", QSize(), QIcon.Normal, QIcon.Off)
+
+        self.ui.favoritos_button.setIcon(icon_star)
+        self.ui.favoritos.load_favorities()
         
 
     def connect_signals(self):
@@ -276,21 +279,12 @@ class DefaultSearchPageImplementation(QWidget):
 
     # Método para atualizar o estado dos botões de navegação
     def update_navigation_buttons(self):
-        current_page = self.ui.webEngineView.url().toString()
-        current_index = self.sites_visitados.index(current_page) if current_page in self.sites_visitados else -1
-
-        # Verifica se é possível retroceder ou avançar
-        can_go_back = current_index > 0
-        can_go_forward = current_index < len(self.sites_visitados) - 1
-
-        # Desabilita e ajusta visualmente os botões se não for possível retroceder ou avançar
-        self.ui.arrow_left_historic.setEnabled(can_go_back)
-        self.ui.arrow_left_historic.setStyleSheet(
-            "color: rgba(255, 255, 255, 0.5);" if not can_go_back else "")
-
-        self.ui.arrow_right_historic.setEnabled(can_go_forward)
-        self.ui.arrow_right_historic.setStyleSheet(
-            "color: rgba(255, 255, 255, 0.5);" if not can_go_forward else "")
+        # Usa o histórico REAL do QWebEngineView. Antes baseava em uma lista
+        # própria (sites_visitados) que não refletia voltar/avançar de verdade
+        # e ainda sobrescrevia o estilo dos botões.
+        history = self.ui.webEngineView.history()
+        self.ui.arrow_left_historic.setEnabled(history.canGoBack())
+        self.ui.arrow_right_historic.setEnabled(history.canGoForward())
 
     def load_direction_specific_historic(self, direc: str):
         if direc == 'ant':
@@ -371,23 +365,23 @@ class DefaultSearchPageImplementation(QWidget):
     def update_url(self, url_c) -> None:
         url = url_c.toString()
         data = datetime.datetime.now()
-        his = recover_historic(f=url, limit=10)
-        if not his.count() > 0:
-            register_historic(url, self.ui.webEngineView.title(), data)
-        
+        # register_historic agora é idempotente e devolve o registro (cria ou
+        # atualiza). Isso evita duplicatas e o IndexError de antes (his[0] quando
+        # a URL era nova e a lista vinha vazia).
+        registro = register_historic(url, self.ui.webEngineView.title(), data)
+        fav = bool(registro and registro.fav)
+
         icon_star = QIcon()
-        icon_star.addFile(f"figs/star_{"full" if his[0].fav else "out"}.png", QSize(), QIcon.Normal, QIcon.Off)
-        
+        icon_star.addFile(f"figs/star_{'full' if fav else 'out'}.png", QSize(), QIcon.Normal, QIcon.Off)
         self.ui.favoritos_button.setIcon(icon_star)
-        
-        page = self.ui.webEngineView.url().toString()
-        if page not in self.sites_visitados:
-            self.sites_visitados.append(page)
 
         self.ui.url.setText(url)
         self.ui.url.setCursorPosition(0)
         self.update_navigation_buttons()
         self.ui.favoritos.load_favorities()
+        # Mantém a toolbar da janela em sincronia com esta aba (se for a atual).
+        if hasattr(self.main_page, "sync_toolbar"):
+            self.main_page.sync_toolbar(self)
 
     def limit_string(self, text: str, limit: int) -> str:
         if len(text) > limit:
@@ -452,7 +446,11 @@ class DefaultSearchPageImplementation(QWidget):
             web_loader.load(QUrl.fromLocalFile(search_text.replace('file:///', "")))
             return
 
-        search_url = "https://www.google.com/search?q=" + search_text.replace(" ", "+")
+        from urllib.parse import quote_plus
+        template = settings_app.value("GeneralSettings/SearchEngine",
+                                      defaultValue="https://www.google.com/search?q={}", type=str)
+        query = quote_plus(search_text)
+        search_url = template.format(query) if "{}" in template else template + query
 
         web_loader.load(QUrl(search_url))
 

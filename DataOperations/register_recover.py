@@ -49,11 +49,21 @@ def register_download_historic(suggested_file_name: str, folder_path: str, statu
     session.commit()
     return download_historic
 
-def recover_download_historic(f: str = "", limit: int=20, order_desc=False):
+def recover_download_historic(f: str = "", limit: int = 20, order_desc=False, offset: int = 0):
+    # Sempre retorna LISTA, sempre ordenada (por data), com limit/offset aplicados
+    # de forma consistente (antes: lista sem ordem quando f vazio, Query quando
+    # filtrado — o que ainda quebrava paginação e `if bool(...)`).
+    query = session.query(DownloadHistoric)
     if f:
-        return session.query(DownloadHistoric).filter(DownloadHistoric.folder_path.like(f'%{f}%') | 
-                                                      DownloadHistoric.suggested_file_name.like(f'%{f}%')).order_by(DownloadHistoric.folder_path.desc() if order_desc else DownloadHistoric.folder_path.asc()).limit(limit)
-    return session.query(DownloadHistoric).all()
+        query = query.filter(DownloadHistoric.folder_path.like(f'%{f}%') |
+                             DownloadHistoric.suggested_file_name.like(f'%{f}%'))
+    col = DownloadHistoric.download_time
+    query = query.order_by(col.desc() if order_desc else col.asc())
+    if offset:
+        query = query.offset(offset)
+    if limit is not None:
+        query = query.limit(limit)
+    return query.all()
 
 def remove_download_historic_item(download_data: DownloadHistoric, remove_view: bool = False, widget=None, layout=None):
     session.query(DownloadHistoric).filter_by(id=download_data.id).delete()
@@ -81,17 +91,38 @@ def update_historic(site: str, id: int, fav: bool, folder: str="default"):
     return False
 
 def register_historic(site: str, name: str, download_time: datetime.datetime, fav: bool=False, folder: str="default"):
+    # Idempotente: se o site já existe, atualiza a visita/título em vez de criar
+    # uma nova linha (antes, cada navegação podia duplicar o histórico).
+    existing = session.query(Historic).filter_by(site=site).first()
+    if existing:
+        existing.download_time = download_time
+        if name:
+            existing.name = name
+        session.commit()
+        return existing
     historic = Historic(site=site, name=name, fav=fav, download_time=download_time, folder=folder)
     session.add(historic)
     session.commit()
+    return historic
 
-def recover_historic(f: str = "", limit: int=20, order_desc=False):
+def recover_historic(f: str = "", limit: int = 20, order_desc=False, offset: int = 0):
+    query = session.query(Historic)
     if f:
-        return session.query(Historic).filter(Historic.site.like(f'%{f}%')).order_by(Historic.site.desc() if order_desc else Historic.site.asc()).limit(limit)
-    return session.query(Historic).all()
+        query = query.filter(Historic.site.like(f'%{f}%'))
+    col = Historic.download_time
+    query = query.order_by(col.desc() if order_desc else col.asc())
+    if offset:
+        query = query.offset(offset)
+    if limit is not None:
+        query = query.limit(limit)
+    return query.all()
 
-def recover_favorities(limit: int=20, order_desc=False):
-    return session.query(Historic).filter(Historic.fav == True).order_by(Historic.site.desc() if order_desc else Historic.site.asc()).limit(limit)
+def recover_favorities(limit: int = 20, order_desc=False):
+    query = session.query(Historic).filter(Historic.fav == True).order_by(
+        Historic.site.desc() if order_desc else Historic.site.asc())
+    if limit is not None:
+        query = query.limit(limit)
+    return query.all()
 
 def remove_historic_item(id: int, widget=None, layout=None, remove_view=True):
     session.query(Historic).filter_by(id=id).delete()
@@ -107,13 +138,18 @@ def register_console_historic(command: str):
     session.commit()
 
 def recover_console_historic(command: str, prev_next: str):
+    # Guardas contra None: antes fazia .first().command direto e estourava
+    # AttributeError quando não havia linha correspondente.
     if not command:
-        return session.query(ConsoleHistoric).order_by(ConsoleHistoric.id.desc()).first().command
+        row = session.query(ConsoleHistoric).order_by(ConsoleHistoric.id.desc()).first()
+        return row.command if row else ""
     query = session.query(ConsoleHistoric)
     if prev_next == "prev":
-        return query.filter(ConsoleHistoric.command < command).order_by(ConsoleHistoric.command.desc()).first().command
+        row = query.filter(ConsoleHistoric.command < command).order_by(ConsoleHistoric.command.desc()).first()
+        return row.command if row else command
     elif prev_next == "next":
-        return query.filter(ConsoleHistoric.command > command).order_by(ConsoleHistoric.command.asc()).first().command
+        row = query.filter(ConsoleHistoric.command > command).order_by(ConsoleHistoric.command.asc()).first()
+        return row.command if row else command
     return ""
 
 def remove_console_historic(command: str):

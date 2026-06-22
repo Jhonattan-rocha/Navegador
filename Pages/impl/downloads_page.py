@@ -43,9 +43,9 @@ class DownloadImplementation(QWidget):
         self.ui.setup_ui(self)
         self.ui.arrow_left_back.hide()
         self.main_page = main_page
-        self.load_download_historic(limit=10)
         self.loaded_items = 0
-        self.items_per_load = 10  # Número de itens a serem carregados a cada vez
+        self.items_per_load = 10  # Número de itens carregados a cada scroll
+        self.load_download_historic(limit=10)
         self.connect_signals()
         
     def connect_signals(self):
@@ -57,13 +57,11 @@ class DownloadImplementation(QWidget):
         self.ui.search_input.textChanged.disconnect()
     
     def load_more_items(self, f: str = ""):
-        downloads = recover_download_historic(f=f, order_desc=True)
-        items_to_load = downloads[self.loaded_items:self.loaded_items + self.items_per_load]
-
-        for download_data in items_to_load:
+        downloads = recover_download_historic(f=f, order_desc=True,
+                                              offset=self.loaded_items, limit=self.items_per_load)
+        for download_data in downloads:
             DownloadImplementation.add_download_history(main_page=self, download_data=download_data)
-
-        self.loaded_items += self.items_per_load
+        self.loaded_items += len(downloads)
 
     def scroll_event(self):
         scrollbar = self.ui.scrollAreaDownloads.verticalScrollBar()
@@ -77,14 +75,11 @@ class DownloadImplementation(QWidget):
             if child.widget():
                 child.widget().deleteLater()
         QCoreApplication.processEvents()
+        self.items_per_load = max(limit, 1)
         history = recover_download_historic(f=f, limit=limit, order_desc=True)
-
-        self.loaded_items = 0
-        self.items_per_load = 10
-
-        if bool(history):
-            for download in history:
-                DownloadImplementation.add_download_history(main_page=self, download_data=download)
+        self.loaded_items = len(history)
+        for download in history:
+            DownloadImplementation.add_download_history(main_page=self, download_data=download)
 
     @staticmethod
     def add_download_history(main_page, download_data):

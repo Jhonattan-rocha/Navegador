@@ -9,6 +9,7 @@ from PySide6.QtWidgets import (QPushButton, QLayout, QProgressBar, QVBoxLayout, 
 
 from CustomElements.CustomProfile import shared_web_profile
 from CustomElements.DraggableToolBar import DraggableToolBar
+from configs.Config import settings_app
 
 
 class DefaultSearchPage(QWidget):
@@ -253,6 +254,8 @@ class DefaultSearchPage(QWidget):
         self.webEngineView.setMinimumSize(QSize(0, 0))
         self.webEngineView.setMaximumSize(QSize(16777215, 16777215))
         self.webEngineView.loadProgress.connect(self.update_progress)
-        self.webEngineView.load("https://www.google.com/")
+        home = settings_app.value("GeneralSettings/HomePage",
+                                  defaultValue="https://www.google.com/", type=str)
+        self.webEngineView.load(QUrl(home))
         self.container_tab.addWidget(self.webEngineView)
         self.container.addWidget(self.page)

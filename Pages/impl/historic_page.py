@@ -43,12 +43,11 @@ class HistoricoImplementation(QWidget):
         self.ui.setup_ui(self)
         self.ui.arrow_left_back_historic.hide()
         self.main_page = main_page
+        self.loaded_items = 0
+        self.items_per_load = 10  # Número de itens carregados a cada scroll
         self.load_historic(10)
         self.connect_signals()
-        self.loaded_items = 0
-        self.items_per_load = 10  # Número de itens a serem carregados a cada vez
 
-        
     def connect_signals(self):
         self.ui.scrollAreaHistoric.verticalScrollBar().valueChanged.connect(self.scroll_event)
         self.ui.search_input.textChanged.connect(lambda txt: self.load_historic(10, txt))
@@ -57,14 +56,14 @@ class HistoricoImplementation(QWidget):
         self.ui.scrollAreaHistoric.verticalScrollBar().valueChanged.disconnect()
         self.ui.search_input.textChanged.disconnect()
     
-    def load_more_items(self, f: str):
-        history = recover_historic(f=f, order_desc=True)
-        items_to_load = history[self.loaded_items:self.loaded_items + self.items_per_load]
-
-        for his in items_to_load:
+    def load_more_items(self, f: str = ""):
+        # Paginação por OFFSET no banco (antes buscava tudo e fatiava, e o
+        # load_historic reiniciava loaded_items=0, recarregando os 10 primeiros).
+        history = recover_historic(f=f, order_desc=True,
+                                   offset=self.loaded_items, limit=self.items_per_load)
+        for his in history:
             self.add_historic_item(historic_data=his)
-
-        self.loaded_items += self.items_per_load
+        self.loaded_items += len(history)
 
     def scroll_event(self):
         scrollbar = self.ui.scrollAreaHistoric.verticalScrollBar()
@@ -78,14 +77,11 @@ class HistoricoImplementation(QWidget):
             if child.widget():
                 child.widget().deleteLater()
         QCoreApplication.processEvents()
+        self.items_per_load = max(limit, 1)
         history = recover_historic(f=f, order_desc=True, limit=limit)
-
-        self.loaded_items = 0
-        self.items_per_load = 10
-
-        if bool(history):
-            for his in history:
-                self.add_historic_item(historic_data=his)
+        self.loaded_items = len(history)
+        for his in history:
+            self.add_historic_item(historic_data=his)
 
 
     def open_historic_site(self, site):
