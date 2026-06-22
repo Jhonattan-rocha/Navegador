@@ -128,9 +128,19 @@ class DefaultSearchPageImplementation(QWidget):
         custom_action_add_config_page = default_menu.addAction("Config Page...")
         custom_action_add_config_page.triggered.disconnect()
         custom_action_add_config_page.triggered.connect(lambda args: ShortcutManager().shortcuts["Ctrl+Shift+c"].activated.emit())
-        
+
+        # Fallback para conteúdo que este build não toca (H.264/DRM): abrir a
+        # página no navegador padrão do sistema (Chrome/Edge).
+        custom_action_open_external = default_menu.addAction("Abrir no navegador padrão...")
+        custom_action_open_external.triggered.connect(lambda: self.open_in_external_browser())
+
         # Exibindo o menu de contexto modificado
         default_menu.exec(event.globalPos())
+
+    def open_in_external_browser(self):
+        url = self.ui.webEngineView.url()
+        if url.isValid() and not url.isEmpty():
+            QDesktopServices.openUrl(url)
     
     def realod_tab(self):
         tab = DefaultSearchPageImplementation(self.main_page.ui.tabs, self.main_page)

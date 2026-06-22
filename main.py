@@ -1,6 +1,11 @@
 # This Python file uses the following encoding: utf-8
 import sys
 
+# DEVE vir antes de qualquer import do QtWebEngine: ajusta flags do Chromium
+# (ex.: caminho do Widevine CDM) que são lidas na inicialização do motor.
+from configs.media_env import configure_media_env
+configure_media_env()
+
 from PySide6.QtCore import Qt, QCoreApplication
 from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import (QApplication, QWidget)
